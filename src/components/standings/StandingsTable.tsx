@@ -4,6 +4,7 @@ import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { PositionsGained } from "@/components/domain/PositionsGained";
+import { podiumChipClass, podiumRowClass } from "@/components/domain/podium";
 
 type StandingsTableProps = {
   standings: SeasonStandings;
@@ -51,7 +52,7 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
         {shown.map((row) => {
           const driver = drivers.get(row.userId);
           return (
-            <Tr key={row.userId}>
+            <Tr key={row.userId} className={podiumRowClass(row.rank)}>
               <Td align="center">
                 <PositionBadge position={row.rank} size="sm" />
               </Td>
@@ -88,7 +89,12 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
                           <span className="text-xs font-bold text-danger">RET</span>
                         ) : (
                           <span
-                            className={cn("font-semibold", position <= 3 && "font-display text-base italic")}
+                            className={cn(
+                              "font-semibold",
+                              position <= 3 &&
+                                "inline-block min-w-8 -skew-x-12 px-1.5 font-display text-sm font-bold italic",
+                              podiumChipClass(position),
+                            )}
                             title={`${row.pointsByRace[race.id]} pts`}
                           >
                             {position}º

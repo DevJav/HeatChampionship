@@ -3,6 +3,7 @@ import { positionsGained } from "@/lib/scoring";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
+import { podiumRowClass } from "@/components/domain/podium";
 import { PositionsGained } from "@/components/domain/PositionsGained";
 
 /** Timing-tower style classification of a race. The stripe by each name shows the car color. */
@@ -25,7 +26,7 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
       </THead>
       <TBody>
         {results.map((result) => (
-          <Tr key={result.id}>
+          <Tr key={result.id} className={podiumRowClass(result.position)}>
             <Td align="center">
               <PositionBadge position={result.position} size="sm" />
             </Td>

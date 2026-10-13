@@ -19,6 +19,7 @@ export { Container, PageHeader, Section } from "./Layout";
 export { LinkTabs } from "./LinkTabs";
 export type { LinkTabItem } from "./LinkTabs";
 export { Modal } from "./Modal";
+export { SegmentDisplay } from "./SegmentDisplay";
 export { Skeleton } from "./Skeleton";
 export { Spinner } from "./Spinner";
 export { StatCard } from "./StatCard";

@@ -76,6 +76,15 @@
   --diverging-neg-2: #e06e68;
   --diverging-neg-3: #b43b3a;
 
+  /* LED countdown board (seven-segment digits) */
+  --led-on: #ff2b1c;
+  --led-off: #1a0605;
+  --led-glow: rgb(255 43 28 / 0.55);
+  --led-panel: #050505;
+  --led-frame: #3d4045;
+  --led-frame-dark: #24262a;
+  --led-label: #f4f4f5;
+
   /* Focus: outer ring for unclipped elements, inset ring for slanted ones */
   --ring: #d10500;
   --ring-contrast: #111214;

@@ -6,7 +6,9 @@ import { cn } from "@/lib/cn";
  * gold/silver/bronze, the rest dark like a broadcast bar, retirements red.
  */
 const positionVariants = cva(
-  "inline-flex shrink-0 items-center justify-center clip-slant gloss font-display font-bold italic leading-none tabular-nums",
+  // Optical centering: digits sit low in the line box (room for descenders) and
+  // italics lean right, so nudge the text up and left in proportion to its size
+  "inline-flex shrink-0 items-center justify-center clip-slant gloss pr-[0.14em] pb-[0.1em] font-display font-bold italic leading-none tabular-nums",
   {
     variants: {
       place: {

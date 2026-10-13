@@ -271,7 +271,6 @@ export default function UiKitPage() {
                   Pos.
                 </Th>
                 <Th>Piloto</Th>
-                <Th>Coche</Th>
                 <Th align="right">Pts</Th>
               </tr>
             </THead>
@@ -283,9 +282,6 @@ export default function UiKitPage() {
                   </Td>
                   <Td>
                     <DriverName name={r.name} color={r.color.hex} />
-                  </Td>
-                  <Td>
-                    <CarColorChip {...r.color} />
                   </Td>
                   <Td align="right" className="font-display text-base font-bold italic">
                     {r.pts}

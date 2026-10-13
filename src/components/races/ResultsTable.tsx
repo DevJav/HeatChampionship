@@ -1,15 +1,13 @@
 import type { RaceResultDetail } from "@/lib/data/results";
 import { positionsGained } from "@/lib/scoring";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
-import { CarColorChip } from "@/components/domain/CarColorChip";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { PositionsGained } from "@/components/domain/PositionsGained";
 
-/** Timing-tower style classification of a race. */
+/** Timing-tower style classification of a race. The stripe by each name shows the car color. */
 export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
   const showGrid = results.some((r) => r.startPosition != null);
-  const showCars = results.some((r) => r.carColor);
   const showUpgrades = results.some((r) => r.upgrades.length > 0);
 
   return (
@@ -21,8 +19,6 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
           </Th>
           <Th>Piloto</Th>
           {showGrid && <Th align="center">Salida</Th>}
-          {/* On phones the stripe next to the name already shows the car color */}
-          {showCars && <Th className="max-sm:hidden">Coche</Th>}
           {showUpgrades && <Th className="max-md:hidden">Mejoras</Th>}
           <Th align="right">Pts</Th>
         </tr>
@@ -46,7 +42,6 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
                 <PositionsGained value={positionsGained(result.startPosition, result.position)} />
               </Td>
             )}
-            {showCars && <Td className="max-sm:hidden">{result.carColor ? <CarColorChip {...result.carColor} /> : "—"}</Td>}
             {showUpgrades && (
               <Td className="text-sm text-fg-muted max-md:hidden">{result.upgrades.map((u) => u.upgrade.name).join(", ") || "—"}</Td>
             )}

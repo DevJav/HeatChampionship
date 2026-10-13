@@ -1,0 +1,129 @@
+/*
+ * Design tokens — the single source of truth for the look of the site.
+ *
+ * Retro F1 broadcast style (circa 2012): dark glossy bars, red accents,
+ * slanted buttons/tags, panels with a cut corner, carbon texture.
+ *
+ * Change a value here and every component picks it up. Components never use
+ * raw colors; they use the semantic classes mapped in globals.css
+ * (bg-surface, text-fg-muted, bg-primary, surface-bar, clip-slant, …).
+ *
+ * Dark is the default theme (:root). The light theme overrides it via
+ * [data-theme="light"], which ThemeScript sets from the stored choice.
+ */
+
+:root {
+  /* Page */
+  --background: #0d0e11;
+  --texture:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.018) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.35) 0 2px, transparent 2px 4px);
+
+  /* Panels (cards, tables, inputs) */
+  --surface: #1a1b1f;
+  --surface-2: #25272c;
+  --surface-gradient: linear-gradient(180deg, #24262b 0%, #17181c 100%);
+  --border: #2f3137;
+  --border-strong: #474a52;
+
+  /* Broadcast bar — header, card headers, table heads. Dark in both themes. */
+  --bar: #08090a;
+  --bar-gradient: linear-gradient(180deg, #2c2d32 0%, #111214 50%, #000 100%);
+  --bar-fg: #ffffff;
+
+  /* Glossy highlight on top edge of panels and buttons */
+  --gloss: inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --gloss-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.2) 0%, rgb(255 255 255 / 0) 55%);
+
+  /* Text */
+  --fg: #f4f4f5;
+  --fg-muted: #a3a5ad;
+  --fg-subtle: #70737c;
+
+  /* Brand */
+  --primary: #e10600;
+  --primary-hover: #ff2a1f;
+  --primary-fg: #ffffff;
+  --accent: #ffc20e;
+  --accent-hover: #ffd447;
+  --accent-fg: #111214;
+
+  /* Status */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ff4d4d; /* text & tints */
+  --danger-solid: #c81e1e; /* filled backgrounds with white text */
+  --danger-solid-hover: #e02424;
+  --info: #38bdf8;
+
+  /* Podium */
+  --gold: #f5c518;
+  --silver: #c8ccd2;
+  --bronze: #cd7f32;
+
+  /* Focus: outer ring for unclipped elements, inset ring for slanted ones */
+  --ring: #ff2a1f;
+  --ring-contrast: #ffffff;
+
+  /* Shape — set --slant / --chamfer to 0 for a plain rectangular look */
+  --slant: 0.5rem;
+  --chamfer: 0.875rem;
+  --control-radius: 0;
+  --card-radius: 0;
+  --pill-radius: 9999px;
+
+  /* Typography — font files are loaded with next/font in app/layout.tsx */
+  --font-heading: var(--font-body);
+
+  /* Elevation */
+  --overlay-shadow: 0 16px 40px rgb(0 0 0 / 0.65);
+
+  /* Layout */
+  --page-max-width: 72rem;
+  --header-height: 4rem;
+
+  color-scheme: dark;
+}
+
+/* Light theme */
+:root[data-theme="light"] {
+  --background: #e4e5e8;
+  --texture:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.5) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.03) 0 2px, transparent 2px 4px);
+
+  --surface: #f8f8f9;
+  --surface-2: #ecedf0;
+  --surface-gradient: linear-gradient(180deg, #ffffff 0%, #eef0f2 100%);
+  --border: #d4d6db;
+  --border-strong: #b4b7be;
+
+  --gloss: inset 0 1px 0 rgb(255 255 255 / 0.9);
+
+  --fg: #111214;
+  --fg-muted: #4b4e56;
+  --fg-subtle: #6f727b;
+
+  --primary: #d10500;
+  --primary-hover: #b00400;
+  --accent: #f2a900;
+  --accent-hover: #d99800;
+
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #c81e1e;
+  --danger-solid: #c81e1e;
+  --danger-solid-hover: #a51818;
+  --info: #0369a1;
+
+  --gold: #d4a017;
+  --silver: #9ca3af;
+  --bronze: #b0703c;
+
+  --ring: #d10500;
+  --ring-contrast: #111214;
+
+  --overlay-shadow: 0 16px 40px rgb(0 0 0 / 0.25);
+
+  color-scheme: light;
+}

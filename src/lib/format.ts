@@ -20,3 +20,11 @@ export const formatDate = (date: Date) => dateFormat.format(date);
 export const formatDateTime = (date: Date) => dateTimeFormat.format(date);
 /** "13 oct" */
 export const formatShortDate = (date: Date) => shortDateFormat.format(date);
+
+const decimalFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+const signedFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1, signDisplay: "exceptZero" });
+
+/** "2,5" */
+export const formatDecimal = (value: number) => decimalFormat.format(value);
+/** "+1,5" / "−0,5" / "0" */
+export const formatSigned = (value: number) => signedFormat.format(value);

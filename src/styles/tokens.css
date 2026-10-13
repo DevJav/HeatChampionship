@@ -58,6 +58,15 @@
   --silver: #9ca3af;
   --bronze: #b0703c;
 
+  /* Charts — categorical slots validated (CVD + contrast) on --surface as a set
+     of three; beyond the top three, drivers fall back to the muted gray */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-muted: #c3c5cb;
+  --chart-grid: #e1e2e6;
+  --chart-axis: #b4b7be;
+
   /* Focus: outer ring for unclipped elements, inset ring for slanted ones */
   --ring: #d10500;
   --ring-contrast: #111214;

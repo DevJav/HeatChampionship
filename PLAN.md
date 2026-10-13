@@ -33,6 +33,6 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
   - Upgrade cards not seeded yet: names depend on the edition — add them once the admin catalog UI exists
 - [x] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline; admin catalogs (seasons, tracks, upgrades, colors); Vitest
 - [x] **4. Results + scoring** — results editor (positions, grid, car, upgrades, notes) with live points, `scoreRace()` + sheet validation with tests, podium/results on the race page, photo uploads, season re-scoring
-- [ ] **5. Standings, race pages, profiles**
+- [x] **5. Standings, race pages, profiles** — standings with countback, movement and points chart; players list; profiles with stats/form/history; profile editing (name, bio, color, avatar, password); home standings + last race
 - [ ] **6. Statistics** — `lib/stats` with tests, charts
 - [ ] **7. Deployment** — Dockerfile, compose, persistent volume, backup script

@@ -88,3 +88,13 @@ export async function nextRoundNumber(seasonId: string) {
   });
   return (last?.round ?? 0) + 1;
 }
+
+/** The most recently finished race (for the home page). */
+export async function getLastFinishedRace() {
+  await connection();
+  return db.race.findFirst({
+    where: { status: "FINISHED" },
+    orderBy: { scheduledAt: "desc" },
+    include: { track: true, season: { select: { name: true } } },
+  });
+}

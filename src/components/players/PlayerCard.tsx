@@ -1,0 +1,51 @@
+import Link from "next/link";
+import { summarizePlayer, type PlayerResult } from "@/lib/player-stats";
+import { Avatar, Card } from "@/components/ui";
+import { FormStrip } from "./FormStrip";
+
+type PlayerCardProps = {
+  player: {
+    name: string;
+    username: string | null;
+    image: string | null;
+    favoriteColor: { hex: string } | null;
+  };
+  results: PlayerResult[];
+};
+
+/** Driver card for the players list: identity, career numbers and recent form. */
+export function PlayerCard({ player, results }: PlayerCardProps) {
+  const summary = summarizePlayer(results, 3);
+  const stats = [
+    { label: "Carreras", value: summary.starts },
+    { label: "Victorias", value: summary.wins },
+    { label: "Podios", value: summary.podiums },
+    { label: "Puntos", value: summary.points },
+  ];
+
+  return (
+    <Card className="transition-transform hover:-translate-y-0.5">
+      <Link href={`/pilotos/${player.username}`} className="flex flex-1 flex-col gap-4 p-5">
+        <div className="flex items-center gap-4">
+          <Avatar name={player.name} src={player.image} color={player.favoriteColor?.hex} size="lg" />
+          <div className="min-w-0">
+            <h3 className="truncate pr-1 text-2xl">{player.name}</h3>
+            <p className="text-sm text-fg-muted">@{player.username}</p>
+          </div>
+        </div>
+        <dl className="grid grid-cols-4 gap-2 border-t border-border pt-3 text-center">
+          {stats.map((stat) => (
+            <div key={stat.label}>
+              <dt className="text-[10px] font-bold uppercase tracking-wider text-fg-subtle">{stat.label}</dt>
+              <dd className="font-display text-2xl font-bold italic">{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Forma</span>
+          <FormStrip form={summary.form} />
+        </div>
+      </Link>
+    </Card>
+  );
+}

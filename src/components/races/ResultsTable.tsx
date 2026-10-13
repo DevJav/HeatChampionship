@@ -32,6 +32,7 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
             <Td>
               <DriverName
                 name={result.user.name}
+                username={result.user.username}
                 color={result.carColor?.hex ?? result.user.favoriteColor?.hex}
                 detail={result.notes}
               />

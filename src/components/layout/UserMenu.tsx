@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogIn, LogOut, Shield } from "lucide-react";
+import { LogIn, LogOut, Shield, UserRound } from "lucide-react";
 import { signOut } from "@/actions/auth";
 import { Avatar, Button, ButtonLink, Skeleton } from "@/components/ui";
 import { getCurrentUser, isAdmin } from "@/lib/session";
@@ -35,12 +35,16 @@ export async function UserMenu() {
           <Shield />
         </ButtonLink>
       )}
-      <span className="flex items-center gap-2 px-2 text-bar-fg">
+      <Link
+        href={`/pilotos/${user.username}`}
+        title="Mi perfil"
+        className="flex items-center gap-2 px-2 text-bar-fg hover:text-bar-fg/80"
+      >
         <Avatar name={user.name} src={user.image} size="sm" />
         <span className="hidden font-display font-bold uppercase italic tracking-wide xl:inline">
           {user.name}
         </span>
-      </span>
+      </Link>
       <form action={signOut} className="max-sm:hidden">
         <Button type="submit" variant="inverse" size="icon" aria-label="Salir" title="Salir">
           <LogOut />
@@ -57,6 +61,9 @@ export async function MobileUserLinks() {
 
   return (
     <div className="flex flex-col gap-1">
+      <Link href="/perfil" className={navItemClass()}>
+        <UserRound /> Mi perfil
+      </Link>
       {isAdmin(user) && (
         <Link href="/admin" className={navItemClass()}>
           <Shield /> Administración

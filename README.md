@@ -41,6 +41,10 @@ Everything is managed from `/admin` (shield icon in the header):
 
 **Photos:** the race's drivers (and admins) can upload photos once the race has started. They're resized to WebP (max 2000px, plus a thumbnail) and stored in `data/uploads/`, which you can change with `UPLOAD_DIR`. Back up the whole `data/` folder to keep both the database and the photos.
 
+**Standings:** `/clasificacion` ranks drivers by points, breaking ties by countback (most wins, then most 2nd places, and so on). It also shows ▲▼ movement since the previous race, each round's result, and a points-progression chart that highlights the top three. Use `?temporada=` to see past seasons.
+
+**Players:** `/pilotos` lists every driver with their career numbers. Each driver has a profile with stats, recent form, best track and race history. Players edit their own name, bio, favorite color, photo and password at `/perfil` (header avatar → "Editar perfil", or "Mi perfil" in the mobile menu).
+
 **Sign-ups:** seats go in sign-up order. Once a race is full, new players join the waitlist. When someone withdraws, the first person on the waitlist moves into the seat automatically. A player who withdraws and signs up again goes to the back of the queue. Players can withdraw until the race starts.
 
 All dates are entered and shown in Madrid time (`siteConfig.timeZone`), whatever time zone the server runs in.
@@ -63,7 +67,9 @@ src/
     domain/            Heat-specific pieces built from ui/: PositionBadge, CarColorChip, …
     layout/            Header, footer, navigation, user menu
     auth/              Login / sign-up forms
-    races/             Race card, entry list, sign-up panel
+    races/             Race card, entry list, sign-up panel, podium, results
+    standings/         Standings table, points chart, season picker
+    players/           Player card, profile pieces, profile forms
     admin/             Admin forms and helpers
     forms/             Form fields wired to server-action state (errors, echoed values)
   config/site.ts       Site name, navigation, locale & time zone, max players per race
@@ -75,7 +81,9 @@ src/
     forms.ts           FormState, parseForm() and zod field helpers
     registration-rules.ts  Seat/waitlist rules (pure, unit-tested);  registrations.ts — DB operations
     scoring.ts, results-rules.ts  Points and results-sheet validation (pure, unit-tested);  results.ts — DB operations
-    uploads.ts         Photo storage (sharp → WebP) served by app/media/[...path]
+    uploads.ts         Photo & avatar storage (sharp → WebP) served by app/media/[...path]
+    standings.ts, player-stats.ts  Standings with countback, points progression, player summaries (pure, unit-tested)
+    colors.ts          Readable text / outline for user-chosen colors
   styles/tokens.css    Design tokens — colors, radii, shadows, layout sizes
 ```
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { needsOutline } from "@/lib/colors";
 
@@ -5,13 +6,16 @@ type DriverNameProps = {
   name: string;
   /** Car color for the team stripe; neutral stripe when unknown */
   color?: string | null;
+  /** Links the name to the driver's profile */
+  username?: string | null;
   /** Secondary line under the name, e.g. a race note */
   detail?: React.ReactNode;
   className?: string;
 };
 
 /** Broadcast-style driver label: car-color stripe + name in caps. */
-export function DriverName({ name, color, detail, className }: DriverNameProps) {
+export function DriverName({ name, color, username, detail, className }: DriverNameProps) {
+  const label = <span className="truncate pr-1 font-display text-base font-bold uppercase tracking-wide">{name}</span>;
   return (
     <span className={cn("inline-flex min-w-0 items-center gap-2.5", className)}>
       <span
@@ -23,7 +27,13 @@ export function DriverName({ name, color, detail, className }: DriverNameProps) 
         style={color ? { backgroundColor: color } : undefined}
       />
       <span className="flex min-w-0 flex-col">
-        <span className="truncate pr-1 font-display text-base font-bold uppercase tracking-wide">{name}</span>
+        {username ? (
+          <Link href={`/pilotos/${username}`} className="flex min-w-0 hover:text-primary hover:underline">
+            {label}
+          </Link>
+        ) : (
+          label
+        )}
         {detail && <span className="text-xs font-normal text-fg-muted italic">{detail}</span>}
       </span>
     </span>

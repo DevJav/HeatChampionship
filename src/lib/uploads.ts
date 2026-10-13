@@ -7,7 +7,10 @@ import sharp from "sharp";
  * Uploaded photos live on disk next to the database (data/uploads by default)
  * and are served by app/media/[...path]/route.ts. Back up data/ to keep both.
  */
-export const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR ?? path.join(process.cwd(), "data", "uploads"));
+// turbopackIgnore: runtime data, not part of the build (otherwise the whole project gets traced)
+export const UPLOAD_DIR = path.resolve(
+  /*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "uploads"),
+);
 
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 export const MAX_FILES_PER_UPLOAD = 10;
@@ -56,6 +59,39 @@ export async function storeRacePhoto(raceId: string, file: File) {
   }
 
   return storedPath;
+}
+
+/** Store a profile picture as a 256px square WebP. Returns the path relative to UPLOAD_DIR. */
+export async function storeAvatar(userId: string, file: File) {
+  if (!file.type.startsWith("image/")) throw new UploadError("El archivo no es una imagen.");
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("La imagen pesa más de 15 MB.");
+
+  const storedPath = path.posix.join("users", userId, `${randomUUID()}.webp`);
+  const absolute = resolveUpload(storedPath);
+  if (!absolute) throw new UploadError("Ruta no válida.");
+  await mkdir(path.dirname(absolute), { recursive: true });
+
+  try {
+    const avatar = await sharp(Buffer.from(await file.arrayBuffer()))
+      .rotate()
+      .resize(256, 256, { fit: "cover" })
+      .webp({ quality: 85 })
+      .toBuffer();
+    await writeFile(absolute, avatar);
+  } catch {
+    throw new UploadError("No se pudo procesar la imagen.");
+  }
+  return storedPath;
+}
+
+/** "/media/users/…/x.webp" → "users/…/x.webp" (only for files we stored). */
+export function storedPathFromUrl(url: string | null | undefined) {
+  return url?.startsWith("/media/") ? url.slice("/media/".length) : null;
+}
+
+export async function deleteStoredFile(storedPath: string) {
+  const absolute = resolveUpload(storedPath);
+  if (absolute) await rm(absolute, { force: true });
 }
 
 export async function deleteStoredPhoto(storedPath: string) {

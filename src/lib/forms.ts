@@ -6,6 +6,8 @@ import { z } from "zod";
  */
 export type FormState = {
   error?: string;
+  /** Success notice (for forms that stay on the page) */
+  message?: string;
   fieldErrors?: Record<string, string>;
   values?: Record<string, string>;
 };

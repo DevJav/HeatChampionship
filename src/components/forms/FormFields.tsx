@@ -125,6 +125,7 @@ export function FormLayout({ state, submitLabel, cancelHref, children }: FormLay
   return (
     <div className="flex flex-col gap-5">
       {state.error && <Alert tone="danger">{state.error}</Alert>}
+      {state.message && <Alert tone="success">{state.message}</Alert>}
       <div key={key} className="grid gap-4 md:grid-cols-2">
         {children}
       </div>

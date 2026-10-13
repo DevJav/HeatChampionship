@@ -1,20 +1,10 @@
 import { Suspense } from "react";
 import { CalendarDays, Trophy } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import {
-  Badge,
-  ButtonLink,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  ChequeredStrip,
-  Container,
-  EmptyState,
-  Skeleton,
-  SpeedStripes,
-} from "@/components/ui";
+import { Badge, ButtonLink, ChequeredStrip, Container, Skeleton, SpeedStripes } from "@/components/ui";
+import { LastRaceCard } from "@/components/races/LastRaceCard";
 import { NextRaceCard } from "@/components/races/NextRaceCard";
+import { HomeStandings } from "@/components/standings/HomeStandings";
 
 export default function HomePage() {
   return (
@@ -41,19 +31,14 @@ export default function HomePage() {
         <Suspense fallback={<Skeleton className="h-72 w-full" />}>
           <NextRaceCard />
         </Suspense>
-        <Card>
-          <CardHeader>
-            <CardTitle>Clasificación</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <EmptyState
-              icon={<Trophy />}
-              title="Aún no hay resultados"
-              description="La cabeza de la clasificación aparecerá tras la primera carrera."
-            />
-          </CardBody>
-        </Card>
+        <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+          <HomeStandings />
+        </Suspense>
       </div>
+
+      <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+        <LastRaceCard />
+      </Suspense>
     </Container>
   );
 }

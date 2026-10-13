@@ -32,7 +32,12 @@ export function EntryList({ entrants, maxPlayers, rowAction }: EntryListProps) {
               <PositionBadge position={i + 1} size="sm" neutral />
               {entrant ? (
                 <>
-                  <DriverName name={entrant.user.name} color={entrant.user.favoriteColor?.hex} className="flex-1" />
+                  <DriverName
+                    name={entrant.user.name}
+                    username={entrant.user.username}
+                    color={entrant.user.favoriteColor?.hex}
+                    className="flex-1"
+                  />
                   {rowAction?.(entrant)}
                 </>
               ) : (
@@ -52,7 +57,12 @@ export function EntryList({ entrants, maxPlayers, rowAction }: EntryListProps) {
             {waitlist.map((entrant, i) => (
               <li key={entrant.id} className="flex items-center gap-3 bg-surface-2/60 py-1.5 pr-2 pl-3">
                 <span className="w-8 text-center font-display font-bold text-fg-subtle italic tabular-nums">{i + 1}º</span>
-                <DriverName name={entrant.user.name} color={entrant.user.favoriteColor?.hex} className="flex-1" />
+                <DriverName
+                    name={entrant.user.name}
+                    username={entrant.user.username}
+                    color={entrant.user.favoriteColor?.hex}
+                    className="flex-1"
+                  />
                 <span className="text-xs text-fg-subtle">desde {formatShortDate(entrant.queuedAt)}</span>
                 {rowAction?.(entrant)}
               </li>

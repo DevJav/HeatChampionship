@@ -6,7 +6,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 
 - **UI language:** Spanish (Spain), Spanish route slugs. Dates/numbers formatted with `es-ES`.
 - **Style:** retro F1 broadcast (circa 2012) — dark glossy bars, red accents, slanted shapes, Titillium Web italic. Light theme only (dark broadcast bars over light panels).
-- **Stack:** Next.js 16 (App Router, Cache Components) + TypeScript, Tailwind 4, Prisma + SQLite, Better Auth, Recharts, Vitest. Docker Compose for deployment.
+- **Stack:** Next.js 16 (App Router, Cache Components) + TypeScript, Tailwind 4, Prisma + SQLite, Better Auth, hand-built SVG charts, Vitest. Docker Compose for deployment.
 - **Accounts:** every friend has a username/password account; one admin enters results. Admin can switch off new registrations.
 - **Scoring:** points table per season, default `9-6-4-3-2-1` (places 1–6). Points are snapshotted when a race is finalized; admin can recalculate a season.
 - **Race data:** finish position, starting position, laps, car color, upgrades used, notes, photos.
@@ -34,5 +34,5 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 - [x] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline; admin catalogs (seasons, tracks, upgrades, colors); Vitest
 - [x] **4. Results + scoring** — results editor (positions, grid, car, upgrades, notes) with live points, `scoreRace()` + sheet validation with tests, podium/results on the race page, photo uploads, season re-scoring
 - [x] **5. Standings, race pages, profiles** — standings with countback, movement and points chart; players list; profiles with stats/form/history; profile editing (name, bio, color, avatar, password); home standings + last race
-- [ ] **6. Statistics** — `lib/stats` with tests, charts
+- [x] **6. Statistics** — `lib/stats` with tests; all-time or per-season records (with streaks and comebacks), driver comparison, head-to-head grid, win rate by grid slot, tracks, car colors, upgrades
 - [ ] **7. Deployment** — Dockerfile, compose, persistent volume, backup script

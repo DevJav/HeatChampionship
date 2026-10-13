@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { niceTicks } from "@/lib/chart-scale";
+import { ChartTooltip } from "@/components/charts/ChartTooltip";
+import { useElementWidth } from "@/components/charts/useElementWidth";
 
 export type ChartRound = { label: string; title: string };
 
@@ -19,32 +22,13 @@ const LABEL_MIN_GAP = 14;
 
 const strokeFor = (slot: ChartSeries["slot"]) => (slot ? `var(--series-${slot})` : "var(--series-muted)");
 
-/** Clean y-axis ticks (step 1, 2, 5, 10, 20, 50…) covering 0..value in about four steps. */
-function niceTicks(value: number) {
-  const rough = Math.max(value, 1) / 4;
-  const magnitude = 10 ** Math.floor(Math.log10(rough));
-  // Points are whole numbers: never step below 1
-  const step = Math.max(1, [1, 2, 5, 10].map((m) => m * magnitude).find((s) => s >= rough)!);
-  const max = Math.ceil(Math.max(value, 1) / step) * step;
-  return Array.from({ length: max / step + 1 }, (_, i) => i * step);
-}
-
 /**
  * Points progression: the top three in color, everyone else in gray.
  * Hover or arrow keys move a crosshair; the readout lists every driver.
  */
 export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: ChartSeries[] }) {
-  const wrapper = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(720);
+  const [wrapper, width] = useElementWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
-
-  useEffect(() => {
-    const element = wrapper.current;
-    if (!element) return;
-    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
 
   const plotWidth = Math.max(width - PAD.left - PAD.right, 50);
   const plotHeight = HEIGHT - PAD.top - PAD.bottom;
@@ -188,14 +172,11 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
         </svg>
 
         {active != null && (
-          <div
-            role="status"
-            className="pointer-events-none absolute top-2 z-10 min-w-40 border-l-4 border-primary bg-surface p-3 text-sm shadow-overlay"
+          <ChartTooltip
+            title={rounds[active].title}
+            className="top-2"
             style={x(active) > width / 2 ? { right: width - x(active) + 12 } : { left: x(active) + 12 }}
           >
-            <p className="mb-1.5 font-display text-xs font-bold uppercase italic tracking-wide text-fg-muted">
-              {rounds[active].title}
-            </p>
             <ul className="flex flex-col gap-1">
               {readout.map((s) => (
                 <li key={s.id} className="flex items-center gap-2">
@@ -205,7 +186,7 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
                 </li>
               ))}
             </ul>
-          </div>
+          </ChartTooltip>
         )}
       </div>
     </div>

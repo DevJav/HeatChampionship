@@ -44,6 +44,16 @@ Everything is managed from `/admin` (shield icon in the header):
 
 **Standings:** `/clasificacion` ranks drivers by points, breaking ties by countback (most wins, then most 2nd places, and so on). It also shows ▲▼ movement since the previous race, each round's result, and a points-progression chart that highlights the top three. Use `?temporada=` to see past seasons.
 
+**Statistics:** `/estadisticas` covers all seasons by default ("Histórico") or a single one with `?temporada=`. It shows:
+- records: most wins, podiums and points; win and podium streaks; best average finish; biggest comeback; win from furthest back. Ties list every holder.
+- a comparison table of all drivers
+- a head-to-head grid: how often each driver finished ahead of each other
+- win rate by starting slot, with a table view
+- per-track kings and latest winners
+- results by car color and by upgrade card
+
+Streaks count consecutive races a driver took part in, so missing a month doesn't break one.
+
 **Players:** `/pilotos` lists every driver with their career numbers. Each driver has a profile with stats, recent form, best track and race history. Players edit their own name, bio, favorite color, photo and password at `/perfil` (header avatar → "Editar perfil", or "Mi perfil" in the mobile menu).
 
 **Sign-ups:** seats go in sign-up order. Once a race is full, new players join the waitlist. When someone withdraws, the first person on the waitlist moves into the seat automatically. A player who withdraws and signs up again goes to the back of the queue. Players can withdraw until the race starts.
@@ -70,6 +80,8 @@ src/
     auth/              Login / sign-up forms
     races/             Race card, entry list, sign-up panel, podium, results
     standings/         Standings table, points chart, season picker
+    stats/             Records, driver table, head-to-head grid, grid chart, track and tally tables
+    charts/            Shared chart pieces: tooltip, width hook
     players/           Player card, profile pieces, profile forms
     admin/             Admin forms and helpers
     forms/             Form fields wired to server-action state (errors, echoed values)
@@ -84,6 +96,8 @@ src/
     scoring.ts, results-rules.ts  Points and results-sheet validation (pure, unit-tested);  results.ts — DB operations
     uploads.ts         Photo & avatar storage (sharp → WebP) served by app/media/[...path]
     standings.ts, player-stats.ts  Standings with countback, points progression, player summaries (pure, unit-tested)
+    stats.ts           Records, head to head, track / car / upgrade / grid tallies (pure, unit-tested)
+    chart-scale.ts     Clean axis ticks for the SVG charts
     colors.ts          Readable text / outline for user-chosen colors
   styles/tokens.css    Design tokens — colors, radii, shadows, layout sizes
 ```

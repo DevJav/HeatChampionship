@@ -28,3 +28,8 @@ const signedFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1, s
 export const formatDecimal = (value: number) => decimalFormat.format(value);
 /** "+1,5" / "−0,5" / "0" */
 export const formatSigned = (value: number) => signedFormat.format(value);
+
+const percentFormat = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 });
+
+/** 0.25 → "25 %" */
+export const formatPercent = (value: number) => percentFormat.format(value);

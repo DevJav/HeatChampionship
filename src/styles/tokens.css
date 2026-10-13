@@ -66,6 +66,15 @@
   --series-muted: #c3c5cb;
   --chart-grid: #e1e2e6;
   --chart-axis: #b4b7be;
+  /* Diverging (head to head): blue = ahead, red = behind, gray = even.
+     Both arms share OKLCH lightness steps; step 3 takes white text. */
+  --diverging-pos-1: #9ec5f4;
+  --diverging-pos-2: #5598e7;
+  --diverging-pos-3: #256abf;
+  --diverging-mid: #dfe1e5;
+  --diverging-neg-1: #f3ada7;
+  --diverging-neg-2: #e06e68;
+  --diverging-neg-3: #b43b3a;
 
   /* Focus: outer ring for unclipped elements, inset ring for slanted ones */
   --ring: #d10500;

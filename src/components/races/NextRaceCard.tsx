@@ -3,6 +3,7 @@ import { getNextRace } from "@/lib/data/races";
 import { raceTitle } from "@/lib/races";
 import { ButtonLink, Card, CardBody, CardFooter, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
+import { RaceCountdown } from "./RaceCountdown";
 import { RaceMeta } from "./RaceMeta";
 import { RaceSignupPanel } from "./RaceSignupPanel";
 
@@ -23,6 +24,7 @@ export async function NextRaceCard() {
               <h3 className="text-3xl">{raceTitle(race)}</h3>
               <RaceMeta race={race} className="text-fg-muted" />
             </div>
+            <RaceCountdown target={race.scheduledAt.toISOString()} />
             <RaceSignupPanel race={race} />
           </CardBody>
           <CardFooter>

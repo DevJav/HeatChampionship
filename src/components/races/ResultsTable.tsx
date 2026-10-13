@@ -2,7 +2,7 @@ import type { RaceResultDetail } from "@/lib/data/results";
 import { positionsGained } from "@/lib/scoring";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { CarColorChip } from "@/components/domain/CarColorChip";
-import { PlayerChip } from "@/components/domain/PlayerChip";
+import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { PositionsGained } from "@/components/domain/PositionsGained";
 
@@ -16,13 +16,14 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
     <Table>
       <THead>
         <tr>
-          <Th align="center" className="w-16">
+          <Th align="center" className="w-20">
             Pos.
           </Th>
           <Th>Piloto</Th>
           {showGrid && <Th align="center">Salida</Th>}
-          {showCars && <Th>Coche</Th>}
-          {showUpgrades && <Th>Mejoras</Th>}
+          {/* On phones the stripe next to the name already shows the car color */}
+          {showCars && <Th className="max-sm:hidden">Coche</Th>}
+          {showUpgrades && <Th className="max-md:hidden">Mejoras</Th>}
           <Th align="right">Pts</Th>
         </tr>
       </THead>
@@ -33,10 +34,11 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
               <PositionBadge position={result.position} size="sm" />
             </Td>
             <Td>
-              <div className="flex flex-col gap-0.5">
-                <PlayerChip user={{ ...result.user, favoriteColor: result.carColor ?? result.user.favoriteColor }} />
-                {result.notes && <span className="pl-9 text-xs text-fg-muted italic">{result.notes}</span>}
-              </div>
+              <DriverName
+                name={result.user.name}
+                color={result.carColor?.hex ?? result.user.favoriteColor?.hex}
+                detail={result.notes}
+              />
             </Td>
             {showGrid && (
               <Td align="center" className="whitespace-nowrap">
@@ -44,9 +46,9 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
                 <PositionsGained value={positionsGained(result.startPosition, result.position)} />
               </Td>
             )}
-            {showCars && <Td>{result.carColor ? <CarColorChip {...result.carColor} /> : "—"}</Td>}
+            {showCars && <Td className="max-sm:hidden">{result.carColor ? <CarColorChip {...result.carColor} /> : "—"}</Td>}
             {showUpgrades && (
-              <Td className="text-sm text-fg-muted">{result.upgrades.map((u) => u.upgrade.name).join(", ") || "—"}</Td>
+              <Td className="text-sm text-fg-muted max-md:hidden">{result.upgrades.map((u) => u.upgrade.name).join(", ") || "—"}</Td>
             )}
             <Td align="right" className="font-display text-lg font-bold italic">
               {result.points}

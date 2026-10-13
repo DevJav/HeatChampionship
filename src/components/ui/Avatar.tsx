@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
+import { needsOutline, readableTextOn } from "@/lib/colors";
 
 const avatarVariants = cva(
   "inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-control bg-surface-2 font-display font-bold italic text-fg-muted",
@@ -36,8 +37,9 @@ function initials(name: string) {
 export function Avatar({ name, src, color, size, className }: AvatarProps) {
   return (
     <span
-      className={cn(avatarVariants({ size }), className)}
-      style={color ? { backgroundColor: color, color: "#fff" } : undefined}
+      className={cn(avatarVariants({ size }), color && needsOutline(color) && "ring-1 ring-border-strong ring-inset", className)}
+      // Text color follows the background so white/yellow cars stay readable
+      style={color ? { backgroundColor: color, color: readableTextOn(color) } : undefined}
       title={name}
     >
       {src ? (

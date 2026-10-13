@@ -1,24 +1,33 @@
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
-/** Timing-tower position box: podium colors, inverse box for the rest. */
+/**
+ * Timing-tower position tag: slanted, bold italic number. Podium places are
+ * gold/silver/bronze, the rest dark like a broadcast bar, retirements red.
+ */
 const positionVariants = cva(
-  "inline-flex items-center justify-center font-display font-bold italic tabular-nums leading-none",
+  "inline-flex shrink-0 items-center justify-center clip-slant gloss font-display font-bold italic leading-none tabular-nums",
   {
     variants: {
       place: {
         1: "bg-gold text-black",
         2: "bg-silver text-black",
         3: "bg-bronze text-white",
-        other: "bg-fg text-background",
+        other: "surface-bar",
         dnf: "bg-danger-solid text-white",
       },
       size: {
-        sm: "h-6 min-w-7 px-1 text-sm",
-        md: "h-8 min-w-9 px-1.5 text-lg",
-        lg: "h-12 min-w-13 px-2 text-3xl",
+        sm: "h-7 w-11 text-lg",
+        md: "h-9 w-14 text-2xl",
+        lg: "h-14 w-20 text-4xl",
       },
     },
+    // "RET" is three letters: smaller than a number at each size
+    compoundVariants: [
+      { place: "dnf", size: "sm", className: "text-xs" },
+      { place: "dnf", size: "md", className: "text-base" },
+      { place: "dnf", size: "lg", className: "text-2xl" },
+    ],
     defaultVariants: { size: "md" },
   },
 );
@@ -27,12 +36,15 @@ type PositionBadgeProps = {
   /** Finishing position; null/undefined means retired (did not finish). */
   position?: number | null;
   size?: "sm" | "md" | "lg";
+  /** Always use the dark tag, e.g. for starting-grid slots (no podium colors) */
+  neutral?: boolean;
   className?: string;
 };
 
-export function PositionBadge({ position, size, className }: PositionBadgeProps) {
-  const place =
-    position == null
+export function PositionBadge({ position, size, neutral = false, className }: PositionBadgeProps) {
+  const place = neutral
+    ? "other"
+    : position == null
       ? "dnf"
       : position === 1 || position === 2 || position === 3
         ? position

@@ -34,6 +34,7 @@ import {
   Textarea,
 } from "@/components/ui";
 import { CarColorChip } from "@/components/domain/CarColorChip";
+import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { ModalDemo } from "./ModalDemo";
 
@@ -88,6 +89,7 @@ const sampleResults = [
   { pos: 2, name: "Ana López", color: { name: "Azul", hex: "#1d4ed8" }, pts: 6 },
   { pos: 3, name: "Marco", color: { name: "Amarillo", hex: "#facc15" }, pts: 4 },
   { pos: 4, name: "Lucía", color: { name: "Verde", hex: "#15803d" }, pts: 3 },
+  { pos: 5, name: "Sara", color: { name: "Blanco", hex: "#f5f5f4" }, pts: 2 },
   { pos: null, name: "Pablo", color: { name: "Negro", hex: "#1c1917" }, pts: 0 },
 ];
 
@@ -191,7 +193,15 @@ export default function UiKitPage() {
           ))}
           <PositionBadge position={null} />
           <PositionBadge position={1} size="lg" />
+          <PositionBadge position={null} size="lg" />
           <PositionBadge position={5} size="sm" />
+          <PositionBadge position={null} size="sm" />
+          <PositionBadge position={2} size="sm" neutral />
+        </div>
+        <div className="flex flex-wrap gap-6">
+          {sampleResults.map((r) => (
+            <DriverName key={r.name} name={r.name} color={r.color.hex} />
+          ))}
         </div>
         <div className="flex flex-wrap gap-4">
           {sampleResults.map((r) => (
@@ -206,6 +216,8 @@ export default function UiKitPage() {
           <Avatar name="Ana López" />
           <Avatar name="Marco" color="#1d4ed8" size="lg" />
           <Avatar name="Lucía Pérez" color="#c8102e" size="xl" />
+          <Avatar name="Sara" color="#f5f5f4" size="lg" />
+          <Avatar name="Amarillo" color="#facc15" size="lg" />
         </div>
       </Section>
 
@@ -255,7 +267,7 @@ export default function UiKitPage() {
           <Table>
             <THead>
               <tr>
-                <Th align="center" className="w-16">
+                <Th align="center" className="w-20">
                   Pos.
                 </Th>
                 <Th>Piloto</Th>
@@ -270,10 +282,7 @@ export default function UiKitPage() {
                     <PositionBadge position={r.pos} size="sm" />
                   </Td>
                   <Td>
-                    <span className="flex items-center gap-2 font-semibold">
-                      <Avatar name={r.name} size="sm" color={r.color.hex} />
-                      {r.name}
-                    </span>
+                    <DriverName name={r.name} color={r.color.hex} />
                   </Td>
                   <Td>
                     <CarColorChip {...r.color} />

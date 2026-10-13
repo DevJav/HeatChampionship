@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { Upgrade } from "@/generated/prisma/client";
 import { CheckboxField, FormLayout, TextareaField, TextField } from "@/components/forms/FormFields";
-import type { FormAction } from "./types";
+import type { FormAction } from "@/lib/forms";
 
 export function UpgradeForm({ action, upgrade }: { action: FormAction; upgrade?: Upgrade }) {
   const [state, formAction] = useActionState(action, {});

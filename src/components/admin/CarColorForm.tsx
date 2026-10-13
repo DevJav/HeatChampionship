@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { CarColor } from "@/generated/prisma/client";
 import { CheckboxField, FormLayout, TextField } from "@/components/forms/FormFields";
-import type { FormAction } from "./types";
+import type { FormAction } from "@/lib/forms";
 
 export function CarColorForm({ action, color }: { action: FormAction; color?: CarColor }) {
   const [state, formAction] = useActionState(action, {});

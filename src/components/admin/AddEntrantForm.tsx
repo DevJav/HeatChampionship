@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { UserPlus } from "lucide-react";
 import { Alert, Select, SubmitButton } from "@/components/ui";
-import type { FormAction } from "./types";
+import type { FormAction } from "@/lib/forms";
 
 type AddEntrantFormProps = {
   action: FormAction;

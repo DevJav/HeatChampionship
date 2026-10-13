@@ -73,3 +73,6 @@ export const optionalInt = (min: number, max: number) =>
 /** Checkbox: present ("on") → true, absent → false. */
 export const checkbox = () =>
   z.preprocess((value) => value === "on" || value === "true", z.boolean());
+
+/** A server action usable with useActionState (optionally pre-bound to an id). */
+export type FormAction = (state: FormState, formData: FormData) => Promise<FormState>;

@@ -37,6 +37,10 @@ Everything is managed from `/admin` (shield icon in the header):
 | Temporadas | Seasons and their points table. Only one season can be in progress at a time. |
 | Circuitos / Mejoras / Colores | The catalogs: track default laps, upgrade cards, car colors. Anything already used can be deactivated but not deleted. |
 
+**Results:** after the race, open it in admin and click **Resultados**. Fill in each driver's finishing position (or *Retirado*), starting position, car and upgrade cards. Points are previewed live from the season's table. Saving awards the points, marks the race *Finalizada* and opens its page with the podium and full results. You can edit the results later or cancel them. Changing a season's points table re-scores its finished races.
+
+**Photos:** the race's drivers (and admins) can upload photos once the race has started. They're resized to WebP (max 2000px, plus a thumbnail) and stored in `data/uploads/`, which you can change with `UPLOAD_DIR`. Back up the whole `data/` folder to keep both the database and the photos.
+
 **Sign-ups:** seats go in sign-up order. Once a race is full, new players join the waitlist. When someone withdraws, the first person on the waitlist moves into the seat automatically. A player who withdraws and signs up again goes to the back of the queue. Players can withdraw until the race starts.
 
 All dates are entered and shown in Madrid time (`siteConfig.timeZone`), whatever time zone the server runs in.
@@ -70,6 +74,8 @@ src/
     db.ts              Prisma client;  format.ts — es-ES date formatting;  dates.ts — Madrid ⇄ UTC
     forms.ts           FormState, parseForm() and zod field helpers
     registration-rules.ts  Seat/waitlist rules (pure, unit-tested);  registrations.ts — DB operations
+    scoring.ts, results-rules.ts  Points and results-sheet validation (pure, unit-tested);  results.ts — DB operations
+    uploads.ts         Photo storage (sharp → WebP) served by app/media/[...path]
   styles/tokens.css    Design tokens — colors, radii, shadows, layout sizes
 ```
 

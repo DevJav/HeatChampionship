@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, Flag, X } from "lucide-react";
 import { addEntrant, deleteRace, removeEntrant, updateRace } from "@/actions/races";
 import {
   Button,
@@ -49,9 +49,14 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
           <h2 className="text-3xl">{raceTitle(race)}</h2>
           <RaceStatusBadge race={race} />
         </div>
-        <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
-          <ExternalLink /> Ver página
-        </ButtonLink>
+        <div className="flex gap-2">
+          <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
+            <ExternalLink /> Ver página
+          </ButtonLink>
+          <ButtonLink href={`/admin/carreras/${race.id}/resultados`} size="sm">
+            <Flag /> {race.status === "FINISHED" ? "Editar resultados" : "Resultados"}
+          </ButtonLink>
+        </div>
       </div>
 
       <div className="grid items-start gap-6 xl:grid-cols-5">

@@ -9,7 +9,9 @@ import { db } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/db-errors";
 import { formValues, int, optionalInt, optionalText, parseForm, text, type FormState } from "@/lib/forms";
 import { joinRace, leaveRace, rebalanceSeats, RegistrationError } from "@/lib/registrations";
+import { recomputeSeasonPoints } from "@/lib/results";
 import { requireAdmin, requireUser } from "@/lib/session";
+import { deleteStoredPhoto } from "@/lib/uploads";
 
 // ---------------------------------------------------------------------------
 // Player sign-ups
@@ -113,6 +115,8 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
       await tx.race.update({ where: { id: raceId }, data: { ...data, status: nextStatus } });
       // Seats may have changed
       await rebalanceSeats(tx, raceId);
+      // A finished race moved to another season takes that season's points table
+      if (nextStatus === "FINISHED") await recomputeSeasonPoints(tx, data.seasonId);
     });
   } catch (error) {
     if (isUniqueViolation(error)) {
@@ -126,7 +130,9 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
 
 export async function deleteRace(raceId: string) {
   await requireAdmin();
+  const photos = await db.racePhoto.findMany({ where: { raceId }, select: { path: true } });
   await db.race.delete({ where: { id: raceId } });
+  await Promise.all(photos.map((photo) => deleteStoredPhoto(photo.path)));
   redirect("/admin/carreras");
 }
 

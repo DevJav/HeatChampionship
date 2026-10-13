@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { int, parseForm, text, type FormState } from "@/lib/forms";
+import { recomputeSeasonPoints } from "@/lib/results";
 import { requireAdmin } from "@/lib/session";
 
 /** "9, 6, 4, 3, 2, 1" → [9, 6, 4, 3, 2, 1] */
@@ -29,7 +30,10 @@ const seasonSchema = z.object({
 
 type SeasonData = z.output<typeof seasonSchema>;
 
-/** Only one season can be in progress: activating one finishes the others. */
+/**
+ * Only one season can be in progress: activating one finishes the others.
+ * Saving also re-scores finished races, in case the points table changed.
+ */
 async function saveSeason(data: SeasonData, seasonId?: string) {
   await db.$transaction(async (tx) => {
     if (data.status === "ACTIVE") {
@@ -38,8 +42,12 @@ async function saveSeason(data: SeasonData, seasonId?: string) {
         data: { status: "FINISHED" },
       });
     }
-    if (seasonId) await tx.season.update({ where: { id: seasonId }, data });
-    else await tx.season.create({ data });
+    if (seasonId) {
+      await tx.season.update({ where: { id: seasonId }, data });
+      await recomputeSeasonPoints(tx, seasonId);
+    } else {
+      await tx.season.create({ data });
+    }
   });
 }
 

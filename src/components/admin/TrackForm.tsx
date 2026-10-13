@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { Track } from "@/generated/prisma/client";
 import { CheckboxField, FormLayout, TextareaField, TextField } from "@/components/forms/FormFields";
-import type { FormAction } from "./types";
+import type { FormAction } from "@/lib/forms";
 
 export function TrackForm({ action, track }: { action: FormAction; track?: Track }) {
   const [state, formAction] = useActionState(action, {});

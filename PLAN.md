@@ -32,7 +32,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 - [x] **2. Database + auth** — Prisma schema, seed (tracks, colors, season, admin, demo players), Better Auth (username login), role guards, registration on/off in `/admin`
   - Upgrade cards not seeded yet: names depend on the edition — add them once the admin catalog UI exists
 - [x] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline; admin catalogs (seasons, tracks, upgrades, colors); Vitest
-- [ ] **4. Results + scoring** — results entry form, `scoreRace()` with tests, photo upload
+- [x] **4. Results + scoring** — results editor (positions, grid, car, upgrades, notes) with live points, `scoreRace()` + sheet validation with tests, podium/results on the race page, photo uploads, season re-scoring
 - [ ] **5. Standings, race pages, profiles**
 - [ ] **6. Statistics** — `lib/stats` with tests, charts
 - [ ] **7. Deployment** — Dockerfile, compose, persistent volume, backup script

@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import type { Season, SeasonStatus } from "@/generated/prisma/client";
 import { SEASON_STATUS } from "@/lib/races";
 import { FormLayout, SelectField, TextField } from "@/components/forms/FormFields";
-import type { FormAction } from "./types";
+import type { FormAction } from "@/lib/forms";
 
 const DEFAULT_POINTS = [9, 6, 4, 3, 2, 1];
 
@@ -38,7 +38,7 @@ export function SeasonForm({ action, season }: { action: FormAction; season?: Se
           name="pointsTable"
           label="Puntos por posición"
           state={state}
-          hint="Del 1º en adelante, separados por comas."
+          hint="Del 1º en adelante, separados por comas. Al cambiarlos se recalculan las carreras ya disputadas."
           defaultValue={points.join(", ")}
         />
       </FormLayout>

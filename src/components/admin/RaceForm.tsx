@@ -6,7 +6,7 @@ import type { Race, RaceStatus } from "@/generated/prisma/client";
 import { toLocalInput } from "@/lib/dates";
 import { RACE_STATUS } from "@/lib/races";
 import { FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
-import type { FormAction } from "./types";
+import type { FormAction } from "@/lib/forms";
 
 type Option = { id: string; name: string };
 

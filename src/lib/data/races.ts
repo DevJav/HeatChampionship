@@ -46,13 +46,28 @@ export async function getRace(id: string, { includeDraft = false } = {}) {
   return race;
 }
 
-/** All published races, soonest first. */
+const raceListInclude = {
+  ...raceSummaryInclude,
+  /** Podium, for finished races */
+  results: {
+    where: { position: { lte: 3 } },
+    orderBy: { position: "asc" },
+    select: {
+      position: true,
+      user: { select: { id: true, name: true, favoriteColor: { select: { hex: true } } } },
+    },
+  },
+} satisfies Prisma.RaceInclude;
+
+export type RaceListItem = Prisma.RaceGetPayload<{ include: typeof raceListInclude }>;
+
+/** All published races with their podium, soonest first. */
 export async function listPublishedRaces() {
   await connection();
   return db.race.findMany({
     where: { status: { not: "DRAFT" } },
     orderBy: { scheduledAt: "asc" },
-    include: raceSummaryInclude,
+    include: raceListInclude,
   });
 }
 

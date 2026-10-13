@@ -12,10 +12,10 @@ import { createUserWithPassword } from "../src/lib/users";
 const DEFAULT_POINTS = [9, 6, 4, 3, 2, 1];
 
 const tracks = [
-  { slug: "usa", name: "Estados Unidos", country: "EE. UU.", expansion: "Juego base" },
-  { slug: "italia", name: "Italia", country: "Italia", expansion: "Juego base" },
-  { slug: "francia", name: "Francia", country: "Francia", expansion: "Juego base" },
-  { slug: "gran-bretana", name: "Gran Bretaña", country: "Reino Unido", expansion: "Juego base" },
+  { slug: "usa", name: "Estados Unidos", countryCode: "US", expansion: "Juego base" },
+  { slug: "italia", name: "Italia", countryCode: "IT", expansion: "Juego base" },
+  { slug: "francia", name: "Francia", countryCode: "FR", expansion: "Juego base" },
+  { slug: "gran-bretana", name: "Gran Bretaña", countryCode: "GB", expansion: "Juego base" },
 ];
 
 const carColors = [

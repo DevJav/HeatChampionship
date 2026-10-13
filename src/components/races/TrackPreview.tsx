@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Crown, Flag, Rocket, TrendingUp } from "lucide-react";
 import type { RaceDetail } from "@/lib/data/races";
+import { countryName } from "@/lib/countries";
 import { getStatsData } from "@/lib/data/stats";
 import { formatDate, formatDecimal, formatPercent } from "@/lib/format";
 import { championshipRecords, entrantRecords, gridStats, raceHistory } from "@/lib/stats";
@@ -39,7 +40,8 @@ export async function TrackPreview({ race }: { race: RaceDetail }) {
 
   const entrants = new Map(race.registrations.map((r) => [r.user.id, r]));
   const nameOf = (userId: string) => drivers.get(userId)?.name ?? entrants.get(userId)?.user.name ?? "—";
-  const facts = [track.country !== track.name && track.country, track.expansion].filter(Boolean).join(" · ");
+  const country = countryName(track.countryCode);
+  const facts = [country !== track.name && country, track.expansion].filter(Boolean).join(" · ");
 
   const records = championshipRecords(races);
   const pole = gridStats(races)[0];

@@ -56,6 +56,8 @@ Streaks count consecutive races a driver took part in, so missing a month doesn'
 
 **Players:** `/pilotos` lists every driver with their career numbers. Each driver has a profile with stats, recent form, best track and race history. Players edit their own name, bio, favorite color, photo and password at `/perfil` (header avatar → "Editar perfil", or "Mi perfil" in the mobile menu).
 
+**Flags:** each track has a country (picked from a list in admin → Circuitos). Its flag fills the background of the race banner, and it also gives the country name shown in the race preview. Tracks without a country keep the red speed stripes. The list includes England, Scotland, Wales, Northern Ireland and Catalonia.
+
 **Race preview:** before a race has results, its page also shows the track's history in the championship. That includes:
 - races held there, the "king" of the track, how often the driver starting 1st has won there, and the biggest comeback
 - each signed-up driver's record on that track (debutants flagged)

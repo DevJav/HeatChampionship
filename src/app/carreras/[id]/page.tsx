@@ -15,6 +15,7 @@ import {
   Skeleton,
   SpeedStripes,
 } from "@/components/ui";
+import { FlagBackdrop } from "@/components/domain/CountryFlag";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { EntryList } from "@/components/races/EntryList";
 import { Podium } from "@/components/races/Podium";
@@ -33,14 +34,21 @@ export const metadata: Metadata = { title: "Carrera" };
 function RaceHero({ race, admin }: { race: RaceDetail; admin: boolean }) {
   return (
     <section className="relative overflow-hidden border-l-4 border-primary surface-bar clip-chamfer">
-      <SpeedStripes className="absolute inset-y-0 right-0 w-1/2 opacity-80" />
+      {race.track.countryCode ? (
+        <FlagBackdrop
+          code={race.track.countryCode}
+          className="absolute inset-y-0 right-0 w-full opacity-45 sm:aspect-[2/1] sm:w-auto sm:max-w-full sm:opacity-60"
+        />
+      ) : (
+        <SpeedStripes className="absolute inset-y-0 right-0 w-1/2 opacity-80" />
+      )}
       <div className="relative flex flex-col items-start gap-3 px-6 py-8 sm:px-10">
         <div className="flex flex-wrap gap-2">
           <Badge tone="primary">Ronda {race.round}</Badge>
           <Badge tone="bar">{race.season.name}</Badge>
           <RaceStatusBadge race={race} />
         </div>
-        <h1 className="text-5xl sm:text-7xl">{race.track.name}</h1>
+        <h1 className="text-5xl [text-shadow:0_2px_12px_rgb(0_0_0/0.5)] sm:text-7xl">{race.track.name}</h1>
         <RaceMeta race={race} className="text-bar-fg/80" />
         {admin && (
           <div className="flex flex-wrap gap-2">

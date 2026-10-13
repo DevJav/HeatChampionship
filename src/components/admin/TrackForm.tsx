@@ -2,8 +2,11 @@
 
 import { useActionState } from "react";
 import type { Track } from "@/generated/prisma/client";
-import { CheckboxField, FormLayout, TextareaField, TextField } from "@/components/forms/FormFields";
+import { CheckboxField, FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
+import { countryOptions } from "@/lib/countries";
 import type { FormAction } from "@/lib/forms";
+
+const countries = countryOptions();
 
 export function TrackForm({ action, track }: { action: FormAction; track?: Track }) {
   const [state, formAction] = useActionState(action, {});
@@ -12,7 +15,15 @@ export function TrackForm({ action, track }: { action: FormAction; track?: Track
     <form action={formAction}>
       <FormLayout state={state} submitLabel={track ? "Guardar cambios" : "Crear circuito"} cancelHref="/admin/circuitos">
         <TextField name="name" label="Nombre" state={state} placeholder="Italia" defaultValue={track?.name} />
-        <TextField name="country" label="País" state={state} defaultValue={track?.country} />
+        <SelectField
+          name="countryCode"
+          label="País"
+          hint="Su bandera aparece en la cabecera de las carreras."
+          state={state}
+          options={countries}
+          placeholder="Sin país"
+          defaultValue={track?.countryCode ?? ""}
+        />
         <TextField
           name="expansion"
           label="Juego / expansión"

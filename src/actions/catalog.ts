@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { countryName } from "@/lib/countries";
 import { db } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/db-errors";
 import {
@@ -36,7 +37,7 @@ function duplicate(formData: FormData, field: string, message: string): FormStat
 
 const trackSchema = z.object({
   name: text(60),
-  country: optionalText(60),
+  countryCode: optionalText(10).refine((code) => code == null || countryName(code) != null, "País no válido."),
   expansion: optionalText(60),
   defaultLaps: optionalInt(1, 10),
   description: optionalText(500),

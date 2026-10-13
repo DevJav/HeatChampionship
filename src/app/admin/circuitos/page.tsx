@@ -5,6 +5,7 @@ import { Badge, ButtonLink, Card, Section, Table, TBody, Td, Th, THead, Tr } fro
 import { listTracks } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { CountryFlag } from "@/components/domain/CountryFlag";
 
 export const metadata: Metadata = { title: "Circuitos · Admin" };
 
@@ -36,9 +37,16 @@ async function AdminTracksPageContent() {
             {tracks.map((track) => (
               <Tr key={track.id}>
                 <Td>
-                  <Link href={`/admin/circuitos/${track.id}`} className="font-semibold hover:text-primary hover:underline">
-                    {track.name}
-                  </Link>
+                  <span className="flex items-center gap-2.5">
+                    {track.countryCode ? (
+                      <CountryFlag code={track.countryCode} className="h-4 w-6 shrink-0 ring-1 ring-border" />
+                    ) : (
+                      <span title="Sin país" className="h-4 w-6 shrink-0 border border-dashed border-border-strong" />
+                    )}
+                    <Link href={`/admin/circuitos/${track.id}`} className="font-semibold hover:text-primary hover:underline">
+                      {track.name}
+                    </Link>
+                  </span>
                 </Td>
                 <Td className="text-fg-muted">{track.expansion ?? "—"}</Td>
                 <Td align="center">{track.defaultLaps ?? <span className="text-fg-subtle">—</span>}</Td>

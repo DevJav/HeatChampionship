@@ -47,7 +47,7 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h2 className="text-3xl">{raceTitle(race)}</h2>
-          <RaceStatusBadge status={race.status} />
+          <RaceStatusBadge race={race} />
         </div>
         <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
           <ExternalLink /> Ver página

@@ -42,7 +42,7 @@ async function RaceView({ params }: { params: Promise<{ id: string }> }) {
           <div className="flex flex-wrap gap-2">
             <Badge tone="primary">Ronda {race.round}</Badge>
             <Badge tone="bar">{race.season.name}</Badge>
-            <RaceStatusBadge status={race.status} />
+            <RaceStatusBadge race={race} />
           </div>
           <h1 className="text-5xl sm:text-7xl">{race.track.name}</h1>
           <RaceMeta race={race} className="text-bar-fg/80" />

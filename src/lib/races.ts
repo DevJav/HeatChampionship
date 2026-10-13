@@ -1,4 +1,5 @@
 import type { RaceStatus, SeasonStatus } from "@/generated/prisma/client";
+import type { RacePhase } from "./registration-rules";
 
 /** "Ronda 3 · Italia" */
 export function raceTitle(race: { round: number; track: { name: string } }) {
@@ -12,10 +13,20 @@ export function raceLaps(race: { laps: number | null; track: { defaultLaps: numb
 
 type Tone = "neutral" | "primary" | "accent" | "success" | "warning" | "danger" | "info" | "bar";
 
+/** Labels for the status the admin sets (race form). */
 export const RACE_STATUS: Record<RaceStatus, { label: string; tone: Tone }> = {
   DRAFT: { label: "Borrador", tone: "neutral" },
   OPEN: { label: "Inscripción abierta", tone: "success" },
   CLOSED: { label: "Inscripción cerrada", tone: "warning" },
+  FINISHED: { label: "Finalizada", tone: "bar" },
+};
+
+/** Labels for what players see (status + deadline + start time). */
+export const RACE_PHASE: Record<RacePhase, { label: string; tone: Tone }> = {
+  DRAFT: { label: "Borrador", tone: "neutral" },
+  OPEN: { label: "Inscripción abierta", tone: "success" },
+  CLOSED: { label: "Inscripción cerrada", tone: "warning" },
+  AWAITING_RESULTS: { label: "Pendiente de resultados", tone: "info" },
   FINISHED: { label: "Finalizada", tone: "bar" },
 };
 

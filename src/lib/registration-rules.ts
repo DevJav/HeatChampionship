@@ -18,7 +18,7 @@ export function assignSeats<T extends QueueEntry>(
   return new Map(ordered.map((entry, index) => [entry.id, index < maxPlayers ? "CONFIRMED" : "WAITLIST"]));
 }
 
-type WindowRace = { status: RaceStatus; scheduledAt: Date; signupDeadline: Date | null };
+export type WindowRace = { status: RaceStatus; scheduledAt: Date; signupDeadline: Date | null };
 
 export type SignupWindow =
   | { open: true }
@@ -32,6 +32,18 @@ export function signupWindow(race: WindowRace, now = new Date()): SignupWindow {
   if (race.status !== "OPEN") return { open: false, reason: "not-open" };
   if (race.signupDeadline && now >= race.signupDeadline) return { open: false, reason: "deadline" };
   return { open: true };
+}
+
+/**
+ * What a race looks like to players right now. The stored status is what the
+ * admin set; the deadline and start time move it along on their own.
+ */
+export type RacePhase = "DRAFT" | "OPEN" | "CLOSED" | "AWAITING_RESULTS" | "FINISHED";
+
+export function racePhase(race: WindowRace, now = new Date()): RacePhase {
+  if (race.status === "DRAFT" || race.status === "FINISHED") return race.status;
+  if (now >= race.scheduledAt) return "AWAITING_RESULTS";
+  return signupWindow(race, now).open ? "OPEN" : "CLOSED";
 }
 
 /** Players may drop out on their own until the race starts (waitlist moves up). */

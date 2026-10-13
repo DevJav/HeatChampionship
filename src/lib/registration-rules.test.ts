@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assignSeats, canWithdraw, signupWindow } from "./registration-rules";
+import { assignSeats, canWithdraw, racePhase, signupWindow } from "./registration-rules";
 
 const at = (minutes: number) => new Date(Date.UTC(2026, 10, 1, 12, minutes));
 const entry = (id: string, minutes: number) => ({ id, queuedAt: at(minutes) });
@@ -73,5 +73,36 @@ describe("canWithdraw", () => {
   it("refuses after the start or once finished", () => {
     expect(canWithdraw({ status: "CLOSED", scheduledAt: at(60), signupDeadline: null }, at(61))).toBe(false);
     expect(canWithdraw({ status: "FINISHED", scheduledAt: at(60), signupDeadline: null }, at(0))).toBe(false);
+  });
+});
+
+describe("racePhase", () => {
+  const race = (overrides: Partial<Parameters<typeof racePhase>[0]> = {}) => ({
+    status: "OPEN" as const,
+    scheduledAt: at(60),
+    signupDeadline: at(30),
+    ...overrides,
+  });
+
+  it("is OPEN while sign-ups are possible", () => {
+    expect(racePhase(race(), at(0))).toBe("OPEN");
+  });
+
+  it("shows CLOSED once the deadline passes, even if the admin left it open", () => {
+    expect(racePhase(race(), at(30))).toBe("CLOSED");
+  });
+
+  it("shows CLOSED when the admin closed sign-ups", () => {
+    expect(racePhase(race({ status: "CLOSED" }), at(0))).toBe("CLOSED");
+  });
+
+  it("is AWAITING_RESULTS once the race has started", () => {
+    expect(racePhase(race(), at(60))).toBe("AWAITING_RESULTS");
+    expect(racePhase(race({ status: "CLOSED" }), at(90))).toBe("AWAITING_RESULTS");
+  });
+
+  it("keeps DRAFT and FINISHED regardless of time", () => {
+    expect(racePhase(race({ status: "DRAFT" }), at(90))).toBe("DRAFT");
+    expect(racePhase(race({ status: "FINISHED" }), at(0))).toBe("FINISHED");
   });
 });

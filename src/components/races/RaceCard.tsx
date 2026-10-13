@@ -12,7 +12,7 @@ export function RaceCard({ race }: { race: RaceSummary }) {
     <Card>
       <CardHeader>
         <CardTitle>{raceTitle(race)}</CardTitle>
-        <RaceStatusBadge status={race.status} />
+        <RaceStatusBadge race={race} />
       </CardHeader>
       <CardBody className="flex flex-col gap-3">
         <RaceMeta race={race} className="text-fg-muted" />

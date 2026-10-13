@@ -48,7 +48,7 @@ async function AdminRacesPageContent() {
                   <Td className="text-fg-muted">{race.season.name}</Td>
                   <Td className="text-fg-muted">{formatDateTime(race.scheduledAt)}</Td>
                   <Td>
-                    <RaceStatusBadge status={race.status} />
+                    <RaceStatusBadge race={race} />
                   </Td>
                   <Td align="right">
                     {race._count.registrations}/{race.maxPlayers}

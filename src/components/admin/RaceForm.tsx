@@ -95,7 +95,11 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
           label="Estado"
           state={state}
           disabled={finished}
-          hint={finished ? "Finalizada al registrar resultados." : "Borrador: oculta. Abierta: se pueden inscribir."}
+          hint={
+            finished
+              ? "Finalizada al registrar resultados."
+              : "Borrador: oculta. Abierta: se pueden inscribir hasta el cierre o el inicio de la carrera."
+          }
           defaultValue={race?.status ?? "DRAFT"}
           options={(finished ? (["FINISHED"] as RaceStatus[]) : editableStatuses).map((status) => ({
             value: status,

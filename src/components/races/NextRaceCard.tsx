@@ -14,7 +14,7 @@ export async function NextRaceCard() {
     <Card>
       <CardHeader>
         <CardTitle>Próxima carrera</CardTitle>
-        {race && <RaceStatusBadge status={race.status} />}
+        {race && <RaceStatusBadge race={race} />}
       </CardHeader>
       {race ? (
         <>

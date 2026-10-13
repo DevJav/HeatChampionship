@@ -1,8 +1,12 @@
-import type { RaceStatus } from "@/generated/prisma/client";
 import { Badge } from "@/components/ui";
-import { RACE_STATUS } from "@/lib/races";
+import { racePhase, type WindowRace } from "@/lib/registration-rules";
+import { RACE_PHASE } from "@/lib/races";
 
-export function RaceStatusBadge({ status }: { status: RaceStatus }) {
-  const { label, tone } = RACE_STATUS[status];
+/**
+ * Status as players experience it: an OPEN race shows "closed" after its
+ * deadline and "awaiting results" once it has started.
+ */
+export function RaceStatusBadge({ race }: { race: WindowRace }) {
+  const { label, tone } = RACE_PHASE[racePhase(race)];
   return <Badge tone={tone}>{label}</Badge>;
 }

@@ -1,26 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Lock, LockOpen } from "lucide-react";
 import { updateRegistrationOpen } from "@/actions/admin";
-import {
-  Avatar,
-  Badge,
-  Card,
-  CardBody,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Section,
-  SubmitButton,
-  Table,
-  TBody,
-  Td,
-  Th,
-  THead,
-  Tr,
-} from "@/components/ui";
+import { Badge, Card, CardBody, CardDescription, CardHeader, CardTitle, SubmitButton } from "@/components/ui";
 import { getSettings } from "@/lib/data/settings";
-import { listUsers } from "@/lib/data/users";
-import { formatDate } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
 
@@ -58,53 +41,19 @@ async function RegistrationSettings() {
   );
 }
 
-async function PlayersTable() {
-  const users = await listUsers();
-
-  return (
-    <Card>
-      <Table>
-        <THead>
-          <tr>
-            <Th>Piloto</Th>
-            <Th>Usuario</Th>
-            <Th>Rol</Th>
-            <Th align="right">Alta</Th>
-          </tr>
-        </THead>
-        <TBody>
-          {users.map((user) => (
-            <Tr key={user.id}>
-              <Td>
-                <span className="flex items-center gap-2 font-semibold">
-                  <Avatar name={user.name} src={user.image} size="sm" />
-                  {user.name}
-                </span>
-              </Td>
-              <Td className="text-fg-muted">@{user.username}</Td>
-              <Td>
-                {user.role === "admin" ? <Badge tone="primary">Admin</Badge> : <Badge>Piloto</Badge>}
-              </Td>
-              <Td align="right" className="text-fg-muted">
-                {formatDate(user.createdAt)}
-              </Td>
-            </Tr>
-          ))}
-        </TBody>
-      </Table>
-    </Card>
-  );
-}
-
 async function AdminPageContent() {
   await requireAdmin("/admin");
 
   return (
     <div className="flex flex-col gap-10">
       <RegistrationSettings />
-      <Section title="Pilotos registrados">
-        <PlayersTable />
-      </Section>
+      <p className="text-sm text-fg-muted">
+        Para cambiar contraseñas, nombres o roles de los pilotos, ve a la pestaña{" "}
+        <Link href="/admin/pilotos" className="font-semibold text-fg hover:text-primary hover:underline">
+          Pilotos
+        </Link>
+        .
+      </p>
     </div>
   );
 }

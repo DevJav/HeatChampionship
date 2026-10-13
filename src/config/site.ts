@@ -3,7 +3,7 @@
  * Edit here to rename the championship or change the menu.
  */
 export const siteConfig = {
-  name: "Campeonato Heat",
+  name: "Heat Championship",
   description:
     "Carreras mensuales de Heat: Pedal to the Metal. Clasificación, resultados y estadísticas.",
   locale: "es-ES",

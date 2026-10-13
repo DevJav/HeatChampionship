@@ -6,10 +6,9 @@ import { admin, username } from "better-auth/plugins";
 import { db } from "./db";
 import { getSettings } from "./data/settings";
 
-export const USERNAME_PATTERN = /^[a-z0-9_.]+$/;
-export const USERNAME_MIN = 3;
-export const USERNAME_MAX = 20;
-export const PASSWORD_MIN = 8;
+import { PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
+
+export { PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
 
 /** Players log in by username; Better Auth still needs a unique email. */
 export function placeholderEmail(username: string) {

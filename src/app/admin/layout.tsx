@@ -4,6 +4,7 @@ import { AdminOnly } from "@/components/admin/AdminOnly";
 
 const sections = [
   { href: "/admin", label: "Resumen", exact: true },
+  { href: "/admin/pilotos", label: "Pilotos" },
   { href: "/admin/carreras", label: "Carreras" },
   { href: "/admin/temporadas", label: "Temporadas" },
   { href: "/admin/circuitos", label: "Circuitos" },

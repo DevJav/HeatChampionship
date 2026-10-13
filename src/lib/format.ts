@@ -33,3 +33,6 @@ const percentFormat = new Intl.NumberFormat(locale, { style: "percent", maximumF
 
 /** 0.25 → "25 %" */
 export const formatPercent = (value: number) => percentFormat.format(value);
+
+/** "1 carrera" / "3 carreras" */
+export const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;

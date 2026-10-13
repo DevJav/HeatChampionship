@@ -3,11 +3,11 @@ import type { StatsRace } from "../stats";
 import { db } from "../db";
 import { driverSelect } from "./standings";
 
-/** Finished races with full results, for one season or all of them. */
-export async function getStatsData(seasonId: string | null) {
+/** Finished races with full results; all of them, or narrowed to a season and/or a track. */
+export async function getStatsData({ seasonId, trackId }: { seasonId?: string | null; trackId?: string } = {}) {
   await connection();
   const races = await db.race.findMany({
-    where: { status: "FINISHED", ...(seasonId ? { seasonId } : {}) },
+    where: { status: "FINISHED", ...(seasonId ? { seasonId } : {}), ...(trackId ? { trackId } : {}) },
     orderBy: { scheduledAt: "asc" },
     select: {
       id: true,

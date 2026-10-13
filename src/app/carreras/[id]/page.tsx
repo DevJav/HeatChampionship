@@ -22,6 +22,7 @@ import { RaceMeta } from "@/components/races/RaceMeta";
 import { RacePhotos } from "@/components/races/RacePhotos";
 import { RaceSignupPanel } from "@/components/races/RaceSignupPanel";
 import { ResultsTable } from "@/components/races/ResultsTable";
+import { TrackPreview } from "@/components/races/TrackPreview";
 import { getRace, type RaceDetail } from "@/lib/data/races";
 import { getRaceResults } from "@/lib/data/results";
 import { racePhase } from "@/lib/registration-rules";
@@ -139,6 +140,9 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
       </div>
       {/* Once the race is on, drivers can already share photos of the board */}
       {started && <PhotosCard race={race} driverIds={driverIds} />}
+      <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+        <TrackPreview race={race} />
+      </Suspense>
     </div>
   );
 }

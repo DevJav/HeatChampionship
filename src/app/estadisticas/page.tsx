@@ -55,7 +55,7 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
   const { temporada } = await searchParams;
   const seasons = await listSeasons();
   const season = seasons.find((s) => s.id === temporada) ?? null;
-  const { races, drivers } = await getStatsData(season?.id ?? null);
+  const { races, drivers } = await getStatsData({ seasonId: season?.id });
 
   const header = (
     <>

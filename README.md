@@ -56,6 +56,11 @@ Streaks count consecutive races a driver took part in, so missing a month doesn'
 
 **Players:** `/pilotos` lists every driver with their career numbers. Each driver has a profile with stats, recent form, best track and race history. Players edit their own name, bio, favorite color, photo and password at `/perfil` (header avatar → "Editar perfil", or "Mi perfil" in the mobile menu).
 
+**Race preview:** before a race has results, its page also shows the track's history in the championship. That includes:
+- races held there, the "king" of the track, how often the driver starting 1st has won there, and the biggest comeback
+- each signed-up driver's record on that track (debutants flagged)
+- the latest podiums there
+
 **Sign-ups:** seats go in sign-up order. Once a race is full, new players join the waitlist. When someone withdraws, the first person on the waitlist moves into the seat automatically. A player who withdraws and signs up again goes to the back of the queue. Players can withdraw until the race starts.
 
 All dates are entered and shown in Madrid time (`siteConfig.timeZone`), whatever time zone the server runs in.

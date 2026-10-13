@@ -5,9 +5,11 @@ import {
   driverCodes,
   driverStats,
   duelStep,
+  entrantRecords,
   gridStats,
   headToHead,
   qualifyingStarts,
+  raceHistory,
   trackStats,
   upgradeStats,
   type StatsRace,
@@ -47,6 +49,29 @@ describe("driverStats", () => {
     const stats = driverStats(races);
     expect(stats.map((d) => d.userId)).toEqual(["ana", "leo", "eva"]);
     expect(stats[0]).toMatchObject({ starts: 2, wins: 1, podiums: 2, points: 15, pointsPerRace: 7.5, winRate: 0.5 });
+  });
+});
+
+describe("entrantRecords", () => {
+  it("orders entrants by average finish, retirement-only records next, debutants last", () => {
+    const races = [
+      race([r("ana", 3), r("leo", 1), r("eva", null)]),
+      race([r("ana", 1), r("leo", 2), r("eva", null)]),
+    ];
+    const rows = entrantRecords(races, ["new", "eva", "ana", "leo", "other"]);
+    expect(rows.map((row) => row.userId)).toEqual(["leo", "ana", "eva", "new", "other"]);
+    expect(rows[0].stats).toMatchObject({ starts: 2, wins: 1, bestFinish: 1, averageFinish: 1.5 });
+    expect(rows[3].stats).toBeNull();
+  });
+});
+
+describe("raceHistory", () => {
+  it("lists races newest first with their podium", () => {
+    const races = [race([r("ana", 1), r("leo", 2)]), race([r("leo", 1), r("eva", 2), r("ana", 3)])];
+    expect(raceHistory(races).map((h) => [h.race.id, h.podium])).toEqual([
+      [races[1].id, ["leo", "eva", "ana"]],
+      [races[0].id, ["ana", "leo", null]],
+    ]);
   });
 });
 

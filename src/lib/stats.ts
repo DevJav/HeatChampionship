@@ -101,6 +101,30 @@ export function driverStats(races: StatsRace[]): DriverStats[] {
     .sort((a, b) => b.pointsPerRace - a.pointsPerRace || b.starts - a.starts);
 }
 
+/** Entrants' record over a set of races (e.g. one track): best average finish first, debutants last. */
+export function entrantRecords(races: StatsRace[], entrantIds: string[]) {
+  const byId = new Map(driverStats(races).map((d) => [d.userId, d]));
+  const sortKey = (stats: DriverStats | null) =>
+    !stats ? [2, 0, 0, 0] : stats.averageFinish == null ? [1, 0, -stats.starts, 0] : [0, stats.averageFinish, -stats.wins, -stats.starts];
+  return entrantIds
+    .map((userId) => ({ userId, stats: byId.get(userId) ?? null }))
+    .sort((a, b) => {
+      const [ka, kb] = [sortKey(a.stats), sortKey(b.stats)];
+      return ka.map((v, i) => v - kb[i]).find((d) => d !== 0) ?? 0;
+    });
+}
+
+/** Races newest first, each with its podium (user ids, null where nobody finished there). */
+export function raceHistory(races: StatsRace[]) {
+  return chronological(races)
+    .reverse()
+    .map((race) => ({
+      race: raceRef(race),
+      scheduledAt: race.scheduledAt,
+      podium: [1, 2, 3].map((p) => race.results.find((r) => r.position === p)?.userId ?? null),
+    }));
+}
+
 // ---------------------------------------------------------------------------
 // Records
 // ---------------------------------------------------------------------------

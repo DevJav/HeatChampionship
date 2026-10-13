@@ -216,6 +216,8 @@ model Registration {
   raceId    String
   userId    String
   status    RegistrationStatus @default(CONFIRMED)
+  /// Place in the queue: seats go to the earliest; reset when re-joining after withdrawing
+  queuedAt  DateTime           @default(now())
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 

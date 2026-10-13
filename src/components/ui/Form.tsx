@@ -24,6 +24,17 @@ export function Select({ className, ...props }: React.ComponentProps<"select">) 
   return <select className={cn(controlClass, "h-10 pr-8", className)} {...props} />;
 }
 
+type CheckboxProps = Omit<React.ComponentProps<"input">, "type"> & { label: React.ReactNode };
+
+export function Checkbox({ label, className, id, ...props }: CheckboxProps) {
+  return (
+    <label htmlFor={id} className={cn("inline-flex cursor-pointer items-center gap-2 text-sm", className)}>
+      <input id={id} type="checkbox" className="size-4 accent-primary" {...props} />
+      {label}
+    </label>
+  );
+}
+
 export function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (
     <label

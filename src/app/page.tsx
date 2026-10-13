@@ -1,4 +1,5 @@
-import { CalendarDays, Flag, Trophy } from "lucide-react";
+import { Suspense } from "react";
+import { CalendarDays, Trophy } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import {
   Badge,
@@ -10,8 +11,10 @@ import {
   ChequeredStrip,
   Container,
   EmptyState,
+  Skeleton,
   SpeedStripes,
 } from "@/components/ui";
+import { NextRaceCard } from "@/components/races/NextRaceCard";
 
 export default function HomePage() {
   return (
@@ -34,19 +37,10 @@ export default function HomePage() {
         <ChequeredStrip className="relative text-bar-fg/80" />
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Próxima carrera</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <EmptyState
-              icon={<Flag />}
-              title="No hay carreras programadas"
-              description="Cuando se programe una carrera aparecerá aquí con el botón de inscripción."
-            />
-          </CardBody>
-        </Card>
+      <div className="grid items-start gap-6 md:grid-cols-2">
+        <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+          <NextRaceCard />
+        </Suspense>
         <Card>
           <CardHeader>
             <CardTitle>Clasificación</CardTitle>

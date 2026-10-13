@@ -3,6 +3,16 @@
 import { useId, useState } from "react";
 import { cn } from "@/lib/cn";
 
+/** Shared tab look, also used by LinkTabs. */
+export function tabItemClass(selected: boolean) {
+  return cn(
+    "whitespace-nowrap px-5 py-2 font-display text-sm font-bold uppercase italic tracking-wide transition-colors clip-slant focus-inset",
+    selected ? "bg-primary text-primary-fg gloss" : "text-fg-muted hover:bg-surface-2 hover:text-fg",
+  );
+}
+
+export const tabListClass = "flex gap-1 overflow-x-auto border-b-2 border-primary";
+
 export type TabItem = {
   id: string;
   label: React.ReactNode;
@@ -21,10 +31,7 @@ export function Tabs({ items, defaultTab, className }: TabsProps) {
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div
-        role="tablist"
-        className="flex gap-1 overflow-x-auto border-b-2 border-primary"
-      >
+      <div role="tablist" className={tabListClass}>
         {items.map((item) => {
           const selected = item.id === active;
           return (
@@ -36,12 +43,7 @@ export function Tabs({ items, defaultTab, className }: TabsProps) {
               aria-selected={selected}
               aria-controls={`${baseId}-panel-${item.id}`}
               onClick={() => setActive(item.id)}
-              className={cn(
-                "whitespace-nowrap px-5 py-2 font-display text-sm font-bold uppercase italic tracking-wide transition-colors clip-slant focus-inset",
-                selected
-                  ? "bg-primary text-primary-fg gloss"
-                  : "text-fg-muted hover:bg-surface-2 hover:text-fg",
-              )}
+              className={tabItemClass(selected)}
             >
               {item.label}
             </button>

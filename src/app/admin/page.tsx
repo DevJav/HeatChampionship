@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Lock, LockOpen } from "lucide-react";
 import { updateRegistrationOpen } from "@/actions/admin";
 import {
@@ -10,10 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Container,
-  PageHeader,
   Section,
-  Skeleton,
   SubmitButton,
   Table,
   TBody,
@@ -22,10 +18,11 @@ import {
   THead,
   Tr,
 } from "@/components/ui";
-import { formatDate } from "@/lib/format";
-import { requireAdmin } from "@/lib/session";
 import { getSettings } from "@/lib/data/settings";
 import { listUsers } from "@/lib/data/users";
+import { formatDate } from "@/lib/format";
+import { requireAdmin } from "@/lib/session";
+import { AdminSuspense } from "@/components/admin/AdminSuspense";
 
 export const metadata: Metadata = { title: "Administración" };
 
@@ -86,11 +83,7 @@ async function PlayersTable() {
               </Td>
               <Td className="text-fg-muted">@{user.username}</Td>
               <Td>
-                {user.role === "admin" ? (
-                  <Badge tone="primary">Admin</Badge>
-                ) : (
-                  <Badge>Piloto</Badge>
-                )}
+                {user.role === "admin" ? <Badge tone="primary">Admin</Badge> : <Badge>Piloto</Badge>}
               </Td>
               <Td align="right" className="text-fg-muted">
                 {formatDate(user.createdAt)}
@@ -103,7 +96,7 @@ async function PlayersTable() {
   );
 }
 
-async function AdminDashboard() {
+async function AdminPageContent() {
   await requireAdmin("/admin");
 
   return (
@@ -118,15 +111,8 @@ async function AdminDashboard() {
 
 export default function AdminPage() {
   return (
-    <Container>
-      <PageHeader
-        eyebrow="Organizador"
-        title="Administración"
-        description="Temporadas, carreras, resultados y pilotos."
-      />
-      <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-        <AdminDashboard />
-      </Suspense>
-    </Container>
+    <AdminSuspense>
+      <AdminPageContent />
+    </AdminSuspense>
   );
 }

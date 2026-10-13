@@ -12,14 +12,11 @@ import {
   USERNAME_MIN,
   USERNAME_PATTERN,
 } from "@/lib/auth";
+import { fieldErrorsOf, type FormState } from "@/lib/forms";
 import { safeReturnPath } from "@/lib/paths";
 
-export type AuthFormState = {
-  error?: string;
-  fieldErrors?: Partial<Record<"username" | "name" | "password" | "confirm", string>>;
-  /** Echoed back so the form keeps what the user typed (never the password) */
-  values?: { username?: string; name?: string };
-};
+/** `values` echoes the username and name back — never the password. */
+export type AuthFormState = FormState;
 
 const ERROR_MESSAGES: Record<string, string> = {
   INVALID_USERNAME_OR_PASSWORD: "Usuario o contraseña incorrectos.",
@@ -58,15 +55,6 @@ const signUpSchema = z
     path: ["confirm"],
     message: "Las contraseñas no coinciden.",
   });
-
-function fieldErrorsOf(error: z.ZodError): AuthFormState["fieldErrors"] {
-  const result: AuthFormState["fieldErrors"] = {};
-  for (const issue of error.issues) {
-    const key = issue.path[0] as keyof NonNullable<AuthFormState["fieldErrors"]>;
-    result[key] ??= issue.message;
-  }
-  return result;
-}
 
 export async function signIn(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const username = String(formData.get("username") ?? "").trim().toLowerCase();

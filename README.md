@@ -25,6 +25,21 @@ npm run dev              # http://localhost:3000
 | `db:seed` / `db:seed:demo` | Seed data (safe to re-run) |
 | `db:studio` | Browse the database in Prisma Studio |
 | `db:reset` | Wipe the database and re-seed |
+| `test` / `test:watch` | Unit tests (Vitest) |
+
+## Running the championship
+
+Everything is managed from `/admin` (shield icon in the header):
+
+| Section | |
+|---|---|
+| Carreras | Create a race (season, track, date, sign-up deadline, seats). **Borrador** hides it, **Inscripción abierta** lets players join, **Inscripción cerrada** stops new sign-ups. On a race you can also add or remove players yourself. |
+| Temporadas | Seasons and their points table. Only one season can be in progress at a time. |
+| Circuitos / Mejoras / Colores | The catalogs: track default laps, upgrade cards, car colors. Anything already used can be deactivated but not deleted. |
+
+**Sign-ups:** seats go in sign-up order. Once a race is full, new players join the waitlist. When someone withdraws, the first person on the waitlist moves into the seat automatically. A player who withdraws and signs up again goes to the back of the queue. Players can withdraw until the race starts.
+
+All dates are entered and shown in Madrid time (`siteConfig.timeZone`), whatever time zone the server runs in.
 
 ## Accounts
 
@@ -37,19 +52,24 @@ npm run dev              # http://localhost:3000
 ```
 prisma/                Schema, migrations, seed script
 src/
-  actions/             Server actions (auth, admin)
+  actions/             Server actions (auth, races, seasons, catalog, admin)
   app/                 Routes (pages). /dev/ui is the living UI kit.
   components/
     ui/                Generic building blocks: Button, Card, Badge, Table, Modal, …
     domain/            Heat-specific pieces built from ui/: PositionBadge, CarColorChip, …
     layout/            Header, footer, navigation, user menu
     auth/              Login / sign-up forms
+    races/             Race card, entry list, sign-up panel
+    admin/             Admin forms and helpers
+    forms/             Form fields wired to server-action state (errors, echoed values)
   config/site.ts       Site name, navigation, locale & time zone, max players per race
   generated/prisma/    Generated Prisma client (git-ignored)
   lib/
     data/              Read queries for pages (each starts with `await connection()`)
     auth.ts            Better Auth config;  session.ts — getCurrentUser / requireUser / requireAdmin
-    db.ts              Prisma client;  format.ts — es-ES date formatting
+    db.ts              Prisma client;  format.ts — es-ES date formatting;  dates.ts — Madrid ⇄ UTC
+    forms.ts           FormState, parseForm() and zod field helpers
+    registration-rules.ts  Seat/waitlist rules (pure, unit-tested);  registrations.ts — DB operations
   styles/tokens.css    Design tokens — colors, radii, shadows, layout sizes
 ```
 
@@ -87,6 +107,6 @@ Open [/dev/ui](http://localhost:3000/dev/ui) to see every component and token at
 
 ### Cache Components rules
 
-- Anything that reads the session (`getCurrentUser`) or the database must be rendered inside a `<Suspense>` boundary.
+- Anything that reads the session (`getCurrentUser`), the URL (`usePathname`) or the database must be rendered inside a `<Suspense>` boundary **within the page**. A boundary in a layout doesn't cover client navigations. Admin pages use `<AdminSuspense>`.
 - Page queries go in `src/lib/data/` and begin with `await connection()`. The SQLite driver is synchronous, so without that call Next would run the query at build time and freeze the result into the page.
-- Server actions check permissions themselves (`requireAdmin()`) and call `refresh()` after a write.
+- Server actions check permissions themselves (`requireAdmin()`) and call `refresh()` after a write. Admin pages call `requireAdmin()` too, because the layout check is only for the UI.

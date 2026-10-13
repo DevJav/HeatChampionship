@@ -20,7 +20,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 | Season | name, year, points table (JSON), status |
 | Track | name, country, default laps, image, expansion |
 | Race | season, track, round, date/time, location, laps, max players, sign-up deadline, status DRAFT → OPEN → CLOSED → FINISHED |
-| Registration | race, user, timestamp, status CONFIRMED / WAITLIST / WITHDRAWN |
+| Registration | race, user, queuedAt, status CONFIRMED / WAITLIST / WITHDRAWN |
 | RaceResult | race, user, position, start position, car color, DNF, points (snapshot), notes |
 | Upgrade + ResultUpgrade | upgrade catalog; upgrades used per result |
 | CarColor | name, hex |
@@ -31,7 +31,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 - [x] **1. Scaffold + design system** — tokens, `ui/` primitives, layout & nav, `/dev/ui` showcase, Spanish UI, retro F1 style
 - [x] **2. Database + auth** — Prisma schema, seed (tracks, colors, season, admin, demo players), Better Auth (username login), role guards, registration on/off in `/admin`
   - Upgrade cards not seeded yet: names depend on the edition — add them once the admin catalog UI exists
-- [ ] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline
+- [x] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline; admin catalogs (seasons, tracks, upgrades, colors); Vitest
 - [ ] **4. Results + scoring** — results entry form, `scoreRace()` with tests, photo upload
 - [ ] **5. Standings, race pages, profiles**
 - [ ] **6. Statistics** — `lib/stats` with tests, charts

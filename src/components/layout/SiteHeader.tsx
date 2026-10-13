@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
-import { NavLinks } from "./NavLinks";
+import { NavLinks, NavList } from "./NavLinks";
 import { MobileUserLinks, UserMenu, UserMenuSkeleton } from "./UserMenu";
 
 export function SiteHeader() {
@@ -12,7 +12,10 @@ export function SiteHeader() {
       <Container className="relative flex h-(--header-height) items-center justify-between gap-2 sm:gap-4">
         <Logo />
         <nav className="hidden lg:block">
-          <NavLinks items={siteConfig.nav} />
+          {/* Shell shows the menu unhighlighted; the active item streams in */}
+          <Suspense fallback={<NavList items={siteConfig.nav} />}>
+            <NavLinks items={siteConfig.nav} />
+          </Suspense>
         </nav>
         <div className="flex items-center gap-1">
           <Suspense fallback={<UserMenuSkeleton />}>

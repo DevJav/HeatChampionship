@@ -13,11 +13,13 @@ import {
   Skeleton,
   StatCard,
 } from "@/components/ui";
+import { SeasonPodium } from "@/components/achievements/SeasonPodium";
 import { SeasonPicker } from "@/components/standings/SeasonPicker";
 import { StandingsChart } from "@/components/standings/StandingsChart";
 import { StandingsTable } from "@/components/standings/StandingsTable";
 import { getCurrentSeason, listSeasons } from "@/lib/data/catalog";
 import { getSeasonStandings } from "@/lib/data/standings";
+import { cn } from "@/lib/cn";
 
 export const metadata: Metadata = { title: "Clasificación" };
 
@@ -36,6 +38,7 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
   }
 
   const standings = await getSeasonStandings(season.id);
+  const finished = season.status === "FINISHED";
   const { rows, races, drivers, scheduledRaces } = standings;
   const leader = rows[0] ? drivers.get(rows[0].userId) : null;
   const topWins = Math.max(...rows.map((r) => r.wins));
@@ -59,13 +62,18 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            <StatCard
-              label="Líder"
-              value={leader?.name ?? "—"}
-              hint={`${rows[0].points} pts${rows[1] ? ` · +${rows[0].points - rows[1].points} sobre el 2º` : ""}`}
-              icon={<Crown />}
-            />
+          {finished && <SeasonPodium places={rows.slice(0, 5)} drivers={drivers} />}
+
+          {/* A finished season shows its champion on the podium above instead of a leader card */}
+          <div className={cn("grid grid-cols-2 gap-4", !finished && "lg:grid-cols-3")}>
+            {!finished && (
+              <StatCard
+                label="Líder"
+                value={leader?.name ?? "—"}
+                hint={`${rows[0].points} pts${rows[1] ? ` · +${rows[0].points - rows[1].points} sobre el 2º` : ""}`}
+                icon={<Crown />}
+              />
+            )}
             <StatCard
               label="Carreras disputadas"
               value={`${races.length}/${Math.max(scheduledRaces, races.length)}`}

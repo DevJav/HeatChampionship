@@ -54,6 +54,18 @@ Everything is managed from `/admin` (shield icon in the header):
 
 Streaks count consecutive races a driver took part in, so missing a month doesn't break one.
 
+**Prizes and achievements:** these are worked out from the results, so nothing needs entering by hand.
+- **Season trophies:** when a season is marked *Finalizada*, its top three get *Campeón*, *Subcampeón* and *Tercero*.
+- **Race badges:** *Desde el fondo* (win starting last), *Remontada* (+4 places), *De principio a fin*, *Hat-trick*, *Fijo en el podio*, *Trotamundos*, *Incansable*, *Veterano*, *Leyenda*, firsts, and *Trompo*.
+- **Where they show:**
+  - profiles: trophies plus badges, with locked badges under "Por conseguir"
+  - player cards
+  - each finished race: "Logros desbloqueados"
+  - finished seasons in the standings: a podium
+  - "Palmarés" in the statistics
+
+The definitions and thresholds are in `src/lib/achievements.ts`. To add a badge, add it to `ACHIEVEMENTS`, detect it in `computeUnlocks()`, and give it an icon in `components/achievements/AchievementIcon.tsx`.
+
 **Players:** `/pilotos` lists every driver with their career numbers. Each driver has a profile with stats, recent form, best track and race history. Players edit their own name, bio, favorite color, photo and password at `/perfil` (header avatar → "Editar perfil", or "Mi perfil" in the mobile menu).
 
 **Flags:** each track has a country (picked from a list in admin → Circuitos). Its flag fills the background of the race banner, and it also gives the country name shown in the race preview. Tracks without a country keep the red speed stripes. The list includes England, Scotland, Wales, Northern Ireland and Catalonia.
@@ -88,6 +100,7 @@ src/
     races/             Race card, entry list, sign-up panel, podium, results
     standings/         Standings table, points chart, season picker
     stats/             Records, driver table, head-to-head grid, grid chart, track and tally tables
+    achievements/      Badges, trophy chips, race unlocks, season podium, palmarés
     charts/            Shared chart pieces: tooltip, width hook
     players/           Player card, profile pieces, profile forms
     admin/             Admin forms and helpers
@@ -103,6 +116,7 @@ src/
     scoring.ts, results-rules.ts  Points and results-sheet validation (pure, unit-tested);  results.ts — DB operations
     uploads.ts         Photo & avatar storage (sharp → WebP) served by app/media/[...path]
     standings.ts, player-stats.ts  Standings with countback, points progression, player summaries (pure, unit-tested)
+    achievements.ts    Trophies and badges computed from results (pure, unit-tested)
     stats.ts           Records, head to head, track / car / upgrade / grid tallies (pure, unit-tested)
     chart-scale.ts     Clean axis ticks for the SVG charts
     colors.ts          Readable text / outline for user-chosen colors

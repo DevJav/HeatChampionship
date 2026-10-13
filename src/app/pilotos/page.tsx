@@ -3,12 +3,13 @@ import { Suspense } from "react";
 import { Users } from "lucide-react";
 import { Container, EmptyState, PageHeader, Skeleton } from "@/components/ui";
 import { PlayerCard } from "@/components/players/PlayerCard";
+import { getAchievements } from "@/lib/data/achievements";
 import { listPlayers, toPlayerResults } from "@/lib/data/players";
 
 export const metadata: Metadata = { title: "Pilotos" };
 
 async function PlayerGrid() {
-  const players = await listPlayers();
+  const [players, { unlocks }] = await Promise.all([listPlayers(), getAchievements()]);
   if (players.length === 0) return <EmptyState icon={<Users />} title="Aún no hay pilotos" />;
 
   // Most career points first, then alphabetical
@@ -20,7 +21,12 @@ async function PlayerGrid() {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {withPoints.map(({ player, results }) => (
-        <PlayerCard key={player.id} player={player} results={results} />
+        <PlayerCard
+          key={player.id}
+          player={player}
+          results={results}
+          unlocks={unlocks.filter((u) => u.userId === player.id)}
+        />
       ))}
     </div>
   );

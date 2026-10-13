@@ -17,6 +17,8 @@ import {
 } from "@/components/ui";
 import { FlagBackdrop } from "@/components/domain/CountryFlag";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
+import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
+import { getAchievements } from "@/lib/data/achievements";
 import { EntryList } from "@/components/races/EntryList";
 import { Podium } from "@/components/races/Podium";
 import { RaceMeta } from "@/components/races/RaceMeta";
@@ -93,8 +95,9 @@ function NotesCard({ notes }: { notes: string }) {
 }
 
 async function FinishedRace({ race }: { race: RaceDetail }) {
-  const results = await getRaceResults(race.id);
+  const [results, { unlocks, drivers }] = await Promise.all([getRaceResults(race.id), getAchievements()]);
   const driverIds = results.map((r) => r.user.id);
+  const raceUnlocks = unlocks.filter((u) => u.race?.id === race.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -112,6 +115,16 @@ async function FinishedRace({ race }: { race: RaceDetail }) {
         </CardHeader>
         <ResultsTable results={results} />
       </Card>
+      {raceUnlocks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Logros desbloqueados</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <RaceUnlocks unlocks={raceUnlocks} drivers={drivers} />
+          </CardBody>
+        </Card>
+      )}
       {race.notes && <NotesCard notes={race.notes} />}
       <PhotosCard race={race} driverIds={driverIds} />
     </div>

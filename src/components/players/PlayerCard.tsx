@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { summarizePlayer, type PlayerResult } from "@/lib/player-stats";
 import { Avatar, Card } from "@/components/ui";
+import type { Unlock } from "@/lib/achievements";
+import { TrophyChips } from "@/components/achievements/TrophyChips";
 import { FormStrip } from "./FormStrip";
 
 type PlayerCardProps = {
@@ -11,10 +13,12 @@ type PlayerCardProps = {
     favoriteColor: { hex: string } | null;
   };
   results: PlayerResult[];
+  /** This player's achievement unlocks (season trophies are shown) */
+  unlocks?: Unlock[];
 };
 
 /** Driver card for the players list: identity, career numbers and recent form. */
-export function PlayerCard({ player, results }: PlayerCardProps) {
+export function PlayerCard({ player, results, unlocks = [] }: PlayerCardProps) {
   const summary = summarizePlayer(results, 3);
   const stats = [
     { label: "Carreras", value: summary.starts },
@@ -33,6 +37,7 @@ export function PlayerCard({ player, results }: PlayerCardProps) {
             <p className="text-sm text-fg-muted">@{player.username}</p>
           </div>
         </div>
+        <TrophyChips unlocks={unlocks} />
         <dl className="grid grid-cols-4 gap-2 border-t border-border pt-3 text-center">
           {stats.map((stat) => (
             <div key={stat.label}>

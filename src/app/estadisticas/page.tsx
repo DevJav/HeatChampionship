@@ -14,6 +14,7 @@ import {
   Skeleton,
   StatCard,
 } from "@/components/ui";
+import { PalmaresTable } from "@/components/achievements/PalmaresTable";
 import { CarColorChip } from "@/components/domain/CarColorChip";
 import { SeasonPicker } from "@/components/standings/SeasonPicker";
 import { DriverStatsTable } from "@/components/stats/DriverStatsTable";
@@ -22,9 +23,11 @@ import { HeadToHeadMatrix } from "@/components/stats/HeadToHeadMatrix";
 import { RecordCard } from "@/components/stats/RecordCard";
 import { TallyTable } from "@/components/stats/TallyTable";
 import { TrackStatsTable } from "@/components/stats/TrackStatsTable";
+import { getAchievements } from "@/lib/data/achievements";
 import { listSeasons } from "@/lib/data/catalog";
 import { getStatsData } from "@/lib/data/stats";
 import { formatDecimal } from "@/lib/format";
+import { seasonPodiums } from "@/lib/achievements";
 import {
   carColorStats,
   championshipRecords,
@@ -97,6 +100,9 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
   const winners = new Set(races.flatMap((race) => race.results.filter((r) => r.position === 1).map((r) => r.userId)));
   const averageField = races.reduce((sum, race) => sum + race.results.length, 0) / races.length;
   const recordProps = { drivers, showSeason: !season };
+  // Season podiums only make sense across seasons
+  const { unlocks } = season ? { unlocks: [] } : await getAchievements();
+  const hasPalmares = seasonPodiums(unlocks).length > 0;
 
   return (
     <div className="flex flex-col gap-8">
@@ -108,6 +114,13 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
         <StatCard label="Ganadores distintos" value={winners.size} icon={<Trophy />} />
         <StatCard label="Pilotos por carrera" value={formatDecimal(averageField)} icon={<Gauge />} />
       </div>
+
+      {hasPalmares && (
+        <Card>
+          <BlockHeader title="Palmarés" description="Los tres primeros de cada temporada terminada." />
+          <PalmaresTable unlocks={unlocks} drivers={drivers} />
+        </Card>
+      )}
 
       <Section title="Récords">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -19,6 +19,10 @@ import {
 import { CarColorChip } from "@/components/domain/CarColorChip";
 import { FormStrip } from "@/components/players/FormStrip";
 import { RaceHistory } from "@/components/players/RaceHistory";
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
+import { TrophyChips } from "@/components/achievements/TrophyChips";
+import { awardsFor } from "@/lib/achievements";
+import { getAchievements } from "@/lib/data/achievements";
 import { getCurrentSeason } from "@/lib/data/catalog";
 import { getPlayerProfile, toPlayerResults } from "@/lib/data/players";
 import { getSeasonStandings } from "@/lib/data/standings";
@@ -30,12 +34,18 @@ export const metadata: Metadata = { title: "Piloto" };
 
 async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]">["params"] }) {
   const { username } = await params;
-  const [player, viewer, season] = await Promise.all([
+  const [player, viewer, season, { unlocks }] = await Promise.all([
     getPlayerProfile(decodeURIComponent(username)),
     getCurrentUser(),
     getCurrentSeason(),
+    getAchievements(),
   ]);
   if (!player) notFound();
+  const awards = awardsFor(player.id, unlocks);
+  const badges = awards.filter((a) => !a.achievement.trophy);
+  const earned = badges.filter((a) => a.unlocks.length > 0);
+  const locked = badges.filter((a) => a.unlocks.length === 0);
+  const earnedBadges = earned.length;
 
   const summary = summarizePlayer(toPlayerResults(player.results));
   const standings = season ? await getSeasonStandings(season.id) : null;
@@ -58,6 +68,7 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
               <Badge tone="bar">@{player.username}</Badge>
             </div>
             <h1 className="pr-2 text-5xl sm:text-6xl">{player.name}</h1>
+            <TrophyChips unlocks={awards.flatMap((a) => a.unlocks)} />
             {player.bio && <p className="max-w-xl text-bar-fg/80">{player.bio}</p>}
             <div className="flex flex-wrap items-center gap-4 text-sm text-bar-fg/80">
               {player.favoriteColor && (
@@ -99,6 +110,38 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
           hint="Puestos ganados desde la salida"
         />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Logros</CardTitle>
+          <Badge tone="bar">
+            {earnedBadges}/{badges.length}
+          </Badge>
+        </CardHeader>
+        <CardBody className="flex flex-col gap-4">
+          {earnedBadges > 0 ? (
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {earned.map((award) => (
+                <AchievementBadge key={award.achievement.id} award={award} />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-fg-muted">Todavía ninguno: el primero llega con la primera carrera.</p>
+          )}
+          {locked.length > 0 && (
+            <details className="group">
+              <summary className="cursor-pointer text-sm font-semibold text-fg-muted hover:text-primary">
+                Por conseguir ({locked.length})
+              </summary>
+              <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {locked.map((award) => (
+                  <AchievementBadge key={award.achievement.id} award={award} />
+                ))}
+              </ul>
+            </details>
+          )}
+        </CardBody>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

@@ -75,6 +75,14 @@ The definitions and thresholds are in `src/lib/achievements.ts`. To add a badge,
 - each signed-up driver's record on that track (debutants flagged)
 - the latest podiums there
 
+**Sharing:** every race page has **WhatsApp** and **Copiar enlace** buttons. The WhatsApp message changes with the race:
+- open: date, place and seats left, with a call to sign up
+- finished: the podium
+
+Links to races show a preview image in WhatsApp and other apps, with the track, date, flag, and the sign-up status or winner. Upcoming races also have **Añadir al calendario**, a calendar file with a reminder 2 hours before, and a **Google Calendar** link. A race night lasts `siteConfig.raceDurationHours` in the invite.
+
+These shared links use the site's public address: `SITE_URL`, or `BETTER_AUTH_URL` if that isn't set.
+
 **Sign-ups:** seats go in sign-up order. Once a race is full, new players join the waitlist. When someone withdraws, the first person on the waitlist moves into the seat automatically. A player who withdraws and signs up again goes to the back of the queue. Players can withdraw until the race starts.
 
 All dates are entered and shown in Madrid time (`siteConfig.timeZone`), whatever time zone the server runs in.

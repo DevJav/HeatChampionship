@@ -10,6 +10,8 @@ export const siteConfig = {
   /** Dates are shown in this time zone regardless of where the server runs */
   timeZone: "Europe/Madrid",
   maxPlayersPerRace: 8,
+  /** How long a race night lasts, for calendar invites */
+  raceDurationHours: 3,
   nav: [
     { label: "Inicio", href: "/" },
     { label: "Clasificación", href: "/clasificacion" },

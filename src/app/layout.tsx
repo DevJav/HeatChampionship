@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Titillium_Web } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { siteUrl } from "@/lib/site-url";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import "./globals.css";
@@ -20,6 +21,8 @@ const codeFont = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Link previews need absolute URLs: the public address of the site
+  metadataBase: new URL(siteUrl()),
   title: {
     default: siteConfig.name,
     template: `%s · ${siteConfig.name}`,

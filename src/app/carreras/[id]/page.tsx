@@ -25,15 +25,36 @@ import { RaceMeta } from "@/components/races/RaceMeta";
 import { RacePhotos } from "@/components/races/RacePhotos";
 import { RaceSignupPanel } from "@/components/races/RaceSignupPanel";
 import { ResultsTable } from "@/components/races/ResultsTable";
+import { CalendarButtons } from "@/components/races/CalendarButtons";
+import { ShareButtons } from "@/components/races/ShareButtons";
 import { TrackPreview } from "@/components/races/TrackPreview";
+import { googleCalendarUrl } from "@/lib/calendar";
+import { raceCalendarEvent, raceShareText, whatsappUrl } from "@/lib/race-share";
+import { absoluteUrl } from "@/lib/site-url";
+import { formatRaceDay } from "@/lib/format";
+import { raceTitle } from "@/lib/races";
 import { getRace, type RaceDetail } from "@/lib/data/races";
-import { getRaceResults } from "@/lib/data/results";
+import { getRaceResults, type RaceResultDetail } from "@/lib/data/results";
 import { racePhase } from "@/lib/registration-rules";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Carrera" };
+export async function generateMetadata({ params }: PageProps<"/carreras/[id]">): Promise<Metadata> {
+  const { id } = await params;
+  const race = await getRace(id);
+  if (!race) return { title: "Carrera" };
+  const description = [formatRaceDay(race.scheduledAt), race.location, race.season.name].filter(Boolean).join(" · ");
+  return { title: raceTitle(race), description, openGraph: { title: raceTitle(race), description } };
+}
 
-function RaceHero({ race, admin }: { race: RaceDetail; admin: boolean }) {
+function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; results: RaceResultDetail[] }) {
+  const url = absoluteUrl(`/carreras/${race.id}`);
+  const phase = racePhase(race);
+  const upcoming = phase === "OPEN" || phase === "CLOSED";
+  const share = raceShareText(race, url, {
+    confirmed: race.registrations.filter((r) => r.status === "CONFIRMED").length,
+    podium: results.filter((r) => r.position != null && r.position <= 3).map((r) => r.user.name),
+  });
+
   return (
     <section className="relative overflow-hidden border-l-4 border-primary surface-bar clip-chamfer">
       {race.track.countryCode ? (
@@ -52,6 +73,17 @@ function RaceHero({ race, admin }: { race: RaceDetail; admin: boolean }) {
         </div>
         <h1 className="text-5xl [text-shadow:0_2px_12px_rgb(0_0_0/0.5)] sm:text-7xl">{race.track.name}</h1>
         <RaceMeta race={race} className="text-bar-fg/80" />
+        {race.status !== "DRAFT" && (
+          <div className="flex flex-wrap gap-2">
+            <ShareButtons whatsappHref={whatsappUrl(share)} url={url} />
+            {upcoming && (
+              <CalendarButtons
+                icsHref={`/carreras/${race.id}/calendario`}
+                googleHref={googleCalendarUrl(raceCalendarEvent(race, url))}
+              />
+            )}
+          </div>
+        )}
         {admin && (
           <div className="flex flex-wrap gap-2">
             <ButtonLink href={`/admin/carreras/${race.id}`} variant="inverse" size="sm">
@@ -94,8 +126,8 @@ function NotesCard({ notes }: { notes: string }) {
   );
 }
 
-async function FinishedRace({ race }: { race: RaceDetail }) {
-  const [results, { unlocks, drivers }] = await Promise.all([getRaceResults(race.id), getAchievements()]);
+async function FinishedRace({ race, results }: { race: RaceDetail; results: RaceResultDetail[] }) {
+  const { unlocks, drivers } = await getAchievements();
   const driverIds = results.map((r) => r.user.id);
   const raceUnlocks = unlocks.filter((u) => u.race?.id === race.id);
 
@@ -173,12 +205,13 @@ async function RaceView({ params }: { params: Promise<{ id: string }> }) {
   const admin = isAdmin(await getCurrentUser());
   const race = await getRace(id, { includeDraft: admin });
   if (!race) notFound();
+  const results = race.status === "FINISHED" ? await getRaceResults(race.id) : [];
 
   return (
     <div className="flex flex-col gap-8">
       {race.status === "DRAFT" && <Alert tone="warning">Borrador: solo lo ven los administradores.</Alert>}
-      <RaceHero race={race} admin={admin} />
-      {race.status === "FINISHED" ? <FinishedRace race={race} /> : <UpcomingRace race={race} />}
+      <RaceHero race={race} admin={admin} results={results} />
+      {race.status === "FINISHED" ? <FinishedRace race={race} results={results} /> : <UpcomingRace race={race} />}
     </div>
   );
 }

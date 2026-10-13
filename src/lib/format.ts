@@ -36,3 +36,15 @@ export const formatPercent = (value: number) => percentFormat.format(value);
 
 /** "1 carrera" / "3 carreras" */
 export const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
+
+const raceDayFormat = new Intl.DateTimeFormat(locale, {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone,
+});
+
+/** "sábado, 14 de noviembre, 18:00" */
+export const formatRaceDay = (date: Date) => raceDayFormat.format(date);

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Titillium_Web } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
 };
+
+/** Phones tint their browser bar to match the header */
+export const viewport: Viewport = { themeColor: "#111214" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

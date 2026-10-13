@@ -146,3 +146,6 @@ Open [/dev/ui](http://localhost:3000/dev/ui) to see every component and token at
 - Anything that reads the session (`getCurrentUser`), the URL (`usePathname`) or the database must be rendered inside a `<Suspense>` boundary **within the page**. A boundary in a layout doesn't cover client navigations. Admin pages use `<AdminSuspense>`.
 - Page queries go in `src/lib/data/` and begin with `await connection()`. The SQLite driver is synchronous, so without that call Next would run the query at build time and freeze the result into the page.
 - Server actions check permissions themselves (`requireAdmin()`) and call `refresh()` after a write. Admin pages call `requireAdmin()` too, because the layout check is only for the UI.
+
+
+**Icons:** the browser-tab icon, the iOS icon and the home-screen icons are generated from the logo by `node scripts/generate-icons.mjs`. Change the colors or shape there, then run it again.

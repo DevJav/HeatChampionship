@@ -35,4 +35,10 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 - [x] **4. Results + scoring** — results editor (positions, grid, car, upgrades, notes) with live points, `scoreRace()` + sheet validation with tests, podium/results on the race page, photo uploads, season re-scoring
 - [x] **5. Standings, race pages, profiles** — standings with countback, movement and points chart; players list; profiles with stats/form/history; profile editing (name, bio, color, avatar, password); home standings + last race
 - [x] **6. Statistics** — `lib/stats` with tests; all-time or per-season records (with streaks and comebacks), driver comparison, head-to-head grid, win rate by grid slot, tracks, car colors, upgrades
+- [x] **6b. Polish before deployment**
+  - track history on upcoming races; country flags in race banners; slim home season strip; LED countdown (to revisit)
+  - admin player management: password reset, rename, role, delete
+  - Spanish 404 and error pages; app icon and web manifest
+  - WhatsApp sharing with link previews; calendar invites (.ics and Google)
+  - season trophies and achievements
 - [ ] **7. Deployment** — Dockerfile, compose, persistent volume, backup script

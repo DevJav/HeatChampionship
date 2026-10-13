@@ -3,7 +3,6 @@ import { Container } from "@/components/ui";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NavLinks } from "./NavLinks";
-import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
   return (
@@ -14,7 +13,6 @@ export function SiteHeader() {
           <NavLinks items={siteConfig.nav} />
         </nav>
         <div className="flex items-center gap-1">
-          <ThemeToggle />
           <MobileNav items={siteConfig.nav} />
         </div>
       </Container>

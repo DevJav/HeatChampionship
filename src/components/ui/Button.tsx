@@ -16,7 +16,7 @@ export const buttonVariants = cva(
         accent: "bg-accent text-accent-fg gloss hover:bg-accent-hover",
         secondary: "bg-surface-2 text-fg hover:bg-border",
         ghost: "text-fg hover:bg-surface-2",
-        /** For use on top of broadcast bars (header, hero) in either theme */
+        /** For use on top of dark broadcast bars (header, hero) */
         inverse: "text-bar-fg hover:bg-white/10",
         danger: "bg-danger-solid text-white gloss hover:bg-danger-solid-hover",
         link: "text-primary normal-case not-italic underline-offset-4 [clip-path:none] hover:underline",

@@ -15,7 +15,7 @@ type NavLinksProps = {
   onNavigate?: () => void;
 };
 
-/** Menu items for the broadcast bar (always dark, so uses bar colors). */
+/** Menu items for the dark broadcast bar, so they use bar colors. */
 export function NavLinks({
   items,
   orientation = "horizontal",

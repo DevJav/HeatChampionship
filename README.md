@@ -22,7 +22,7 @@ src/
   components/
     ui/                Generic building blocks: Button, Card, Badge, Table, Modal, …
     domain/            Heat-specific pieces built from ui/: PositionBadge, CarColorChip, …
-    layout/            Header, footer, navigation, theme toggle
+    layout/            Header, footer, navigation
   config/site.ts       Site name, navigation menu, max players per race
   lib/                 Helpers (cn class merger, …)
   styles/tokens.css    Design tokens — colors, radii, shadows, layout sizes
@@ -30,7 +30,7 @@ src/
 
 ## Customizing the look
 
-1. **Colors, shapes, textures** — edit `src/styles/tokens.css`. Dark (default) values are in `:root`, light overrides in `:root[data-theme="light"]`. Every component reads from these.
+1. **Colors, shapes, textures** — edit `src/styles/tokens.css`. Every component reads from these.
    - `--slant` / `--chamfer` control the slanted buttons and cut panel corners — set to `0` for plain rectangles.
    - `--bar-*` is the dark broadcast bar (header, card headers, table heads); `--texture` is the carbon background.
 2. **Fonts** — change the `next/font` imports in `src/app/layout.tsx` (`--font-body`, `--font-code`); `--font-heading` is set in `tokens.css`.
@@ -57,5 +57,5 @@ Open [/dev/ui](http://localhost:3000/dev/ui) to see every component and token at
 - Use semantic token classes (`bg-surface`, `text-fg-muted`, `bg-primary`, `rounded-card`), never raw colors like `bg-red-600`.
 - Need a new look for a button or badge? Add a variant to the component rather than overriding classes at the call site.
 - Navigation that looks like a button uses `<ButtonLink>`, which shares the same variants as `<Button>`.
-- On top of a broadcast bar (dark in both themes) use `text-bar-fg` and the `inverse` button variant.
+- On top of a dark broadcast bar use `text-bar-fg` and the `inverse` button variant.
 - User-facing text is in Spanish; routes use Spanish slugs (`/clasificacion`, `/carreras`, `/pilotos`, `/estadisticas`).

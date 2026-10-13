@@ -1,9 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
 
-/* Tailwind's dark: variant follows the data-theme attribute, not the OS */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
 /*
  * Maps design tokens (src/styles/tokens.css) to Tailwind utilities.
  * e.g. --color-surface → bg-surface / text-surface / border-surface

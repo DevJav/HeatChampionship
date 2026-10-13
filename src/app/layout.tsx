@@ -3,7 +3,6 @@ import { Geist_Mono, Titillium_Web } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { ThemeScript } from "@/components/layout/ThemeScript";
 import "./globals.css";
 
 // Font CSS variables are consumed in globals.css (--font-body, --font-heading, --font-code).
@@ -32,13 +31,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      data-theme="dark"
-      suppressHydrationWarning
       className={`${titillium.variable} ${codeFont.variable} h-full antialiased`}
     >
-      <head>
-        <ThemeScript />
-      </head>
       <body className="flex min-h-full flex-col">
         <SiteHeader />
         <main className="flex-1 py-8 sm:py-10">{children}</main>

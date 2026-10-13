@@ -5,7 +5,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 ## Decisions
 
 - **UI language:** Spanish (Spain), Spanish route slugs. Dates/numbers formatted with `es-ES`.
-- **Style:** retro F1 broadcast (circa 2012) — dark glossy bars, red accents, slanted shapes, Titillium Web italic. Dark theme by default, light available.
+- **Style:** retro F1 broadcast (circa 2012) — dark glossy bars, red accents, slanted shapes, Titillium Web italic. Light theme only (dark broadcast bars over light panels).
 - **Stack:** Next.js 16 (App Router, Cache Components) + TypeScript, Tailwind 4, Prisma + SQLite, Better Auth, Recharts, Vitest. Docker Compose for deployment.
 - **Accounts:** every friend has a username/password account; one admin enters results. Admin can switch off new registrations.
 - **Scoring:** points table per season, default `9-6-4-3-2-1` (places 1–6). Points are snapshotted when a race is finalized; admin can recalculate a season.
@@ -28,7 +28,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 
 ## Phases
 
-- [x] **1. Scaffold + design system** — tokens, `ui/` primitives, layout & nav, light/dark theme, `/dev/ui` showcase, Spanish UI, retro F1 style
+- [x] **1. Scaffold + design system** — tokens, `ui/` primitives, layout & nav, `/dev/ui` showcase, Spanish UI, retro F1 style
 - [ ] **2. Database + auth** — Prisma schema, seed (tracks, upgrades, colors, admin, sample players), Better Auth, role guards
 - [ ] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline
 - [ ] **4. Results + scoring** — results entry form, `scoreRace()` with tests, photo upload

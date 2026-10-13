@@ -23,6 +23,7 @@ npm run dev              # http://localhost:3000
 | `db:migrate` | Create/apply migrations after editing `prisma/schema.prisma` |
 | `db:deploy` | Apply migrations in production |
 | `db:seed` / `db:seed:demo` | Seed data (safe to re-run) |
+| `db:seed:sample` | Local testing only: a finished 2025/26 season and part of 2026/27 (reproducible random results). Skipped if 2025/26 already exists |
 | `db:studio` | Browse the database in Prisma Studio |
 | `db:reset` | Wipe the database and re-seed |
 | `test` / `test:watch` | Unit tests (Vitest) |

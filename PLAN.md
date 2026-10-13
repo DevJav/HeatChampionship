@@ -29,7 +29,8 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 ## Phases
 
 - [x] **1. Scaffold + design system** — tokens, `ui/` primitives, layout & nav, `/dev/ui` showcase, Spanish UI, retro F1 style
-- [ ] **2. Database + auth** — Prisma schema, seed (tracks, upgrades, colors, admin, sample players), Better Auth, role guards
+- [x] **2. Database + auth** — Prisma schema, seed (tracks, colors, season, admin, demo players), Better Auth (username login), role guards, registration on/off in `/admin`
+  - Upgrade cards not seeded yet: names depend on the edition — add them once the admin catalog UI exists
 - [ ] **3. Races & sign-ups** — admin race CRUD, sign-up / withdraw, waitlist with auto-promotion, deadline
 - [ ] **4. Results + scoring** — results entry form, `scoreRace()` with tests, photo upload
 - [ ] **5. Standings, race pages, profiles**

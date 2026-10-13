@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Flag, Plus, Trash2, Trophy } from "lucide-react";
 import {
+  Alert,
   Avatar,
   Badge,
   Button,
@@ -326,6 +327,15 @@ export default function UiKitPage() {
             { id: "photos", label: "Fotos", content: <p>Panel de fotos</p> },
           ]}
         />
+      </Section>
+
+      <Section title="Avisos">
+        <div className="flex flex-col gap-2">
+          <Alert tone="info">Las inscripciones cierran el viernes a las 20:00.</Alert>
+          <Alert tone="success">Te has inscrito en la Ronda 3.</Alert>
+          <Alert tone="warning">Quedan 2 plazas libres.</Alert>
+          <Alert tone="danger">Usuario o contraseña incorrectos.</Alert>
+        </div>
       </Section>
 
       <Section title="Feedback">

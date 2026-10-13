@@ -7,6 +7,8 @@ export const siteConfig = {
   description:
     "Carreras mensuales de Heat: Pedal to the Metal. Clasificación, resultados y estadísticas.",
   locale: "es-ES",
+  /** Dates are shown in this time zone regardless of where the server runs */
+  timeZone: "Europe/Madrid",
   maxPlayersPerRace: 8,
   nav: [
     { label: "Inicio", href: "/" },

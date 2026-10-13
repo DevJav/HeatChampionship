@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import type { NavItem } from "@/config/site";
+import { navItemClass } from "./navStyles";
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -33,12 +34,7 @@ export function NavLinks({
               href={item.href}
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
-              className={cn(
-                "block px-4 py-2 font-display text-sm font-bold uppercase italic tracking-wide transition-colors clip-slant focus-inset",
-                active
-                  ? "bg-primary text-primary-fg gloss"
-                  : "text-bar-fg/70 hover:bg-white/10 hover:text-bar-fg",
-              )}
+              className={navItemClass(active)}
             >
               {item.label}
             </Link>

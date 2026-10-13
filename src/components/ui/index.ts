@@ -1,3 +1,4 @@
+export { Alert } from "./Alert";
 export { Avatar } from "./Avatar";
 export { Badge, badgeVariants } from "./Badge";
 export { Button, ButtonLink, buttonVariants } from "./Button";
@@ -18,6 +19,7 @@ export { Modal } from "./Modal";
 export { Skeleton } from "./Skeleton";
 export { Spinner } from "./Spinner";
 export { StatCard } from "./StatCard";
+export { SubmitButton } from "./SubmitButton";
 export { Table, TBody, Td, Th, THead, Tr } from "./Table";
 export { Tabs } from "./Tabs";
 export type { TabItem } from "./Tabs";

@@ -6,13 +6,13 @@ export const badgeVariants = cva(
   {
     variants: {
       tone: {
-        neutral: "bg-surface-2 text-fg-muted",
+        neutral: "bg-border text-fg-muted",
         primary: "bg-primary text-primary-fg",
         accent: "bg-accent text-accent-fg",
-        success: "bg-success/20 text-success",
-        warning: "bg-warning/20 text-warning",
-        danger: "bg-danger/20 text-danger",
-        info: "bg-info/20 text-info",
+        success: "bg-success text-white",
+        warning: "bg-warning text-white",
+        danger: "bg-danger-solid text-white",
+        info: "bg-info text-white",
         bar: "surface-bar",
       },
     },

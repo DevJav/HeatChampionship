@@ -1,0 +1,273 @@
+// Heat Championship database schema.
+// Database URL lives in prisma.config.ts (from DATABASE_URL).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ---------------------------------------------------------------------------
+// Auth — tables required by Better Auth (core + username + admin plugins).
+// Field names must match what Better Auth expects; extra columns are ours.
+// ---------------------------------------------------------------------------
+
+model User {
+  id              String    @id
+  /// Display name shown across the site
+  name            String
+  /// Internal placeholder (<username>@users.heat.local); players log in by username
+  email           String    @unique
+  emailVerified   Boolean   @default(false)
+  image           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  username        String?   @unique
+  displayUsername String?
+  /// "admin" or "user"
+  role            String?
+  banned          Boolean?  @default(false)
+  banReason       String?
+  banExpires      DateTime?
+
+  // Championship profile
+  bio             String?
+  favoriteColorId String?
+  favoriteColor   CarColor? @relation(fields: [favoriteColorId], references: [id], onDelete: SetNull)
+
+  sessions      Session[]
+  accounts      Account[]
+  registrations Registration[]
+  results       RaceResult[]
+  photos        RacePhoto[]
+
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---------------------------------------------------------------------------
+// App settings — a single row (id = 1)
+// ---------------------------------------------------------------------------
+
+model AppSettings {
+  id               Int     @id @default(1)
+  /// When false, new accounts can't be created from the sign-up page
+  registrationOpen Boolean @default(true)
+}
+
+// ---------------------------------------------------------------------------
+// Catalogs — editable from the admin so expansions only need new rows
+// ---------------------------------------------------------------------------
+
+model Track {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  country     String?
+  /// Base game or expansion name, e.g. "Juego base", "Heavy Rain"
+  expansion   String?
+  defaultLaps Int?
+  imageUrl    String?
+  description String?
+  active      Boolean @default(true)
+
+  races Race[]
+}
+
+model CarColor {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  /// CSS color, e.g. "#d10500"
+  hex       String
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+
+  results  RaceResult[]
+  favorers User[]
+}
+
+model Upgrade {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+  expansion   String?
+  active      Boolean @default(true)
+
+  results ResultUpgrade[]
+}
+
+// ---------------------------------------------------------------------------
+// Championship
+// ---------------------------------------------------------------------------
+
+enum SeasonStatus {
+  UPCOMING
+  ACTIVE
+  FINISHED
+}
+
+model Season {
+  id          String       @id @default(cuid())
+  name        String
+  year        Int
+  status      SeasonStatus @default(UPCOMING)
+  /// Points by finishing position: [9, 6, 4, 3, 2, 1] → 1st gets 9, 6th gets 1
+  pointsTable Json
+  createdAt   DateTime     @default(now())
+
+  races Race[]
+}
+
+enum RaceStatus {
+  /// Being prepared, not visible to players
+  DRAFT
+  /// Sign-ups open
+  OPEN
+  /// Sign-ups closed, waiting to be raced
+  CLOSED
+  /// Results recorded and points awarded
+  FINISHED
+}
+
+model Race {
+  id             String     @id @default(cuid())
+  seasonId       String
+  trackId        String
+  round          Int
+  scheduledAt    DateTime
+  location       String?
+  laps           Int?
+  maxPlayers     Int        @default(8)
+  signupDeadline DateTime?
+  status         RaceStatus @default(DRAFT)
+  notes          String?
+  finalizedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  season        Season         @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  track         Track          @relation(fields: [trackId], references: [id])
+  registrations Registration[]
+  results       RaceResult[]
+  photos        RacePhoto[]
+
+  @@unique([seasonId, round])
+  @@index([scheduledAt])
+}
+
+enum RegistrationStatus {
+  CONFIRMED
+  WAITLIST
+  WITHDRAWN
+}
+
+model Registration {
+  id        String             @id @default(cuid())
+  raceId    String
+  userId    String
+  status    RegistrationStatus @default(CONFIRMED)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  race Race @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([raceId, userId])
+}
+
+model RaceResult {
+  id            String   @id @default(cuid())
+  raceId        String
+  userId        String
+  /// Finishing position; null when the player retired (dnf = true)
+  position      Int?
+  dnf           Boolean  @default(false)
+  startPosition Int?
+  carColorId    String?
+  /// Snapshot of points awarded when the race was finalized
+  points        Int      @default(0)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  race     Race            @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carColor CarColor?       @relation(fields: [carColorId], references: [id], onDelete: SetNull)
+  upgrades ResultUpgrade[]
+
+  @@unique([raceId, userId])
+  @@index([userId])
+}
+
+model ResultUpgrade {
+  resultId  String
+  upgradeId String
+
+  result  RaceResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  upgrade Upgrade    @relation(fields: [upgradeId], references: [id], onDelete: Cascade)
+
+  @@id([resultId, upgradeId])
+}
+
+model RacePhoto {
+  id           String   @id @default(cuid())
+  raceId       String
+  /// Path relative to the uploads directory
+  path         String
+  caption      String?
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  race       Race  @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+}

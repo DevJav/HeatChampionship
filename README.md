@@ -4,27 +4,52 @@ League tracker for monthly **Heat: Pedal to the Metal** races: sign-ups, results
 
 The UI is in Spanish (Spain) with a retro F1-broadcast look (circa 2012). Code and comments are in English.
 
-Built with Next.js 16 (App Router, Cache Components), Tailwind CSS 4 and TypeScript.
+Built with Next.js 16 (App Router, Cache Components), Tailwind CSS 4, TypeScript, Prisma 7 + SQLite and Better Auth.
 
 ## Running locally
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000
-npm run build && npm start   # production
+cp .env.example .env     # then set BETTER_AUTH_SECRET and the admin credentials
+npm install              # also generates the Prisma client
+npm run db:migrate       # creates data/heat.db
+npm run db:seed          # tracks, car colors, first season, admin account
+npm run dev              # http://localhost:3000
 ```
+
+`npm run db:seed:demo` also adds 7 demo players (password `carreras`) for local testing.
+
+| Script | |
+|---|---|
+| `db:migrate` | Create/apply migrations after editing `prisma/schema.prisma` |
+| `db:deploy` | Apply migrations in production |
+| `db:seed` / `db:seed:demo` | Seed data (safe to re-run) |
+| `db:studio` | Browse the database in Prisma Studio |
+| `db:reset` | Wipe the database and re-seed |
+
+## Accounts
+
+- Players sign up at `/registro` with a username, a display name and a password, then log in at `/entrar`. Behind the scenes Better Auth also needs an email, so one is generated: `<username>@users.heat.local`.
+- The admin account comes from `ADMIN_USERNAME` / `ADMIN_PASSWORD` in `.env` when you run `db:seed`. Admins get a shield icon in the header that leads to `/admin`.
+- In `/admin` you can close registration once all your friends have signed up. The check runs inside the auth API itself, so the sign-up endpoint can't be called directly to get around it.
 
 ## Project layout
 
 ```
+prisma/                Schema, migrations, seed script
 src/
+  actions/             Server actions (auth, admin)
   app/                 Routes (pages). /dev/ui is the living UI kit.
   components/
     ui/                Generic building blocks: Button, Card, Badge, Table, Modal, …
     domain/            Heat-specific pieces built from ui/: PositionBadge, CarColorChip, …
-    layout/            Header, footer, navigation
-  config/site.ts       Site name, navigation menu, max players per race
-  lib/                 Helpers (cn class merger, …)
+    layout/            Header, footer, navigation, user menu
+    auth/              Login / sign-up forms
+  config/site.ts       Site name, navigation, locale & time zone, max players per race
+  generated/prisma/    Generated Prisma client (git-ignored)
+  lib/
+    data/              Read queries for pages (each starts with `await connection()`)
+    auth.ts            Better Auth config;  session.ts — getCurrentUser / requireUser / requireAdmin
+    db.ts              Prisma client;  format.ts — es-ES date formatting
   styles/tokens.css    Design tokens — colors, radii, shadows, layout sizes
 ```
 
@@ -59,3 +84,9 @@ Open [/dev/ui](http://localhost:3000/dev/ui) to see every component and token at
 - Navigation that looks like a button uses `<ButtonLink>`, which shares the same variants as `<Button>`.
 - On top of a dark broadcast bar use `text-bar-fg` and the `inverse` button variant.
 - User-facing text is in Spanish; routes use Spanish slugs (`/clasificacion`, `/carreras`, `/pilotos`, `/estadisticas`).
+
+### Cache Components rules
+
+- Anything that reads the session (`getCurrentUser`) or the database must be rendered inside a `<Suspense>` boundary.
+- Page queries go in `src/lib/data/` and begin with `await connection()`. The SQLite driver is synchronous, so without that call Next would run the query at build time and freeze the result into the page.
+- Server actions check permissions themselves (`requireAdmin()`) and call `refresh()` after a write.

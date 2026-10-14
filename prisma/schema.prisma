@@ -45,6 +45,9 @@ model User {
   photos        RacePhoto[]
   articles      Article[]
   comments      ArticleComment[]
+  notifications Notification[]   @relation("NotificationsReceived")
+  /// Notifications caused by this user (their mention, reply…)
+  notified      Notification[]   @relation("NotificationsCaused")
 
   @@map("user")
 }
@@ -206,6 +209,7 @@ model Race {
   results       RaceResult[]
   photos        RacePhoto[]
   articles      Article[]
+  notifications Notification[]
 
   @@unique([seasonId, round])
   @@index([scheduledAt])
@@ -325,25 +329,69 @@ model Article {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
-  race     Race?            @relation(fields: [raceId], references: [id], onDelete: SetNull)
-  author   User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  comments ArticleComment[]
+  race          Race?            @relation(fields: [raceId], references: [id], onDelete: SetNull)
+  author        User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  comments      ArticleComment[]
+  notifications Notification[]
 
   @@index([status, publishedAt])
   @@index([raceId])
 }
 
-/// Drivers' comments under an article: one flat thread, oldest first
+/// Drivers' comments under an article, oldest first. Replies are one level deep.
 model ArticleComment {
   id        String   @id @default(cuid())
   articleId String
   authorId  String
+  /// The top-level comment this replies to (replies to a reply join the same thread)
+  parentId  String?
   /// Light Markdown (bold, italics, links) with @username mentions
   body      String
   createdAt DateTime @default(now())
 
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  article       Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author        User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent        ArticleComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       ArticleComment[] @relation("Replies")
+  notifications Notification[]
 
   @@index([articleId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Notifications — the header bell
+// ---------------------------------------------------------------------------
+
+enum NotificationType {
+  /// Mentioned (or given a driver card) in a published article
+  ARTICLE_MENTION
+  /// Mentioned in a comment
+  COMMENT_MENTION
+  /// Someone replied to your comment
+  COMMENT_REPLY
+  /// A race you drove has results
+  RACE_RESULTS
+}
+
+/// The text is built when shown, from the linked article, comment or race
+model Notification {
+  id        String           @id @default(cuid())
+  /// Who receives it
+  userId    String
+  type      NotificationType
+  /// Who caused it, if anyone (the race results have no actor)
+  actorId   String?
+  articleId String?
+  commentId String?
+  raceId    String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user    User            @relation("NotificationsReceived", fields: [userId], references: [id], onDelete: Cascade)
+  actor   User?           @relation("NotificationsCaused", fields: [actorId], references: [id], onDelete: SetNull)
+  article Article?        @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  comment ArticleComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  race    Race?           @relation(fields: [raceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

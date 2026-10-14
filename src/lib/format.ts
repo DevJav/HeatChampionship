@@ -69,3 +69,16 @@ export function dateParts(date: Date) {
     time: timeFormat.format(date),
   };
 }
+
+const relativeFormat = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+
+/** "ahora", "hace 5 minutos", "hace 3 horas", "ayer"… then a short date after a week. */
+export function formatRelative(date: Date, now = new Date()) {
+  const seconds = Math.round((date.getTime() - now.getTime()) / 1000);
+  const abs = Math.abs(seconds);
+  if (abs < 60) return "ahora";
+  if (abs < 3600) return relativeFormat.format(Math.round(seconds / 60), "minute");
+  if (abs < 86_400) return relativeFormat.format(Math.round(seconds / 3600), "hour");
+  if (abs < 7 * 86_400) return relativeFormat.format(Math.round(seconds / 86_400), "day");
+  return formatShortDate(date);
+}

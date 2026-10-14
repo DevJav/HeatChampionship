@@ -115,6 +115,14 @@ export function mentionedUsernames(text: string): string[] {
   return [...new Set(Array.from(text.matchAll(MENTION_PATTERN), (m) => m[1].toLowerCase()))];
 }
 
+/** Drivers an article points at: @mentions plus driver-card embeds (lowercased usernames). */
+export function referencedUsernames(body: string): string[] {
+  const cards = splitArticle(body).flatMap((segment) =>
+    segment.type === "embed" && segment.embed.kind === "piloto" && segment.embed.ref ? [segment.embed.ref.toLowerCase()] : [],
+  );
+  return [...new Set([...mentionedUsernames(body), ...cards])];
+}
+
 /** Plain-text summary for previews when the article has no excerpt. */
 export function plainExcerpt(body: string, max = 180) {
   const text = splitArticle(body)

@@ -1,0 +1,34 @@
+import type { NotificationType } from "@/generated/prisma/client";
+import { raceTitle } from "./races";
+
+/** A stored notification with what's needed to describe it (see lib/data/notifications.ts). */
+export type NotificationRecord = {
+  type: NotificationType;
+  actor: { name: string } | null;
+  article: { slug: string; title: string } | null;
+  commentId: string | null;
+  race: { id: string; round: number; track: { name: string }; results: { position: number; points: number }[] } | null;
+};
+
+/** Sentence and link for a notification. Built when shown, so edited results or titles stay current. */
+export function describeNotification(n: NotificationRecord): { message: string; href: string } {
+  const who = n.actor?.name ?? "Alguien";
+  const title = n.article ? `«${n.article.title}»` : "un artículo";
+  const articleHref = n.article ? `/noticias/${n.article.slug}` : "/noticias";
+  const commentHref = n.commentId ? `${articleHref}#comentario-${n.commentId}` : articleHref;
+
+  switch (n.type) {
+    case "ARTICLE_MENTION":
+      return { message: `${who} te ha mencionado en ${title}`, href: articleHref };
+    case "COMMENT_MENTION":
+      return { message: `${who} te ha mencionado en un comentario en ${title}`, href: commentHref };
+    case "COMMENT_REPLY":
+      return { message: `${who} ha respondido a tu comentario en ${title}`, href: commentHref };
+    case "RACE_RESULTS": {
+      if (!n.race) return { message: "Ya están los resultados de la carrera", href: "/carreras" };
+      const result = n.race.results[0];
+      const finish = result ? `: terminaste ${result.position}º (${result.points} pts)` : "";
+      return { message: `Ya están los resultados de ${raceTitle(n.race)}${finish}`, href: `/carreras/${n.race.id}` };
+    }
+  }
+}

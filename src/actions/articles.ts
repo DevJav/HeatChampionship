@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkbox, formValues, optionalText, parseForm, text, type FormState } from "@/lib/forms";
 import { requireAdmin } from "@/lib/session";
+import { notifyArticleMentions } from "@/lib/notify";
 import { slugify } from "@/lib/slug";
 import { deleteStoredFile, storeArticleCover, UploadError } from "@/lib/uploads";
 
@@ -61,12 +62,13 @@ export async function createArticle(_prev: FormState, formData: FormData): Promi
       publishedAt: parsed.data.status === "PUBLISHED" ? new Date() : null,
     },
   });
+  await notifyArticleMentions(article.id, admin.id);
   redirect(`/admin/noticias/${article.id}`);
 }
 
 /** Saves and stays in the editor. The URL follows the title until the first publish, then it's frozen. */
 export async function updateArticle(articleId: string, _prev: FormState, formData: FormData): Promise<FormState> {
-  await requireAdmin();
+  const admin = await requireAdmin();
   const parsed = parseForm(articleSchema, formData);
   if (!parsed.ok) return parsed.state;
   const cover = await uploadCover(formData);
@@ -89,6 +91,8 @@ export async function updateArticle(articleId: string, _prev: FormState, formDat
     },
   });
   if (current.coverImage && current.coverImage !== coverImage) await deleteStoredFile(current.coverImage);
+  // Publishing, or adding someone to a published article, tells them
+  await notifyArticleMentions(articleId, admin.id);
 
   refresh();
   // Don't echo "remove": the box would stay ticked next to a newly uploaded cover

@@ -63,6 +63,7 @@ export async function listArticleComments(articleId: string) {
     orderBy: { createdAt: "asc" },
     select: {
       id: true,
+      parentId: true,
       body: true,
       createdAt: true,
       author: {

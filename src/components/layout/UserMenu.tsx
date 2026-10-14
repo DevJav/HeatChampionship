@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LogIn, LogOut, Shield, UserRound } from "lucide-react";
 import { signOut } from "@/actions/auth";
 import { Avatar, Button, ButtonLink, Skeleton } from "@/components/ui";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { getNotifications } from "@/lib/data/notifications";
 import { getFavoriteColorHex } from "@/lib/data/players";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { cn } from "@/lib/cn";
@@ -21,7 +23,7 @@ export async function UserMenu() {
     );
   }
 
-  const color = await getFavoriteColorHex(user.id);
+  const [color, notifications] = await Promise.all([getFavoriteColorHex(user.id), getNotifications(user.id)]);
 
   // On phones the admin link and logout live in the mobile menu (MobileUserLinks)
   return (
@@ -38,6 +40,7 @@ export async function UserMenu() {
           <Shield />
         </ButtonLink>
       )}
+      <NotificationBell initial={notifications} />
       <Link
         href={`/pilotos/${user.username}`}
         title="Mi perfil"

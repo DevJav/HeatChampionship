@@ -56,6 +56,20 @@
   --font-sans: var(--font-body);
   --font-display: var(--font-heading);
   --font-mono: var(--font-code);
+
+  /* Logo gauge: needle drops to the bottom stop, then revs up past its rest angle and settles */
+  --animate-needle-sweep: needle-sweep 0.9s cubic-bezier(0.3, 0.7, 0.3, 1) both;
+  @keyframes needle-sweep {
+    0% {
+      transform: rotate(-150deg);
+    }
+    70% {
+      transform: rotate(8deg);
+    }
+    100% {
+      transform: rotate(0);
+    }
+  }
 }
 
 /* ---------- Retro style utilities (all driven by tokens) ---------- */

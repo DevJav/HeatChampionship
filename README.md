@@ -45,7 +45,7 @@ Everything is managed from `/admin` (shield icon in the header):
 **Standings:** `/clasificacion` ranks drivers by points, breaking ties by countback (most wins, then most 2nd places, and so on). It also shows ▲▼ movement since the previous race, each round's result, and a points-progression chart that highlights the top three. Use `?temporada=` to see past seasons.
 
 **Statistics:** `/estadisticas` covers all seasons by default ("Histórico") or a single one with `?temporada=`. It shows:
-- records: most wins, podiums and points; win and podium streaks; best average finish; biggest comeback; win from furthest back. Ties list every holder.
+- records: most wins, podiums and points; win and podium streaks; best average finish; biggest comeback; win from furthest back; most trompos. Ties list every holder.
 - a comparison table of all drivers
 - a head-to-head grid: how often each driver finished ahead of each other
 - win rate by starting slot, with a table view

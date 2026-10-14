@@ -74,3 +74,13 @@ export async function getEditableProfile(userId: string) {
     select: { id: true, name: true, username: true, image: true, bio: true, favoriteColorId: true },
   });
 }
+
+/** Hex of a player's favorite car color, to tint their avatar. Null when unset. */
+export async function getFavoriteColorHex(userId: string) {
+  await connection();
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { favoriteColor: { select: { hex: true } } },
+  });
+  return user?.favoriteColor?.hex ?? null;
+}

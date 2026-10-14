@@ -29,6 +29,7 @@ export async function getAdminUser(id: string) {
       image: true,
       role: true,
       createdAt: true,
+      favoriteColor: { select: { hex: true } },
       _count: { select: { results: true, registrations: true, sessions: true } },
     },
   });

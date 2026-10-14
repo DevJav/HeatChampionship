@@ -26,7 +26,7 @@ async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]
       <Card>
         <CardHeader>
           <span className="flex items-center gap-3">
-            <Avatar name={user.name} src={user.image} />
+            <Avatar name={user.name} src={user.image} color={user.favoriteColor?.hex} />
             <span>
               <CardTitle>{user.name}</CardTitle>
               <CardDescription>

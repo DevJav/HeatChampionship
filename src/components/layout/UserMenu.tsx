@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogIn, LogOut, Shield, UserRound } from "lucide-react";
 import { signOut } from "@/actions/auth";
 import { Avatar, Button, ButtonLink, Skeleton } from "@/components/ui";
+import { getFavoriteColorHex } from "@/lib/data/players";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { cn } from "@/lib/cn";
 import { navItemClass } from "./navStyles";
@@ -19,6 +20,8 @@ export async function UserMenu() {
       </ButtonLink>
     );
   }
+
+  const color = await getFavoriteColorHex(user.id);
 
   // On phones the admin link and logout live in the mobile menu (MobileUserLinks)
   return (
@@ -40,7 +43,7 @@ export async function UserMenu() {
         title="Mi perfil"
         className="flex items-center gap-2 px-2 text-bar-fg hover:text-bar-fg/80"
       >
-        <Avatar name={user.name} src={user.image} size="sm" />
+        <Avatar name={user.name} src={user.image} color={color} size="sm" />
         <span className="hidden font-display font-bold uppercase italic tracking-wide xl:inline">
           {user.name}
         </span>

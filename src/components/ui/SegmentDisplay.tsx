@@ -40,32 +40,31 @@ const SEGMENTS: Record<string, string> = {
   g: horizontal(50),
 };
 
-const glow = "drop-shadow(0 0 3px var(--led-glow))";
+// A tight hot core plus a wider bloom. Applied to a whole <svg>: on a shape inside
+// one, Chrome clips the blur to the shape's box and the bloom shows square edges.
+const glow = "drop-shadow(0 0 1.5px var(--led-on)) drop-shadow(0 0 1px var(--led-glow)) drop-shadow(0 0 6px var(--led-glow))";
 
 function Digit({ char }: { char: string }) {
   const lit = DIGITS[char] ?? "";
+  const segments = Object.entries(SEGMENTS);
   return (
-    <svg viewBox="0 0 60 100" className="h-full w-auto shrink-0 -skew-x-6" aria-hidden>
-      {Object.entries(SEGMENTS).map(([name, points]) => {
-        const on = lit.includes(name);
-        return (
-          <polygon
-            key={name}
-            points={points}
-            fill={on ? "var(--led-on)" : "var(--led-off)"}
-            style={on ? { filter: glow } : undefined}
-          />
-        );
-      })}
-    </svg>
+    // Unlit segments underneath, lit ones (glowing) on a layer of their own
+    <span className="relative flex h-full shrink-0 -skew-x-6" aria-hidden>
+      <svg viewBox="0 0 60 100" className="h-full w-auto">
+        {segments.map(([name, points]) => (lit.includes(name) ? null : <polygon key={name} points={points} fill="var(--led-off)" />))}
+      </svg>
+      <svg viewBox="0 0 60 100" className="absolute inset-0 h-full w-auto overflow-visible" style={{ filter: glow }}>
+        {segments.map(([name, points]) => (lit.includes(name) ? <polygon key={name} points={points} fill="var(--led-on)" /> : null))}
+      </svg>
+    </span>
   );
 }
 
 function Colon() {
   return (
-    <svg viewBox="0 0 20 100" className="h-full w-auto shrink-0" aria-hidden>
-      <circle cx="10" cy="34" r="5" fill="var(--led-on)" style={{ filter: glow }} />
-      <circle cx="10" cy="68" r="5" fill="var(--led-on)" style={{ filter: glow }} />
+    <svg viewBox="0 0 20 100" className="h-full w-auto shrink-0 overflow-visible" style={{ filter: glow }} aria-hidden>
+      <circle cx="10" cy="34" r="5" fill="var(--led-on)" />
+      <circle cx="10" cy="68" r="5" fill="var(--led-on)" />
     </svg>
   );
 }

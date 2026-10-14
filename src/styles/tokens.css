@@ -82,12 +82,15 @@
 
   /* LED countdown board (seven-segment digits) */
   --led-on: #ff2b1c;
-  --led-off: #1a0605;
+  --led-off: #240806;
   --led-glow: rgb(255 43 28 / 0.55);
   --led-panel: #050505;
+  --led-grid: rgb(255 255 255 / 0.07);
+  --led-face: #121316;
+  --led-face-dark: #0b0c0e;
   --led-frame: #3d4045;
   --led-frame-dark: #24262a;
-  --led-label: #f4f4f5;
+  --led-label: #c7cbd3;
 
   /* Focus: outer ring for unclipped elements, inset ring for slanted ones */
   --ring: #d10500;

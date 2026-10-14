@@ -91,7 +91,8 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
     return { error: messageFor(error), values };
   }
 
-  redirect("/");
+  // New players finish their profile before anything else
+  redirect("/bienvenida");
 }
 
 export async function signOut() {

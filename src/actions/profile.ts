@@ -3,11 +3,12 @@
 import { APIError } from "better-auth/api";
 import { refresh } from "next/cache";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { auth, PASSWORD_MIN } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { optionalText, parseForm, type FormState } from "@/lib/forms";
-import { requireUser } from "@/lib/session";
+import { formValues, optionalText, parseForm, type FormState } from "@/lib/forms";
+import { requireUser, type CurrentUser } from "@/lib/session";
 import { deleteStoredFile, storeAvatar, storedPathFromUrl, UploadError } from "@/lib/uploads";
 
 const profileSchema = z.object({
@@ -19,13 +20,39 @@ const profileSchema = z.object({
     .transform((value) => value || null),
 });
 
+/** No color chosen, or one that's still offered. */
+async function isValidColor(favoriteColorId: string | null) {
+  return !favoriteColorId || !!(await db.carColor.findFirst({ where: { id: favoriteColorId, active: true } }));
+}
+
+/** The picked file, or null when the file input was left empty. */
+function pickedFile(formData: FormData, name: string) {
+  const file = formData.get(name);
+  return file instanceof File && file.size > 0 ? file : null;
+}
+
+/** Store a new profile picture and delete the old one. Returns an error message, or null on success. */
+async function replaceAvatar(user: CurrentUser, file: File) {
+  let storedPath: string;
+  try {
+    storedPath = await storeAvatar(user.id, file);
+  } catch (error) {
+    if (error instanceof UploadError) return error.message;
+    throw error;
+  }
+
+  const previous = storedPathFromUrl(user.image);
+  await db.user.update({ where: { id: user.id }, data: { image: `/media/${storedPath}` } });
+  if (previous) await deleteStoredFile(previous);
+  return null;
+}
+
 export async function updateProfile(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireUser("/perfil");
   const parsed = parseForm(profileSchema, formData);
   if (!parsed.ok) return parsed.state;
 
-  const { favoriteColorId } = parsed.data;
-  if (favoriteColorId && !(await db.carColor.findFirst({ where: { id: favoriteColorId, active: true } }))) {
+  if (!(await isValidColor(parsed.data.favoriteColorId))) {
     return { fieldErrors: { favoriteColorId: "Color no válido." } };
   }
   await db.user.update({ where: { id: user.id }, data: parsed.data });
@@ -35,22 +62,34 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
 
 export async function uploadAvatar(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireUser("/perfil");
-  const file = formData.get("avatar");
-  if (!(file instanceof File) || file.size === 0) return { error: "Elige una imagen." };
+  const file = pickedFile(formData, "avatar");
+  if (!file) return { error: "Elige una imagen." };
 
-  let storedPath: string;
-  try {
-    storedPath = await storeAvatar(user.id, file);
-  } catch (error) {
-    if (error instanceof UploadError) return { error: error.message };
-    throw error;
-  }
-
-  const previous = storedPathFromUrl(user.image);
-  await db.user.update({ where: { id: user.id }, data: { image: `/media/${storedPath}` } });
-  if (previous) await deleteStoredFile(previous);
+  const error = await replaceAvatar(user, file);
+  if (error) return { error };
   refresh();
   return { message: "Foto actualizada." };
+}
+
+// The name was just chosen at sign-up, so the welcome step only asks for the extras
+const setupSchema = profileSchema.pick({ bio: true, favoriteColorId: true });
+
+/** Welcome step right after sign-up: every field is optional, then on to the home page. */
+export async function completeProfileSetup(_prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser("/bienvenida");
+  const parsed = parseForm(setupSchema, formData);
+  if (!parsed.ok) return parsed.state;
+
+  if (!(await isValidColor(parsed.data.favoriteColorId))) {
+    return { fieldErrors: { favoriteColorId: "Color no válido." }, values: formValues(formData) };
+  }
+  const file = pickedFile(formData, "avatar");
+  if (file) {
+    const error = await replaceAvatar(user, file);
+    if (error) return { fieldErrors: { avatar: error }, values: formValues(formData) };
+  }
+  await db.user.update({ where: { id: user.id }, data: parsed.data });
+  redirect("/");
 }
 
 export async function removeAvatar() {

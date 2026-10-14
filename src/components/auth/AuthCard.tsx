@@ -7,7 +7,7 @@ type AuthCardProps = {
   children: React.ReactNode;
 };
 
-/** Narrow centered card shared by the login and sign-up pages. */
+/** Narrow centered card shared by the login, sign-up and welcome pages. */
 export function AuthCard({ title, description, footer, children }: AuthCardProps) {
   return (
     <Container className="flex max-w-md flex-col gap-4">

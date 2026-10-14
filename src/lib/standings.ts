@@ -3,7 +3,7 @@
 export type StandingsRace = {
   id: string;
   round: number;
-  results: { userId: string; position: number | null; points: number }[];
+  results: { userId: string; position: number; points: number }[];
 };
 
 export type StandingsRow = {
@@ -16,9 +16,8 @@ export type StandingsRow = {
   wins: number;
   podiums: number;
   starts: number;
-  dnfs: number;
-  /** Finishing position per race id (null = retired, absent = didn't race) */
-  positions: Record<string, number | null>;
+  /** Finishing position per race id (absent = didn't race) */
+  positions: Record<string, number>;
   /** Points per race id */
   pointsByRace: Record<string, number>;
   /** Places gained (+) or lost (−) since before the latest race; null if not ranked then */
@@ -42,7 +41,6 @@ function tally(races: StandingsRace[]) {
           wins: 0,
           podiums: 0,
           starts: 0,
-          dnfs: 0,
           positions: {},
           pointsByRace: {},
           finishCounts: [],
@@ -51,13 +49,9 @@ function tally(races: StandingsRace[]) {
       row.starts += 1;
       row.positions[race.id] = result.position;
       row.pointsByRace[race.id] = result.points;
-      if (result.position == null) {
-        row.dnfs += 1;
-      } else {
-        if (result.position === 1) row.wins += 1;
-        if (result.position <= 3) row.podiums += 1;
-        row.finishCounts[result.position - 1] = (row.finishCounts[result.position - 1] ?? 0) + 1;
-      }
+      if (result.position === 1) row.wins += 1;
+      if (result.position <= 3) row.podiums += 1;
+      row.finishCounts[result.position - 1] = (row.finishCounts[result.position - 1] ?? 0) + 1;
       byUser.set(result.userId, row);
     }
   }

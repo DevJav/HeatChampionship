@@ -2,15 +2,17 @@
 
 export type ResultRow = {
   userId: string;
-  /** Finishing position; null = retired */
-  position: number | null;
+  /** Finishing position — everyone finishes in Heat */
+  position: number;
+  /** Spin-outs (trompos) during the race */
+  spins: number;
   startPosition: number | null;
   carColorId: string | null;
   upgradeIds: string[];
   notes: string | null;
 };
 
-export type RowField = "position" | "startPosition" | "carColorId";
+export type RowField = "position" | "spins" | "startPosition" | "carColorId";
 
 export type ResultsValidation = {
   /** Problem with the sheet as a whole */
@@ -18,6 +20,9 @@ export type ResultsValidation = {
   /** Problems per player and field */
   rowErrors: Record<string, Partial<Record<RowField, string>>>;
 };
+
+/** Upper bound for a driver's spin-outs in one race */
+export const MAX_SPINS = 20;
 
 function duplicates<T>(values: T[]) {
   const seen = new Set<T>();
@@ -37,22 +42,15 @@ export function validateResults(rows: ResultRow[]): ResultsValidation {
 
   if (rows.length === 0) return { error: "No hay pilotos en la carrera.", rowErrors };
 
-  // Finishing positions: unique and 1..k without gaps (k = finishers)
-  const finishers = rows.filter((row) => row.position != null);
-  const repeatedPositions = duplicates(finishers.map((row) => row.position));
-  for (const row of finishers) {
-    if (row.position! < 1 || row.position! > rows.length) flag(row.userId, "position", "Posición no válida.");
+  // Finishing positions: everyone finishes, so unique and within 1..n (hence exactly 1..n)
+  const repeatedPositions = duplicates(rows.map((row) => row.position));
+  for (const row of rows) {
+    if (row.position < 1 || row.position > rows.length) flag(row.userId, "position", "Posición no válida.");
     else if (repeatedPositions.has(row.position)) flag(row.userId, "position", "Posición repetida.");
   }
-  let error: string | undefined;
-  if (finishers.length === 0) {
-    error = "Indica al menos un piloto que haya terminado.";
-  } else if (Object.keys(rowErrors).length === 0) {
-    const expected = finishers.map((_, i) => i + 1).join(",");
-    const actual = finishers.map((row) => row.position!).sort((a, b) => a - b).join(",");
-    if (expected !== actual) {
-      error = `Las posiciones deben ir de 1 a ${finishers.length} sin huecos (los retirados no cuentan).`;
-    }
+
+  for (const row of rows) {
+    if (row.spins < 0 || row.spins > MAX_SPINS) flag(row.userId, "spins", "Trompos no válidos.");
   }
 
   // Starting grid: optional, but unique and within the field size
@@ -72,6 +70,6 @@ export function validateResults(rows: ResultRow[]): ResultsValidation {
     if (row.carColorId && repeatedColors.has(row.carColorId)) flag(row.userId, "carColorId", "Color repetido.");
   }
 
-  if (!error && Object.keys(rowErrors).length > 0) error = "Revisa los campos marcados.";
+  const error = Object.keys(rowErrors).length > 0 ? "Revisa los campos marcados." : undefined;
   return { error, rowErrors };
 }

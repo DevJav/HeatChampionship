@@ -2,23 +2,20 @@ import { describe, expect, it } from "vitest";
 import { computeStandings, pointsProgression, type StandingsRace } from "./standings";
 
 const TABLE = [9, 6, 4, 3, 2, 1];
-const race = (round: number, order: (string | null)[], retired: string[] = []): StandingsRace => ({
+const race = (round: number, order: string[]): StandingsRace => ({
   id: `r${round}`,
   round,
-  results: [
-    ...order.map((userId, i) => ({ userId: userId!, position: i + 1, points: TABLE[i] ?? 0 })),
-    ...retired.map((userId) => ({ userId, position: null, points: 0 })),
-  ],
+  results: order.map((userId, i) => ({ userId, position: i + 1, points: TABLE[i] ?? 0 })),
 });
 
 describe("computeStandings", () => {
-  it("sums points and counts wins, podiums, starts and retirements", () => {
-    const rows = computeStandings([race(1, ["ana", "marco", "lucia"]), race(2, ["marco", "ana"], ["lucia"])]);
+  it("sums points and counts wins, podiums and starts", () => {
+    const rows = computeStandings([race(1, ["ana", "marco", "lucia"]), race(2, ["marco", "ana"])]);
     const ana = rows.find((r) => r.userId === "ana")!;
     const lucia = rows.find((r) => r.userId === "lucia")!;
-    expect(ana).toMatchObject({ points: 15, wins: 1, podiums: 2, starts: 2, dnfs: 0 });
-    expect(lucia).toMatchObject({ points: 4, podiums: 1, starts: 2, dnfs: 1 });
-    expect(lucia.positions).toEqual({ r1: 3, r2: null });
+    expect(ana).toMatchObject({ points: 15, wins: 1, podiums: 2, starts: 2 });
+    expect(lucia).toMatchObject({ points: 4, podiums: 1, starts: 1 });
+    expect(lucia.positions).toEqual({ r1: 3 });
   });
 
   it("orders by points and reports the gap to the leader", () => {

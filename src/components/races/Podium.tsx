@@ -12,7 +12,7 @@ const steps = [
 
 /** Top three on a podium, winner in the middle. */
 export function Podium({ results }: { results: RaceResultDetail[] }) {
-  const byPlace = new Map(results.filter((r) => r.position != null).map((r) => [r.position!, r]));
+  const byPlace = new Map(results.map((r) => [r.position, r]));
 
   return (
     <div className="grid grid-cols-3 items-end gap-2 sm:gap-4">

@@ -88,7 +88,7 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
       </section>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="Carreras" value={summary.starts} icon={<Flag />} hint={summary.dnfs ? `${summary.dnfs} retiradas` : undefined} />
+        <StatCard label="Carreras" value={summary.starts} icon={<Flag />} hint={summary.spins ? `${summary.spins} ${summary.spins === 1 ? "trompo" : "trompos"}` : undefined} />
         <StatCard label="Victorias" value={summary.wins} icon={<Trophy />} />
         <StatCard label="Podios" value={summary.podiums} icon={<Medal />} />
         <StatCard

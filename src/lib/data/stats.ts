@@ -19,6 +19,7 @@ export async function getStatsData({ seasonId, trackId }: { seasonId?: string | 
         select: {
           userId: true,
           position: true,
+          spins: true,
           startPosition: true,
           points: true,
           carColor: { select: { id: true, name: true, hex: true } },

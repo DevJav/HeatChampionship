@@ -5,9 +5,11 @@ import { positionsGained } from "@/lib/scoring";
 import { EmptyState, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { PositionsGained } from "@/components/domain/PositionsGained";
+import { SpinCount } from "@/components/domain/SpinCount";
 
 type HistoryRow = {
-  position: number | null;
+  position: number;
+  spins: number;
   startPosition: number | null;
   points: number;
   carColor: { name: string; hex: string } | null;
@@ -19,6 +21,7 @@ export function RaceHistory({ results }: { results: HistoryRow[] }) {
   if (results.length === 0) {
     return <EmptyState icon={<History />} title="Todavía sin carreras" className="m-5 py-8" />;
   }
+  const showSpins = results.some((r) => r.spins > 0);
   return (
     <Table>
       <THead>
@@ -29,6 +32,11 @@ export function RaceHistory({ results }: { results: HistoryRow[] }) {
           <Th>Carrera</Th>
           <Th className="max-sm:hidden">Fecha</Th>
           <Th align="center">Salida</Th>
+          {showSpins && (
+            <Th align="center" title="Trompos">
+              Tromp.
+            </Th>
+          )}
           <Th align="right">Pts</Th>
         </tr>
       </THead>
@@ -57,6 +65,11 @@ export function RaceHistory({ results }: { results: HistoryRow[] }) {
                 <span className="text-fg-subtle">—</span>
               )}
             </Td>
+            {showSpins && (
+              <Td align="center">
+                <SpinCount spins={result.spins} />
+              </Td>
+            )}
             <Td align="right" className="font-display text-lg font-bold italic">
               {result.points}
             </Td>

@@ -48,7 +48,7 @@ const raceNotes = [
 const resultNotes = [
   "Remontada desde el fondo de la parrilla",
   "Se pasó de calor en la última curva",
-  "Trompo en la primera vuelta",
+  "Salida de cohete con la marcha alta",
   "Rebufo perfecto en la recta final",
   "Gestionó el calor como nadie",
   "Penalizado por exceso de velocidad en curva",
@@ -147,11 +147,9 @@ async function finishedRace(args: {
     },
   });
 
-  // ~6% chance of retiring; retirees leave the finishing order
+  // Everyone finishes; ~20% of drivers spin out, a few of them twice
   const order = finishingOrder(field);
-  const retired = new Set(order.filter(() => random() < 0.06).map((d) => d.id));
-  if (retired.size === order.length) retired.delete(order[0].id);
-  const finishers = order.filter((d) => !retired.has(d.id));
+  const spins = new Map(field.map((d) => [d.id, random() < 0.2 ? (random() < 0.25 ? 2 : 1) : 0]));
 
   const grid = shuffle(field);
 
@@ -167,7 +165,7 @@ async function finishedRace(args: {
 
   const rows = field.map((d) => ({
     userId: d.id,
-    position: retired.has(d.id) ? null : finishers.findIndex((f) => f.id === d.id) + 1,
+    position: order.findIndex((o) => o.id === d.id) + 1,
   }));
   const points = scoreRace(rows, POINTS);
 
@@ -177,7 +175,7 @@ async function finishedRace(args: {
         raceId: race.id,
         userId: row.userId,
         position: row.position,
-        dnf: row.position == null,
+        spins: spins.get(row.userId) ?? 0,
         startPosition: grid.findIndex((d) => d.id === row.userId) + 1,
         carColorId: cars.get(row.userId),
         points: points.get(row.userId) ?? 0,

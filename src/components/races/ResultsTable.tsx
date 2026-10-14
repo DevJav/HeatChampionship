@@ -5,11 +5,13 @@ import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { podiumRowClass } from "@/components/domain/podium";
 import { PositionsGained } from "@/components/domain/PositionsGained";
+import { SpinCount } from "@/components/domain/SpinCount";
 
 /** Timing-tower style classification of a race. The stripe by each name shows the car color. */
 export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
   const showGrid = results.some((r) => r.startPosition != null);
   const showUpgrades = results.some((r) => r.upgrades.length > 0);
+  const showSpins = results.some((r) => r.spins > 0);
 
   return (
     <Table>
@@ -21,6 +23,11 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
           <Th>Piloto</Th>
           {showGrid && <Th align="center">Salida</Th>}
           {showUpgrades && <Th className="max-md:hidden">Mejoras</Th>}
+          {showSpins && (
+            <Th align="center" title="Trompos">
+              Tromp.
+            </Th>
+          )}
           <Th align="right">Pts</Th>
         </tr>
       </THead>
@@ -46,6 +53,11 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
             )}
             {showUpgrades && (
               <Td className="text-sm text-fg-muted max-md:hidden">{result.upgrades.map((u) => u.upgrade.name).join(", ") || "—"}</Td>
+            )}
+            {showSpins && (
+              <Td align="center">
+                <SpinCount spins={result.spins} />
+              </Td>
             )}
             <Td align="right" className="font-display text-lg font-bold italic">
               {result.points}

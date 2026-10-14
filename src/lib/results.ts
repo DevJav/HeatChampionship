@@ -23,7 +23,7 @@ export async function saveRaceResults(raceId: string, rows: ResultRow[]) {
           raceId,
           userId: row.userId,
           position: row.position,
-          dnf: row.position == null,
+          spins: row.spins,
           startPosition: row.startPosition,
           carColorId: row.carColorId,
           notes: row.notes,

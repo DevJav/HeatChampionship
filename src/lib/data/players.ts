@@ -5,6 +5,7 @@ import { driverSelect } from "./standings";
 
 const resultSelect = {
   position: true,
+  spins: true,
   startPosition: true,
   points: true,
   carColor: { select: { name: true, hex: true } },
@@ -19,7 +20,7 @@ const resultSelect = {
   },
 } as const;
 
-type ResultRow = { position: number | null; startPosition: number | null; points: number; race: { id: string; scheduledAt: Date; track: { id: string; name: string } } };
+type ResultRow = { position: number; spins: number; startPosition: number | null; points: number; race: { id: string; scheduledAt: Date; track: { id: string; name: string } } };
 
 /** Shape results for summarizePlayer(). */
 export function toPlayerResults(results: ResultRow[]): PlayerResult[] {
@@ -29,6 +30,7 @@ export function toPlayerResults(results: ResultRow[]): PlayerResult[] {
     trackId: r.race.track.id,
     trackName: r.race.track.name,
     position: r.position,
+    spins: r.spins,
     startPosition: r.startPosition,
     points: r.points,
   }));

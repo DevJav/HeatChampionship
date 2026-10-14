@@ -29,7 +29,7 @@ export function TallyTable({ labelHeader, usesHeader = "Usos", rows }: TallyTabl
           <Th align="right" title="Porcentaje de victorias">
             % V
           </Th>
-          <Th align="right" className="max-sm:hidden" title="Posición media de llegada (sin abandonos)">
+          <Th align="right" className="max-sm:hidden" title="Posición media de llegada">
             Media
           </Th>
         </tr>

@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { awardsFor, computeUnlocks, seasonPodiums, type AchievementId } from "./achievements";
 import type { StatsRace, StatsResult } from "./stats";
 
-const r = (userId: string, position: number | null, startPosition: number | null = null): StatsResult => ({
+const r = (userId: string, position: number, startPosition: number | null = null, spins = 0): StatsResult => ({
   userId,
   position,
+  spins,
   startPosition,
   points: position === 1 ? 9 : position === 2 ? 6 : position === 3 ? 4 : 0,
   carColor: null,
@@ -40,11 +41,10 @@ describe("computeUnlocks — firsts and milestones", () => {
     expect(ids("ana", races)).toEqual(["first-race", "veteran"]);
   });
 
-  it("marks the first retirement as a spin", () => {
-    expect(ids("ana", [race([r("ana", null), r("leo", 1)]), race([r("ana", null), r("leo", 1)])])).toEqual([
-      "first-race",
-      "spin",
-    ]);
+  it("marks the first spin-out, once", () => {
+    const races = [race([r("ana", 4), r("leo", 1)]), race([r("ana", 4, null, 2), r("leo", 1)]), race([r("ana", 4, null, 1), r("leo", 1)])];
+    expect(ids("ana", races)).toEqual(["first-race", "spin"]);
+    expect(computeUnlocks(races, []).find((u) => u.achievementId === "spin")?.race?.id).toBe(races[1].id);
   });
 });
 

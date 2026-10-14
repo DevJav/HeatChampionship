@@ -180,12 +180,6 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
               <li>
                 {colDriver.name} por delante: <span className="font-bold text-fg tabular-nums">{duel.behind}</span>
               </li>
-              {duel.meetings > duel.ahead + duel.behind && (
-                <li>
-                  Abandonaron los dos:{" "}
-                  <span className="font-bold text-fg tabular-nums">{duel.meetings - duel.ahead - duel.behind}</span>
-                </li>
-              )}
             </ul>
           ) : (
             <p className="text-fg-muted">Aún no han coincidido en una carrera.</p>

@@ -85,8 +85,6 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
                       <Td key={race.id} align="center" className="max-lg:hidden">
                         {!raced ? (
                           <span className="text-fg-subtle">·</span>
-                        ) : position == null ? (
-                          <span className="text-xs font-bold text-danger">RET</span>
                         ) : (
                           <span
                             className={cn(

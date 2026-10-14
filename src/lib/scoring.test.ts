@@ -21,10 +21,6 @@ describe("scoreRace", () => {
     expect(Object.fromEntries(points)).toEqual({ g: 0, h: 0 });
   });
 
-  it("gives 0 to retired players", () => {
-    expect(scoreRace([{ userId: "x", position: null }], TABLE).get("x")).toBe(0);
-  });
-
   it("works with custom tables", () => {
     const f1 = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
     expect(scoreRace([{ userId: "a", position: 8 }], f1).get("a")).toBe(4);
@@ -38,9 +34,8 @@ describe("positionsGained", () => {
     expect(positionsGained(3, 3)).toBe(0);
   });
 
-  it("is null when either is unknown", () => {
+  it("is null without a recorded grid slot", () => {
     expect(positionsGained(null, 2)).toBeNull();
-    expect(positionsGained(2, null)).toBeNull();
   });
 });
 

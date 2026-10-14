@@ -232,9 +232,10 @@ model RaceResult {
   id            String   @id @default(cuid())
   raceId        String
   userId        String
-  /// Finishing position; null when the player retired (dnf = true)
-  position      Int?
-  dnf           Boolean  @default(false)
+  /// Finishing position — in Heat everyone finishes the race
+  position      Int
+  /// Spin-outs (trompos) during the race, a fun statistic
+  spins         Int      @default(0)
   startPosition Int?
   carColorId    String?
   /// Snapshot of points awarded when the race was finalized

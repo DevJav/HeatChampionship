@@ -90,7 +90,7 @@ const sampleResults = [
   { pos: 3, name: "Marco", color: { name: "Amarillo", hex: "#facc15" }, pts: 4 },
   { pos: 4, name: "Lucía", color: { name: "Verde", hex: "#15803d" }, pts: 3 },
   { pos: 5, name: "Sara", color: { name: "Blanco", hex: "#f5f5f4" }, pts: 2 },
-  { pos: null, name: "Pablo", color: { name: "Negro", hex: "#1c1917" }, pts: 0 },
+  { pos: 6, name: "Pablo", color: { name: "Negro", hex: "#1c1917" }, pts: 1 },
 ];
 
 export default function UiKitPage() {
@@ -191,11 +191,8 @@ export default function UiKitPage() {
           {[1, 2, 3, 4, 8].map((p) => (
             <PositionBadge key={p} position={p} />
           ))}
-          <PositionBadge position={null} />
           <PositionBadge position={1} size="lg" />
-          <PositionBadge position={null} size="lg" />
           <PositionBadge position={5} size="sm" />
-          <PositionBadge position={null} size="sm" />
           <PositionBadge position={2} size="sm" neutral />
         </div>
         <div className="flex flex-wrap gap-6">

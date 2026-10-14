@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { validateResults, type ResultRow } from "./results-rules";
 
-const row = (userId: string, position: number | null, extra: Partial<ResultRow> = {}): ResultRow => ({
+const row = (userId: string, position: number, extra: Partial<ResultRow> = {}): ResultRow => ({
   userId,
   position,
+  spins: 0,
   startPosition: null,
   carColorId: null,
   upgradeIds: [],
@@ -21,8 +22,12 @@ describe("validateResults", () => {
     expect(result).toEqual({ error: undefined, rowErrors: {} });
   });
 
-  it("accepts retired players outside the finishing order", () => {
-    expect(validateResults([row("a", 1), row("b", 2), row("c", null)]).error).toBeUndefined();
+  it("accepts spin-outs", () => {
+    expect(validateResults([row("a", 1, { spins: 2 }), row("b", 2, { spins: 1 })]).error).toBeUndefined();
+  });
+
+  it("flags a negative spin count", () => {
+    expect(validateResults([row("a", 1, { spins: -1 })]).rowErrors.a?.spins).toBe("Trompos no válidos.");
   });
 
   it("flags repeated positions", () => {
@@ -32,12 +37,10 @@ describe("validateResults", () => {
     expect(result.error).toBe("Revisa los campos marcados.");
   });
 
-  it("rejects gaps in the finishing order", () => {
-    expect(validateResults([row("a", 1), row("b", 3), row("c", null)]).error).toMatch(/de 1 a 2 sin huecos/);
-  });
-
-  it("requires at least one finisher", () => {
-    expect(validateResults([row("a", null)]).error).toMatch(/al menos un piloto/);
+  it("flags positions past the size of the field", () => {
+    const result = validateResults([row("a", 1), row("b", 3)]);
+    expect(result.rowErrors.b?.position).toBe("Posición no válida.");
+    expect(result.error).toBe("Revisa los campos marcados.");
   });
 
   it("flags out-of-range and repeated starting positions", () => {

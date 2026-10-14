@@ -128,7 +128,7 @@ export async function TrackPreview({ race }: { race: RaceDetail }) {
                       <Th align="center" title="Mejor resultado">
                         Mejor
                       </Th>
-                      <Th align="right" className="max-sm:hidden" title="Posición media de llegada (sin abandonos)">
+                      <Th align="right" className="max-sm:hidden" title="Posición media de llegada">
                         Media
                       </Th>
                       <Th align="center" className="max-sm:hidden" title="Resultado la última vez">
@@ -155,7 +155,7 @@ export async function TrackPreview({ race }: { race: RaceDetail }) {
                               <Td align="center">{stats.wins}</Td>
                               <Td align="center">{stats.podiums}</Td>
                               <Td align="center">
-                                <PositionBadge position={stats.bestFinish} size="sm" />
+                                <PositionBadge position={stats.bestFinish!} size="sm" />
                               </Td>
                               <Td align="right" className="max-sm:hidden">
                                 {stats.averageFinish == null ? "—" : formatDecimal(stats.averageFinish)}

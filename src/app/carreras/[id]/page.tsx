@@ -52,7 +52,7 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
   const upcoming = phase === "OPEN" || phase === "CLOSED";
   const share = raceShareText(race, url, {
     confirmed: race.registrations.filter((r) => r.status === "CONFIRMED").length,
-    podium: results.filter((r) => r.position != null && r.position <= 3).map((r) => r.user.name),
+    podium: results.filter((r) => r.position <= 3).map((r) => r.user.name),
   });
 
   return (

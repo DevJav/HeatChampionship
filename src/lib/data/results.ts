@@ -12,13 +12,13 @@ const resultInclude = {
 
 export type RaceResultDetail = Prisma.RaceResultGetPayload<{ include: typeof resultInclude }>;
 
-/** Results of a race: finishers in order, then retired players. */
+/** Results of a race in finishing order. */
 export async function getRaceResults(raceId: string) {
   await connection();
   return db.raceResult.findMany({
     where: { raceId },
     include: resultInclude,
-    orderBy: [{ position: { sort: "asc", nulls: "last" } }, { user: { name: "asc" } }],
+    orderBy: { position: "asc" },
   });
 }
 
@@ -66,7 +66,7 @@ export async function getResultsEditorData(raceId: string) {
 
   // Union of entrants and existing results, results first (in finishing order)
   const players = new Map<string, { id: string; name: string; image: string | null }>();
-  const ordered = [...race.results].sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
+  const ordered = [...race.results].sort((a, b) => a.position - b.position);
   for (const result of ordered) players.set(result.user.id, result.user);
   for (const { user } of race.registrations) if (!players.has(user.id)) players.set(user.id, user);
 

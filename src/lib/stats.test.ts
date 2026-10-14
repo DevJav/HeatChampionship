@@ -20,9 +20,10 @@ const red = { id: "red", name: "Rojo", hex: "#d10500" };
 const blue = { id: "blue", name: "Azul", hex: "#2a78d6" };
 const sprint = { id: "sprint", name: "Sprint" };
 
-const r = (userId: string, position: number | null, extra: Partial<StatsResult> = {}): StatsResult => ({
+const r = (userId: string, position: number, extra: Partial<StatsResult> = {}): StatsResult => ({
   userId,
   position,
+  spins: 0,
   startPosition: null,
   points: position === 1 ? 9 : position === 2 ? 6 : position === 3 ? 4 : 0,
   carColor: null,
@@ -53,10 +54,10 @@ describe("driverStats", () => {
 });
 
 describe("entrantRecords", () => {
-  it("orders entrants by average finish, retirement-only records next, debutants last", () => {
+  it("orders entrants by average finish, debutants last", () => {
     const races = [
-      race([r("ana", 3), r("leo", 1), r("eva", null)]),
-      race([r("ana", 1), r("leo", 2), r("eva", null)]),
+      race([r("ana", 3), r("leo", 1), r("eva", 4)]),
+      race([r("ana", 1), r("leo", 2), r("eva", 3)]),
     ];
     const rows = entrantRecords(races, ["new", "eva", "ana", "leo", "other"]);
     expect(rows.map((row) => row.userId)).toEqual(["leo", "ana", "eva", "new", "other"]);
@@ -100,7 +101,7 @@ describe("championshipRecords", () => {
   it("finds the biggest comeback and the win from furthest back", () => {
     const races = [
       race([r("ana", 1, { startPosition: 2 }), r("leo", 2, { startPosition: 6 }), r("eva", 3, { startPosition: 1 })]),
-      race([r("eva", 1, { startPosition: 5 }), r("ana", null, { startPosition: 1 })]),
+      race([r("eva", 1, { startPosition: 5 }), r("ana", 2, { startPosition: 1 })]),
     ];
     const records = championshipRecords(races);
     expect(records.biggestComeback?.value).toBe(4);
@@ -122,8 +123,17 @@ describe("championshipRecords", () => {
     expect(records.bestAverageFinish).toEqual({ value: 2, holders: [{ userId: "ana" }] });
   });
 
+  it("totals spin-outs, leaving the record empty until someone spins", () => {
+    expect(championshipRecords([race([r("ana", 1), r("leo", 2)])]).mostSpins).toBeNull();
+    const races = [
+      race([r("ana", 1, { spins: 1 }), r("leo", 2, { spins: 2 })]),
+      race([r("ana", 2, { spins: 2 }), r("leo", 1)]),
+    ];
+    expect(championshipRecords(races).mostSpins).toEqual({ value: 3, holders: [{ userId: "ana" }] });
+  });
+
   it("returns null records when nothing qualifies", () => {
-    const records = championshipRecords([race([r("ana", null)])]);
+    const records = championshipRecords([race([r("ana", 2, { points: 6, startPosition: 1 })])]);
     expect(records.mostWins).toBeNull();
     expect(records.biggestComeback).toBeNull();
     expect(records.winStreak).toBeNull();
@@ -131,25 +141,25 @@ describe("championshipRecords", () => {
 });
 
 describe("headToHead", () => {
-  it("counts shared races and who finished ahead, retirements losing", () => {
+  it("counts shared races and who finished ahead", () => {
     const duels = headToHead([
       race([r("ana", 1), r("leo", 2)]),
-      race([r("leo", 1), r("ana", null)]),
-      race([r("ana", null), r("leo", null)]),
+      race([r("leo", 1), r("ana", 2)]),
+      race([r("ana", 2), r("leo", 3)]),
       race([r("ana", 3), r("eva", 1)]),
     ]);
-    expect(duels.get("ana")?.get("leo")).toEqual({ meetings: 3, ahead: 1, behind: 1 });
-    expect(duels.get("leo")?.get("ana")).toEqual({ meetings: 3, ahead: 1, behind: 1 });
+    expect(duels.get("ana")?.get("leo")).toEqual({ meetings: 3, ahead: 2, behind: 1 });
+    expect(duels.get("leo")?.get("ana")).toEqual({ meetings: 3, ahead: 1, behind: 2 });
     expect(duels.get("eva")?.get("ana")).toEqual({ meetings: 1, ahead: 1, behind: 0 });
     expect(duels.get("eva")?.get("leo")).toBeUndefined();
   });
 });
 
 describe("duelStep", () => {
-  it("bands the share of decided races symmetrically", () => {
+  it("bands the share of races finished ahead symmetrically", () => {
     const step = (ahead: number, behind: number) => duelStep({ meetings: ahead + behind, ahead, behind });
     expect([step(5, 5), step(6, 5), step(6, 4), step(8, 2), step(9, 1), step(0, 4), step(4, 5)]).toEqual([0, 0, 1, 2, 3, -3, -1]);
-    expect(duelStep({ meetings: 2, ahead: 0, behind: 0 })).toBe(0);
+    expect(duelStep({ meetings: 0, ahead: 0, behind: 0 })).toBe(0);
   });
 });
 
@@ -176,15 +186,15 @@ describe("carColorStats / upgradeStats", () => {
   it("tallies uses, wins and podiums, most used first", () => {
     const races = [
       race([r("ana", 1, { carColor: red, upgrades: [sprint] }), r("leo", 2, { carColor: blue })]),
-      race([r("ana", 4, { carColor: red }), r("leo", null, { carColor: blue, upgrades: [sprint] })]),
+      race([r("ana", 4, { carColor: red }), r("leo", 5, { carColor: blue, upgrades: [sprint] })]),
       race([r("ana", 3, { carColor: red })]),
     ];
     expect(carColorStats(races)).toEqual([
       { color: red, uses: 3, wins: 1, podiums: 2, winRate: 1 / 3, averageFinish: 8 / 3 },
-      { color: blue, uses: 2, wins: 0, podiums: 1, winRate: 0, averageFinish: 2 },
+      { color: blue, uses: 2, wins: 0, podiums: 1, winRate: 0, averageFinish: 3.5 },
     ]);
     expect(upgradeStats(races)).toEqual([
-      { upgrade: sprint, uses: 2, wins: 1, podiums: 1, winRate: 0.5, averageFinish: 1 },
+      { upgrade: sprint, uses: 2, wins: 1, podiums: 1, winRate: 0.5, averageFinish: 3 },
     ]);
   });
 });

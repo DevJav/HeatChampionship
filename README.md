@@ -38,7 +38,7 @@ Everything is managed from `/admin` (shield icon in the header):
 | Temporadas | Seasons and their points table. Only one season can be in progress at a time. |
 | Circuitos / Mejoras / Colores | The catalogs: track default laps, upgrade cards, car colors. Anything already used can be deactivated but not deleted. |
 
-**Results:** after the race, open it in admin and click **Resultados**. Fill in each driver's finishing position (or *Retirado*), starting position, car and upgrade cards. Points are previewed live from the season's table. Saving awards the points, marks the race *Finalizada* and opens its page with the podium and full results. You can edit the results later or cancel them. Changing a season's points table re-scores its finished races.
+**Results:** after the race, open it in admin and click **Resultados**. Fill in each driver's finishing position (everyone finishes in Heat), starting position, car, upgrade cards and how many times they spun out (*trompos*). Points are previewed live from the season's table. Saving awards the points, marks the race *Finalizada* and opens its page with the podium and full results. You can edit the results later or cancel them. Changing a season's points table re-scores its finished races.
 
 **Photos:** the race's drivers (and admins) can upload photos once the race has started. They're resized to WebP (max 2000px, plus a thumbnail) and stored in `data/uploads/`, which you can change with `UPLOAD_DIR`. Back up the whole `data/` folder to keep both the database and the photos.
 

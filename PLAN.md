@@ -21,7 +21,7 @@ Monthly Heat: Pedal to the Metal league. One race per month on a chosen track; p
 | Track | name, country, default laps, image, expansion |
 | Race | season, track, round, date/time, location, laps, max players, sign-up deadline, status DRAFT → OPEN → CLOSED → FINISHED |
 | Registration | race, user, queuedAt, status CONFIRMED / WAITLIST / WITHDRAWN |
-| RaceResult | race, user, position, start position, car color, DNF, points (snapshot), notes |
+| RaceResult | race, user, position, start position, car color, spins (trompos), points (snapshot), notes |
 | Upgrade + ResultUpgrade | upgrade catalog; upgrades used per result |
 | CarColor | name, hex |
 | RacePhoto | race, file path, caption |

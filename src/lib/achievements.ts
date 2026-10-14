@@ -66,7 +66,7 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
   { id: "first-race", name: "Debut", description: "Corrió su primera carrera.", tier: "common" },
   { id: "veteran", name: "Veterano", description: `${VETERAN_STARTS} carreras disputadas.`, tier: "common" },
   { id: "legend", name: "Leyenda", description: `${LEGEND_STARTS} carreras disputadas.`, tier: "special" },
-  { id: "spin", name: "Trompo", description: "Su primer abandono. Le pasa a cualquiera.", tier: "common" },
+  { id: "spin", name: "Trompo", description: "Su primer trompo. Le pasa a cualquiera.", tier: "common" },
 ];
 
 export const ACHIEVEMENT_BY_ID = new Map(ACHIEVEMENTS.map((a) => [a.id, a]));
@@ -97,7 +97,7 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
   const unlocks: Unlock[] = [];
 
   // --- Race by race, per driver
-  type Career = { starts: number; wins: number; podiums: number; dnfs: number; winStreak: number; podiumStreak: number; winTracks: Set<string> };
+  type Career = { starts: number; wins: number; podiums: number; spins: number; winStreak: number; podiumStreak: number; winTracks: Set<string> };
   const careers = new Map<string, Career>();
 
   for (const race of ordered) {
@@ -108,7 +108,7 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
     for (const result of race.results) {
       const c =
         careers.get(result.userId) ??
-        { starts: 0, wins: 0, podiums: 0, dnfs: 0, winStreak: 0, podiumStreak: 0, winTracks: new Set<string>() };
+        { starts: 0, wins: 0, podiums: 0, spins: 0, winStreak: 0, podiumStreak: 0, winTracks: new Set<string>() };
       careers.set(result.userId, c);
       const { userId, position, startPosition } = result;
 
@@ -117,9 +117,9 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
       if (c.starts === VETERAN_STARTS) add("veteran", userId);
       if (c.starts === LEGEND_STARTS) add("legend", userId);
 
-      if (position == null) {
-        c.dnfs += 1;
-        if (c.dnfs === 1) add("spin", userId);
+      if (result.spins > 0) {
+        if (c.spins === 0) add("spin", userId);
+        c.spins += result.spins;
       }
 
       const won = position === 1;
@@ -137,7 +137,7 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
         if (before < GLOBETROTTER_TRACKS && c.winTracks.size === GLOBETROTTER_TRACKS) add("globetrotter", userId);
       }
 
-      const podium = position != null && position <= 3;
+      const podium = position <= 3;
       c.podiumStreak = podium ? c.podiumStreak + 1 : 0;
       if (podium) {
         c.podiums += 1;

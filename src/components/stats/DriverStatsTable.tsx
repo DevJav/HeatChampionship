@@ -26,14 +26,14 @@ export function DriverStatsTable({ rows, drivers }: { rows: DriverStats[]; drive
           <Th align="right" className="max-sm:hidden" title="Porcentaje de victorias">
             % V
           </Th>
-          <Th align="right" className="max-md:hidden" title="Posición media de llegada (sin abandonos)">
+          <Th align="right" className="max-md:hidden" title="Posición media de llegada">
             Media
           </Th>
           <Th align="center" className="max-md:hidden" title="Posiciones ganadas de media desde la parrilla">
             +/−
           </Th>
-          <Th align="center" className="max-lg:hidden" title="Abandonos">
-            Ret.
+          <Th align="center" className="max-lg:hidden" title="Trompos">
+            Tromp.
           </Th>
           <Th align="right" title="Puntos por carrera">
             Pts/c.
@@ -61,7 +61,7 @@ export function DriverStatsTable({ rows, drivers }: { rows: DriverStats[]; drive
                 <PositionsGained value={row.averageGained} />
               </Td>
               <Td align="center" className="max-lg:hidden">
-                {row.dnfs || zero}
+                {row.spins || zero}
               </Td>
               <Td align="right" className="font-display text-lg font-bold italic">
                 {formatDecimal(row.pointsPerRace)}

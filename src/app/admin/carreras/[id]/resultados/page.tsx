@@ -25,7 +25,8 @@ async function ResultsPageContent({ params }: PageProps<"/admin/carreras/[id]/re
     race.results.map((result) => [
       result.userId,
       {
-        position: result.position == null ? "RET" : String(result.position),
+        position: String(result.position),
+        spins: result.spins,
         startPosition: result.startPosition == null ? "" : String(result.startPosition),
         carColorId: result.carColorId ?? "",
         upgradeIds: result.upgrades.map((u) => u.upgradeId),

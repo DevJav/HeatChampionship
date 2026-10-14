@@ -1,15 +1,13 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Flag } from "lucide-react";
+import { Flag, Minus, Plus } from "lucide-react";
 import { saveResults } from "@/actions/results";
 import { cn } from "@/lib/cn";
-import type { ResultRow, ResultsValidation, RowField } from "@/lib/results-rules";
+import { MAX_SPINS, type ResultRow, type ResultsValidation, type RowField } from "@/lib/results-rules";
 import { scoreRace } from "@/lib/scoring";
 import { Alert, Avatar, Button, Input, Select } from "@/components/ui";
 import { PositionBadge } from "@/components/domain/PositionBadge";
-
-const RETIRED = "RET";
 
 type Player = { id: string; name: string; image: string | null };
 type Option = { id: string; name: string };
@@ -17,6 +15,7 @@ type Option = { id: string; name: string };
 /** Editable row: selects hold strings ("" = not set). */
 type DraftRow = {
   position: string;
+  spins: number;
   startPosition: string;
   carColorId: string;
   upgradeIds: string[];
@@ -33,12 +32,14 @@ export type ResultsEditorProps = {
   initial: Record<string, Partial<DraftRow>>;
 };
 
-const emptyRow: DraftRow = { position: "", startPosition: "", carColorId: "", upgradeIds: [], notes: "" };
+const emptyRow: DraftRow = { position: "", spins: 0, startPosition: "", carColorId: "", upgradeIds: [], notes: "" };
 
+/** Only called with every position filled in (empty ones are caught before saving). */
 function toResultRow(userId: string, row: DraftRow): ResultRow {
   return {
     userId,
-    position: row.position === RETIRED || row.position === "" ? null : Number(row.position),
+    position: Number(row.position),
+    spins: row.spins,
     startPosition: row.startPosition ? Number(row.startPosition) : null,
     carColorId: row.carColorId || null,
     upgradeIds: row.upgradeIds,
@@ -75,17 +76,22 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
     });
   };
 
+  // Live preview: a driver without a position yet scores nothing
   const points = useMemo(
-    () => scoreRace(players.map((p) => toResultRow(p.id, rows[p.id])), pointsTable),
+    () =>
+      scoreRace(
+        players.filter((p) => rows[p.id].position !== "").map((p) => toResultRow(p.id, rows[p.id])),
+        pointsTable,
+      ),
     [players, rows, pointsTable],
   );
 
   function submit() {
-    // An empty position is a missing answer, not a retirement
+    // Everyone finishes in Heat: every driver needs a position
     const missing = players.filter((p) => rows[p.id].position === "");
     if (missing.length > 0) {
       setValidation({
-        error: "Indica la posición de todos los pilotos (o márcalos como retirados).",
+        error: "Indica la posición de todos los pilotos.",
         rowErrors: Object.fromEntries(missing.map((p) => [p.id, { position: "Falta la posición." }])),
       });
       return;
@@ -107,10 +113,10 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
         {players.map((player) => {
           const row = rows[player.id];
           const color = carColors.find((c) => c.id === row.carColorId);
-          const finishing = row.position && row.position !== RETIRED ? Number(row.position) : null;
+          const finishing = row.position ? Number(row.position) : null;
           return (
             <li key={player.id} className="flex flex-col gap-3 border-l-4 border-primary bg-surface-2/60 p-3">
-              <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(10rem,1.4fr)_repeat(3,minmax(0,1fr))_4rem]">
+              <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(10rem,1.4fr)_repeat(3,minmax(0,1fr))_auto_4rem]">
                 <div className="flex items-center gap-2 self-center font-semibold">
                   <Avatar name={player.name} src={player.image} color={color?.hex} size="sm" />
                   {player.name}
@@ -129,7 +135,6 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                         {p}º
                       </option>
                     ))}
-                    <option value={RETIRED}>Retirado</option>
                   </Select>
                 </SelectCell>
 
@@ -163,6 +168,14 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                       </option>
                     ))}
                   </Select>
+                </SelectCell>
+
+                <SelectCell label="Trompos" error={errorFor(player.id, "spins")}>
+                  <SpinStepper
+                    name={player.name}
+                    value={row.spins}
+                    onChange={(spins) => update(player.id, { spins })}
+                  />
                 </SelectCell>
 
                 <div className="flex flex-col items-center gap-1">
@@ -201,7 +214,7 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
 
               <Input
                 aria-label={`Nota sobre ${player.name}`}
-                placeholder="Nota (opcional): trompo en la curva 3, remontada épica…"
+                placeholder="Nota (opcional): remontada épica, rebufo en la última curva…"
                 value={row.notes}
                 maxLength={300}
                 onChange={(e) => update(player.id, { notes: e.target.value })}
@@ -223,6 +236,24 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
           <Flag /> Guardar resultados
         </Button>
       </div>
+    </div>
+  );
+}
+
+/** − count + : spin-outs during the race, 0 to MAX_SPINS. */
+function SpinStepper({ name, value, onChange }: { name: string; value: number; onChange: (value: number) => void }) {
+  const step = "flex size-10 items-center justify-center bg-surface-2 text-fg transition-colors hover:bg-border focus-inset disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4";
+  return (
+    <div role="group" aria-label={`Trompos de ${name}`} className="flex items-center gap-1">
+      <button type="button" className={step} aria-label="Un trompo menos" disabled={value <= 0} onClick={() => onChange(value - 1)}>
+        <Minus />
+      </button>
+      <span aria-live="polite" className="w-8 text-center font-display text-xl font-bold italic tabular-nums">
+        {value}
+      </span>
+      <button type="button" className={step} aria-label="Un trompo más" disabled={value >= MAX_SPINS} onClick={() => onChange(value + 1)}>
+        <Plus />
+      </button>
     </div>
   );
 }

@@ -5,8 +5,9 @@ import { positionsGained } from "./scoring";
 
 export type StatsResult = {
   userId: string;
-  /** null = retired */
-  position: number | null;
+  position: number;
+  /** Spin-outs (trompos) */
+  spins: number;
   startPosition: number | null;
   points: number;
   carColor: { id: string; name: string; hex: string } | null;
@@ -86,6 +87,7 @@ export function driverStats(races: StatsRace[]): DriverStats[] {
         trackId: race.track.id,
         trackName: race.track.name,
         position: result.position,
+        spins: result.spins,
         startPosition: result.startPosition,
         points: result.points,
       }));
@@ -105,7 +107,7 @@ export function driverStats(races: StatsRace[]): DriverStats[] {
 export function entrantRecords(races: StatsRace[], entrantIds: string[]) {
   const byId = new Map(driverStats(races).map((d) => [d.userId, d]));
   const sortKey = (stats: DriverStats | null) =>
-    !stats ? [2, 0, 0, 0] : stats.averageFinish == null ? [1, 0, -stats.starts, 0] : [0, stats.averageFinish, -stats.wins, -stats.starts];
+    !stats ? [1, 0, 0, 0] : [0, stats.averageFinish!, -stats.wins, -stats.starts];
   return entrantIds
     .map((userId) => ({ userId, stats: byId.get(userId) ?? null }))
     .sort((a, b) => {
@@ -114,7 +116,7 @@ export function entrantRecords(races: StatsRace[], entrantIds: string[]) {
     });
 }
 
-/** Races newest first, each with its podium (user ids, null where nobody finished there). */
+/** Races newest first, each with its podium (user ids, null where the field was smaller). */
 export function raceHistory(races: StatsRace[]) {
   return chronological(races)
     .reverse()
@@ -180,9 +182,10 @@ export function championshipRecords(races: StatsRace[]) {
     mostPodiums: totalRecord(drivers, (d) => d.podiums || null),
     mostPoints: totalRecord(drivers, (d) => d.points || null),
     mostStarts: totalRecord(drivers, (d) => d.starts),
+    mostSpins: totalRecord(drivers, (d) => d.spins || null),
     bestAverageFinish: totalRecord(drivers, (d) => (d.starts >= minStarts ? d.averageFinish : null), { lowest: true }),
     winStreak: streakRecord(races, (r) => r.position === 1),
-    podiumStreak: streakRecord(races, (r) => r.position != null && r.position <= 3),
+    podiumStreak: streakRecord(races, (r) => r.position <= 3),
     biggestComeback: comeback && {
       value: comeback.value,
       holders: comeback.items.map(({ race, result }) => ({
@@ -209,18 +212,10 @@ export type ChampionshipRecords = ReturnType<typeof championshipRecords>;
 export type Duel = {
   /** Races both drivers took part in */
   meetings: number;
-  /** Races the row driver finished ahead (including the other retiring) */
+  /** Races the row driver finished ahead */
   ahead: number;
   behind: number;
 };
-
-/** Whether `a` beat `b` in a race: 1 ahead, -1 behind, 0 when both retired. */
-function compare(a: StatsResult, b: StatsResult) {
-  if (a.position == null && b.position == null) return 0;
-  if (a.position == null) return -1;
-  if (b.position == null) return 1;
-  return a.position < b.position ? 1 : -1;
-}
 
 /** duels.get(a)?.get(b) = how `a` fared against `b` in races they shared. */
 export function headToHead(races: StatsRace[]) {
@@ -238,9 +233,8 @@ export function headToHead(races: StatsRace[]) {
         if (a.userId === b.userId) continue;
         const entry = duel(a.userId, b.userId);
         entry.meetings += 1;
-        const outcome = compare(a, b);
-        if (outcome > 0) entry.ahead += 1;
-        if (outcome < 0) entry.behind += 1;
+        if (a.position < b.position) entry.ahead += 1;
+        else entry.behind += 1;
       }
     }
   }
@@ -249,12 +243,11 @@ export function headToHead(races: StatsRace[]) {
 
 /**
  * Diverging step for a duel, −3 (nearly always behind) … 0 (even) … +3 (nearly always ahead).
- * Equal-width bands of the share of decided races; races where both retired don't count.
+ * Equal-width bands of the share of races finished ahead.
  */
-export function duelStep({ ahead, behind }: Duel) {
-  const decided = ahead + behind;
-  if (decided === 0) return 0;
-  const lead = ahead / decided - 0.5;
+export function duelStep({ meetings, ahead }: Duel) {
+  if (meetings === 0) return 0;
+  const lead = ahead / meetings - 0.5;
   const band = Math.abs(lead) <= 0.05 ? 0 : Math.abs(lead) <= 0.2 ? 1 : Math.abs(lead) <= 0.35 ? 2 : 3;
   return band === 0 ? 0 : Math.sign(lead) * band;
 }
@@ -308,7 +301,7 @@ export type Tally = {
 };
 
 function tallyResults(results: StatsResult[]): Tally {
-  const finishes = results.map((r) => r.position).filter((p): p is number => p != null);
+  const finishes = results.map((r) => r.position);
   const wins = finishes.filter((p) => p === 1).length;
   return {
     uses: results.length,

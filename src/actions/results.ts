@@ -4,12 +4,13 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { clearRaceResults, saveRaceResults } from "@/lib/results";
-import { validateResults, type ResultsValidation } from "@/lib/results-rules";
+import { MAX_SPINS, validateResults, type ResultsValidation } from "@/lib/results-rules";
 import { requireAdmin } from "@/lib/session";
 
 const rowSchema = z.object({
   userId: z.string().min(1),
-  position: z.number().int().nullable(),
+  position: z.number().int(),
+  spins: z.number().int().min(0).max(MAX_SPINS),
   startPosition: z.number().int().nullable(),
   carColorId: z.string().min(1).nullable(),
   upgradeIds: z.array(z.string().min(1)).max(20),

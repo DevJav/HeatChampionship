@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { ChartColumn, Flag, Flame, Gauge, Medal, Rocket, Star, Trophy, TrendingUp, Users, Award } from "lucide-react";
+import { ChartColumn, Flag, Flame, Gauge, Medal, Rocket, Star, Tornado, Trophy, TrendingUp, Users, Award } from "lucide-react";
 import {
   Card,
   CardBody,
@@ -166,6 +166,7 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
             {...recordProps}
           />
           <RecordCard label="Más carreras" icon={<Flag />} record={records.mostStarts} {...recordProps} />
+          <RecordCard label="Más trompos" icon={<Tornado />} record={records.mostSpins} caption="en total" {...recordProps} />
         </div>
         <p className="text-xs text-fg-muted">Las rachas cuentan carreras disputadas seguidas: faltar a una no la corta.</p>
       </Section>

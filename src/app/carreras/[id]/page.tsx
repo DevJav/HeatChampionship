@@ -17,6 +17,7 @@ import {
 } from "@/components/ui";
 import { FlagBackdrop } from "@/components/domain/CountryFlag";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
+import { RaceArticles } from "@/components/articles/RaceArticles";
 import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
 import { getAchievements } from "@/lib/data/achievements";
 import { EntryList } from "@/components/races/EntryList";
@@ -211,6 +212,9 @@ async function RaceView({ params }: { params: Promise<{ id: string }> }) {
     <div className="flex flex-col gap-8">
       {race.status === "DRAFT" && <Alert tone="warning">Borrador: solo lo ven los administradores.</Alert>}
       <RaceHero race={race} admin={admin} results={results} />
+      <Suspense>
+        <RaceArticles raceId={race.id} />
+      </Suspense>
       {race.status === "FINISHED" ? <FinishedRace race={race} results={results} /> : <UpcomingRace race={race} />}
     </div>
   );

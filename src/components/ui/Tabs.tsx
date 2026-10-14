@@ -2,16 +2,7 @@
 
 import { useId, useState } from "react";
 import { cn } from "@/lib/cn";
-
-/** Shared tab look, also used by LinkTabs. */
-export function tabItemClass(selected: boolean) {
-  return cn(
-    "whitespace-nowrap px-5 py-2 font-display text-sm font-bold uppercase italic tracking-wide transition-colors clip-slant focus-inset",
-    selected ? "bg-primary text-primary-fg gloss" : "text-fg-muted hover:bg-surface-2 hover:text-fg",
-  );
-}
-
-export const tabListClass = "flex gap-1 overflow-x-auto border-b-2 border-primary";
+import { tabItemClass, tabListClass } from "./tabStyles";
 
 export type TabItem = {
   id: string;

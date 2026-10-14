@@ -43,6 +43,8 @@ model User {
   registrations Registration[]
   results       RaceResult[]
   photos        RacePhoto[]
+  articles      Article[]
+  comments      ArticleComment[]
 
   @@map("user")
 }
@@ -203,6 +205,7 @@ model Race {
   registrations Registration[]
   results       RaceResult[]
   photos        RacePhoto[]
+  articles      Article[]
 
   @@unique([seasonId, round])
   @@index([scheduledAt])
@@ -276,4 +279,71 @@ model RacePhoto {
 
   race       Race  @relation(fields: [raceId], references: [id], onDelete: Cascade)
   uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+}
+
+// ---------------------------------------------------------------------------
+// News — articles written by admins
+// ---------------------------------------------------------------------------
+
+enum ArticleCategory {
+  /// Before a race
+  PREVIEW
+  /// After a race
+  REPORT
+  /// Championship news and updates
+  NEWS
+  /// Rules and how the championship works
+  RULES
+}
+
+enum ArticleStatus {
+  /// Being written, only admins see it
+  DRAFT
+  PUBLISHED
+}
+
+model Article {
+  id          String          @id @default(cuid())
+  /// URL name, from the title; frozen once published so links keep working
+  slug        String          @unique
+  title       String
+  /// Summary shown in lists and link previews
+  excerpt     String?
+  /// Banner image, path relative to the uploads directory; the race's flag is used without one
+  coverImage  String?
+  /// Markdown, with @username mentions and {{embed:id}} blocks (see src/lib/articles.ts)
+  body        String
+  category    ArticleCategory @default(NEWS)
+  status      ArticleStatus   @default(DRAFT)
+  /// Featured at the top of the news page
+  pinned      Boolean         @default(false)
+  /// The race it's about: listed on that race's page
+  raceId      String?
+  authorId    String?
+  /// Set the first time it's published
+  publishedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  race     Race?            @relation(fields: [raceId], references: [id], onDelete: SetNull)
+  author   User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  comments ArticleComment[]
+
+  @@index([status, publishedAt])
+  @@index([raceId])
+}
+
+/// Drivers' comments under an article: one flat thread, oldest first
+model ArticleComment {
+  id        String   @id @default(cuid())
+  articleId String
+  authorId  String
+  /// Light Markdown (bold, italics, links) with @username mentions
+  body      String
+  createdAt DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, createdAt])
 }

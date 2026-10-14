@@ -84,6 +84,29 @@ export async function storeAvatar(userId: string, file: File) {
   return storedPath;
 }
 
+/** Store an article's banner image as WebP (max 2000px wide). Returns the path relative to UPLOAD_DIR. */
+export async function storeArticleCover(file: File) {
+  if (!file.type.startsWith("image/")) throw new UploadError("El archivo no es una imagen.");
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("La imagen pesa más de 15 MB.");
+
+  const storedPath = path.posix.join("articles", `${randomUUID()}.webp`);
+  const absolute = resolveUpload(storedPath);
+  if (!absolute) throw new UploadError("Ruta no válida.");
+  await mkdir(path.dirname(absolute), { recursive: true });
+
+  try {
+    const cover = await sharp(Buffer.from(await file.arrayBuffer()))
+      .rotate()
+      .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+    await writeFile(absolute, cover);
+  } catch {
+    throw new UploadError("No se pudo procesar la imagen.");
+  }
+  return storedPath;
+}
+
 /** "/media/users/…/x.webp" → "users/…/x.webp" (only for files we stored). */
 export function storedPathFromUrl(url: string | null | undefined) {
   return url?.startsWith("/media/") ? url.slice("/media/".length) : null;

@@ -6,6 +6,7 @@ const sections = [
   { href: "/admin", label: "Resumen", exact: true },
   { href: "/admin/pilotos", label: "Pilotos" },
   { href: "/admin/carreras", label: "Carreras" },
+  { href: "/admin/noticias", label: "Noticias" },
   { href: "/admin/temporadas", label: "Temporadas" },
   { href: "/admin/circuitos", label: "Circuitos" },
   { href: "/admin/mejoras", label: "Mejoras" },

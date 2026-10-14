@@ -16,6 +16,7 @@ export const siteConfig = {
     { label: "Inicio", href: "/" },
     { label: "Clasificación", href: "/clasificacion" },
     { label: "Carreras", href: "/carreras" },
+    { label: "Noticias", href: "/noticias" },
     { label: "Pilotos", href: "/pilotos" },
     { label: "Estadísticas", href: "/estadisticas" },
   ],

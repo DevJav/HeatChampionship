@@ -16,16 +16,7 @@ import {
   type FormState,
 } from "@/lib/forms";
 import { requireAdmin } from "@/lib/session";
-
-/** "Gran Bretaña" → "gran-bretana" */
-function slugify(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+import { slugify } from "@/lib/slug";
 
 function duplicate(formData: FormData, field: string, message: string): FormState {
   return { fieldErrors: { [field]: message }, values: formValues(formData) };

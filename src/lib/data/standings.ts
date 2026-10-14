@@ -10,11 +10,14 @@ export const driverSelect = {
   favoriteColor: { select: { name: true, hex: true } },
 } as const;
 
-/** Standings, finished races and drivers of a season. */
-export async function getSeasonStandings(seasonId: string) {
+/**
+ * Standings, finished races and drivers of a season. With `throughRound`, the
+ * table as it stood right after that round (movement shows that race's effect).
+ */
+export async function getSeasonStandings(seasonId: string, { throughRound }: { throughRound?: number } = {}) {
   await connection();
   const races = await db.race.findMany({
-    where: { seasonId, status: "FINISHED" },
+    where: { seasonId, status: "FINISHED", ...(throughRound != null && { round: { lte: throughRound } }) },
     orderBy: { round: "asc" },
     select: {
       id: true,

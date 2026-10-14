@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { tabItemClass, tabListClass } from "./Tabs";
+import { tabItemClass, tabListClass } from "./tabStyles";
 
 export type LinkTabItem = {
   href: string;

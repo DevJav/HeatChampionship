@@ -28,6 +28,33 @@ npm run dev              # http://localhost:3000
 | `db:reset` | Wipe the database and re-seed |
 | `test` / `test:watch` | Unit tests (Vitest) |
 
+## Deploying
+
+Needs Node 24 (see `.nvmrc`). The app runs under [pm2](https://pm2.keymetrics.io/) with `ecosystem.config.cjs`, listening on `127.0.0.1:3000` for the Cloudflare tunnel.
+
+First time, with `.env` filled in from `.env.example` (real `BETTER_AUTH_SECRET`, public `BETTER_AUTH_URL`, admin account):
+
+```bash
+npm ci
+npm run db:deploy        # creates data/heat.db
+npm run db:seed          # tracks, car colors, first season, admin account
+npm run build
+pm2 start ecosystem.config.cjs
+pm2 save                 # remember it; `pm2 startup` once to start pm2 on boot
+```
+
+Updating:
+
+```bash
+git pull
+npm ci
+npm run db:deploy
+npm run build
+pm2 restart heat
+```
+
+`pm2 logs heat` shows the server output.
+
 ## Running the championship
 
 Everything is managed from `/admin` (shield icon in the header):

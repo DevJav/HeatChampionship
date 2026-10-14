@@ -20,7 +20,7 @@ type RaceFormProps = {
   defaults?: { seasonId?: string; round?: number };
 };
 
-const editableStatuses: RaceStatus[] = ["DRAFT", "OPEN", "CLOSED"];
+const editableStatuses: RaceStatus[] = ["DRAFT", "UPCOMING", "OPEN", "CLOSED"];
 
 export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormProps) {
   const [state, formAction] = useActionState(action, {});

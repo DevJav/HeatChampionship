@@ -47,8 +47,9 @@ describe("signupWindow", () => {
     expect(signupWindow(race(), at(0))).toEqual({ open: true });
   });
 
-  it("is closed for drafts, closed and finished races", () => {
+  it("is closed for drafts, upcoming, closed and finished races", () => {
     expect(signupWindow(race({ status: "DRAFT" }), at(0))).toEqual({ open: false, reason: "draft" });
+    expect(signupWindow(race({ status: "UPCOMING" }), at(0))).toEqual({ open: false, reason: "upcoming" });
     expect(signupWindow(race({ status: "CLOSED" }), at(0))).toEqual({ open: false, reason: "not-open" });
     expect(signupWindow(race({ status: "FINISHED" }), at(0))).toEqual({ open: false, reason: "finished" });
   });
@@ -99,6 +100,11 @@ describe("racePhase", () => {
   it("is AWAITING_RESULTS once the race has started", () => {
     expect(racePhase(race(), at(60))).toBe("AWAITING_RESULTS");
     expect(racePhase(race({ status: "CLOSED" }), at(90))).toBe("AWAITING_RESULTS");
+  });
+
+  it("shows UPCOMING until the race starts", () => {
+    expect(racePhase(race({ status: "UPCOMING" }), at(0))).toBe("UPCOMING");
+    expect(racePhase(race({ status: "UPCOMING" }), at(90))).toBe("AWAITING_RESULTS");
   });
 
   it("keeps DRAFT and FINISHED regardless of time", () => {

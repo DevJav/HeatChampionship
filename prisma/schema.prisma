@@ -172,6 +172,8 @@ model Season {
 enum RaceStatus {
   /// Being prepared, not visible to players
   DRAFT
+  /// Announced on the calendar, sign-ups not open yet
+  UPCOMING
   /// Sign-ups open
   OPEN
   /// Sign-ups closed, waiting to be raced

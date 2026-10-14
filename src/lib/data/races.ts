@@ -75,7 +75,7 @@ export async function listPublishedRaces() {
 export async function getNextRace() {
   await connection();
   return db.race.findFirst({
-    where: { status: { in: ["OPEN", "CLOSED"] }, scheduledAt: { gte: new Date() } },
+    where: { status: { in: ["UPCOMING", "OPEN", "CLOSED"] }, scheduledAt: { gte: new Date() } },
     orderBy: { scheduledAt: "asc" },
     include: raceDetailInclude,
   });

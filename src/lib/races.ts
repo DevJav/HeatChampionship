@@ -16,6 +16,7 @@ type Tone = "neutral" | "primary" | "accent" | "success" | "warning" | "danger" 
 /** Labels for the status the admin sets (race form). */
 export const RACE_STATUS: Record<RaceStatus, { label: string; tone: Tone }> = {
   DRAFT: { label: "Borrador", tone: "neutral" },
+  UPCOMING: { label: "Próximamente", tone: "accent" },
   OPEN: { label: "Inscripción abierta", tone: "success" },
   CLOSED: { label: "Inscripción cerrada", tone: "warning" },
   FINISHED: { label: "Finalizada", tone: "bar" },
@@ -24,6 +25,7 @@ export const RACE_STATUS: Record<RaceStatus, { label: string; tone: Tone }> = {
 /** Labels for what players see (status + deadline + start time). */
 export const RACE_PHASE: Record<RacePhase, { label: string; tone: Tone }> = {
   DRAFT: { label: "Borrador", tone: "neutral" },
+  UPCOMING: { label: "Próximamente", tone: "accent" },
   OPEN: { label: "Inscripción abierta", tone: "success" },
   CLOSED: { label: "Inscripción cerrada", tone: "warning" },
   AWAITING_RESULTS: { label: "Pendiente de resultados", tone: "info" },

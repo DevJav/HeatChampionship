@@ -22,13 +22,14 @@ export type WindowRace = { status: RaceStatus; scheduledAt: Date; signupDeadline
 
 export type SignupWindow =
   | { open: true }
-  | { open: false; reason: "draft" | "not-open" | "deadline" | "started" | "finished" };
+  | { open: false; reason: "draft" | "upcoming" | "not-open" | "deadline" | "started" | "finished" };
 
 /** Can players join right now? Requires status OPEN, before the deadline and the race start. */
 export function signupWindow(race: WindowRace, now = new Date()): SignupWindow {
   if (race.status === "DRAFT") return { open: false, reason: "draft" };
   if (race.status === "FINISHED") return { open: false, reason: "finished" };
   if (now >= race.scheduledAt) return { open: false, reason: "started" };
+  if (race.status === "UPCOMING") return { open: false, reason: "upcoming" };
   if (race.status !== "OPEN") return { open: false, reason: "not-open" };
   if (race.signupDeadline && now >= race.signupDeadline) return { open: false, reason: "deadline" };
   return { open: true };
@@ -38,21 +39,23 @@ export function signupWindow(race: WindowRace, now = new Date()): SignupWindow {
  * What a race looks like to players right now. The stored status is what the
  * admin set; the deadline and start time move it along on their own.
  */
-export type RacePhase = "DRAFT" | "OPEN" | "CLOSED" | "AWAITING_RESULTS" | "FINISHED";
+export type RacePhase = "DRAFT" | "UPCOMING" | "OPEN" | "CLOSED" | "AWAITING_RESULTS" | "FINISHED";
 
 export function racePhase(race: WindowRace, now = new Date()): RacePhase {
   if (race.status === "DRAFT" || race.status === "FINISHED") return race.status;
   if (now >= race.scheduledAt) return "AWAITING_RESULTS";
+  if (race.status === "UPCOMING") return "UPCOMING";
   return signupWindow(race, now).open ? "OPEN" : "CLOSED";
 }
 
 /** Players may drop out on their own until the race starts (waitlist moves up). */
 export function canWithdraw(race: WindowRace, now = new Date()) {
-  return (race.status === "OPEN" || race.status === "CLOSED") && now < race.scheduledAt;
+  return (race.status === "UPCOMING" || race.status === "OPEN" || race.status === "CLOSED") && now < race.scheduledAt;
 }
 
 export const SIGNUP_CLOSED_MESSAGES: Record<Exclude<SignupWindow, { open: true }>["reason"], string> = {
   draft: "Esta carrera todavía no está publicada.",
+  upcoming: "Las inscripciones todavía no están abiertas.",
   "not-open": "Las inscripciones están cerradas.",
   deadline: "El plazo de inscripción ha terminado.",
   started: "La carrera ya ha empezado.",

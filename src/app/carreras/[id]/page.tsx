@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps<"/carreras/[id]">):
 function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; results: RaceResultDetail[] }) {
   const url = absoluteUrl(`/carreras/${race.id}`);
   const phase = racePhase(race);
-  const upcoming = phase === "OPEN" || phase === "CLOSED";
+  const upcoming = phase === "UPCOMING" || phase === "OPEN" || phase === "CLOSED";
   const share = raceShareText(race, url, {
     confirmed: race.registrations.filter((r) => r.status === "CONFIRMED").length,
     podium: results.filter((r) => r.position <= 3).map((r) => r.user.name),

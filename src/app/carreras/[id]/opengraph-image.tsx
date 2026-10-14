@@ -42,6 +42,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       <OgTag background="#15803d">
         {confirmed >= race.maxPlayers ? "Completa · lista de espera" : `Inscripción abierta · ${confirmed}/${race.maxPlayers}`}
       </OgTag>
+    ) : phase === "UPCOMING" ? (
+      <OgTag background="#475569">Próximamente</OgTag>
     ) : phase === "CLOSED" ? (
       <OgTag background="#b45309">Inscripción cerrada</OgTag>
     ) : (

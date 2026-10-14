@@ -72,7 +72,7 @@ const raceSchema = z
     laps: optionalInt(1, 10),
     maxPlayers: int(2, siteConfig.maxPlayersPerRace),
     // Absent when the select is disabled (finished races)
-    status: z.enum(["DRAFT", "OPEN", "CLOSED"]).optional(),
+    status: z.enum(["DRAFT", "UPCOMING", "OPEN", "CLOSED"]).optional(),
     notes: optionalText(2000),
   })
   .refine((race) => !race.signupDeadline || race.signupDeadline <= race.scheduledAt, {

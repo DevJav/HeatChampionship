@@ -54,7 +54,7 @@ const raceListInclude = {
     orderBy: { position: "asc" },
     select: {
       position: true,
-      user: { select: { id: true, name: true, favoriteColor: { select: { hex: true } } } },
+      user: { select: { id: true, name: true, username: true, favoriteColor: { select: { hex: true } } } },
     },
   },
 } satisfies Prisma.RaceInclude;

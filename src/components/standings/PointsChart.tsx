@@ -10,6 +10,8 @@ export type ChartRound = { label: string; title: string };
 export type ChartSeries = {
   id: string;
   name: string;
+  /** Tags the logged-in driver's line and labels for highlighting */
+  username: string | null;
   /** Running points total after each round */
   values: number[];
   /** 1–3 for the highlighted leaders, null for the rest (gray) */
@@ -64,9 +66,22 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
         {leaders.map((s) => (
           <li key={s.id} className="flex items-center gap-2">
             <span aria-hidden className="h-0.5 w-4" style={{ background: strokeFor(s.slot) }} />
-            <span className="font-semibold text-fg">{s.name}</span>
+            <span data-driver={s.username ?? undefined} className="font-semibold text-fg">
+              {s.name}
+            </span>
           </li>
         ))}
+        {/* The logged-in driver's own line when outside the top three; MeHighlight reveals it */}
+        {series
+          .filter((s) => !s.slot && s.username)
+          .map((s) => (
+            <li key={s.id} data-driver-legend={s.username} className="hidden items-center gap-2">
+              <span aria-hidden className="h-0.5 w-4 bg-(--me-line)" />
+              <span data-driver={s.username!} className="font-semibold text-fg">
+                {s.name}
+              </span>
+            </li>
+          ))}
         {series.length > leaders.length && (
           <li className="flex items-center gap-2">
             <span aria-hidden className="h-0.5 w-4" style={{ background: strokeFor(null) }} />
@@ -135,6 +150,8 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
           {drawOrder.map((s) => (
             <polyline
               key={s.id}
+              data-driver={s.username ?? undefined}
+              data-leader={s.slot ? "" : undefined}
               fill="none"
               stroke={strokeFor(s.slot)}
               strokeWidth={2}
@@ -182,7 +199,9 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
                 <li key={s.id} className="flex items-center gap-2">
                   <span aria-hidden className="h-0.5 w-3 shrink-0" style={{ background: strokeFor(s.slot) }} />
                   <span className="w-8 text-right font-bold tabular-nums text-fg">{s.value}</span>
-                  <span className="text-fg-muted">{s.name}</span>
+                  <span data-driver={s.username ?? undefined} className="text-fg-muted">
+                    {s.name}
+                  </span>
                 </li>
               ))}
             </ul>

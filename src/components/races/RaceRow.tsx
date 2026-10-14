@@ -3,6 +3,7 @@ import { ChevronRight, MapPin } from "lucide-react";
 import type { RaceListItem } from "@/lib/data/races";
 import { cn } from "@/lib/cn";
 import { dateParts } from "@/lib/format";
+import { italicCenterStyle } from "@/lib/italic-center";
 import { CountryFlag } from "@/components/domain/CountryFlag";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
@@ -26,7 +27,9 @@ export function RaceRow({ race }: { race: RaceListItem }) {
         {/* Date block */}
         <span className="flex w-16 flex-col items-center surface-bar border-b-2 border-primary py-1.5 text-bar-fg">
           <span className="text-[10px] font-bold uppercase tracking-widest text-bar-fg/70">{date.weekday}</span>
-          <span className="font-display text-3xl font-bold italic leading-none">{date.day}</span>
+          <span className="font-display text-3xl font-bold italic italic-center leading-none" style={italicCenterStyle(date.day)}>
+            {date.day}
+          </span>
           <span className="text-[11px] font-bold uppercase tracking-wider">{date.month}</span>
         </span>
 
@@ -68,7 +71,12 @@ export function RaceRow({ race }: { race: RaceListItem }) {
               race.results.map((result) => (
                 <span key={result.user.id} className="flex items-center gap-2">
                   <PositionBadge position={result.position} size="sm" />
-                  <DriverName name={result.user.name} color={result.user.favoriteColor?.hex} />
+                  <DriverName
+                    name={result.user.name}
+                    username={result.user.username}
+                    link={false}
+                    color={result.user.favoriteColor?.hex}
+                  />
                 </span>
               ))
             ) : (

@@ -56,7 +56,7 @@ export function EntryList({ entrants, maxPlayers, rowAction }: EntryListProps) {
           <ol className="flex flex-col gap-1">
             {waitlist.map((entrant, i) => (
               <li key={entrant.id} className="flex items-center gap-3 bg-surface-2/60 py-1.5 pr-2 pl-3">
-                <span className="w-8 text-center font-display font-bold text-fg-subtle italic tabular-nums">{i + 1}º</span>
+                <span className="w-8 text-center font-display font-bold text-fg-subtle italic italic-center tabular-nums">{i + 1}º</span>
                 <DriverName
                     name={entrant.user.name}
                     username={entrant.user.username}

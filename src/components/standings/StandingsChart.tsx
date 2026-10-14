@@ -8,6 +8,7 @@ export function StandingsChart({ standings }: { standings: SeasonStandings }) {
   const series: ChartSeries[] = rows.map((row, index) => ({
     id: row.userId,
     name: drivers.get(row.userId)?.name ?? "—",
+    username: drivers.get(row.userId)?.username ?? null,
     values: progression.map((step) => step.totals[row.userId] ?? 0),
     slot: index < 3 ? ((index + 1) as 1 | 2 | 3) : null,
   }));

@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Titillium_Web } from "next/font/google";
+import { Suspense } from "react";
 import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/site-url";
+import { MeHighlight } from "@/components/domain/MeHighlight";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import "./globals.css";
@@ -43,6 +45,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <main className="flex-1 py-8 sm:py-10">{children}</main>
         <SiteFooter />
+        <Suspense>
+          <MeHighlight />
+        </Suspense>
       </body>
     </html>
   );

@@ -33,7 +33,9 @@ export function PlayerCard({ player, results, unlocks = [] }: PlayerCardProps) {
         <div className="flex items-center gap-4">
           <Avatar name={player.name} src={player.image} color={player.favoriteColor?.hex} size="lg" />
           <div className="min-w-0">
-            <h3 className="truncate pr-1 text-2xl">{player.name}</h3>
+            <h3 data-driver={player.username ?? undefined} className="truncate pr-1 text-2xl">
+              {player.name}
+            </h3>
             <p className="text-sm text-fg-muted">@{player.username}</p>
           </div>
         </div>

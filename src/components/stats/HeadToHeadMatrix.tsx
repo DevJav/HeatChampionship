@@ -100,11 +100,11 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
                   scope="col"
                   title={d.name}
                   className={cn(
-                    "w-11 pb-1 font-display text-xs font-bold italic tracking-wide text-fg-muted sm:w-14",
+                    "w-11 pb-1 font-display text-xs font-bold italic italic-center tracking-wide text-fg-muted sm:w-14",
                     active?.col === col && "text-primary",
                   )}
                 >
-                  {d.code}
+                  <span data-driver={d.username ?? undefined}>{d.code}</span>
                 </th>
               ))}
             </tr>
@@ -113,8 +113,8 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
             {drivers.map((rowD, row) => (
               <tr key={rowD.id}>
                 <th scope="row" className={cn("pr-3 text-left font-normal", active?.row === row && "text-primary")}>
-                  <DriverName name={rowD.name} color={rowD.color} className="max-sm:hidden" />
-                  <DriverName name={rowD.code} color={rowD.color} className="sm:hidden" />
+                  <DriverName name={rowD.name} username={rowD.username} link={false} color={rowD.color} className="max-sm:hidden" />
+                  <DriverName name={rowD.code} username={rowD.username} link={false} color={rowD.color} className="sm:hidden" />
                 </th>
                 {drivers.map((colD, col) => {
                   if (row === col) {

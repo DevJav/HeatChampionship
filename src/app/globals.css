@@ -89,6 +89,13 @@
   background-image: var(--gloss-gradient);
 }
 
+/* Italic glyphs overhang their advance box to the right (~0.07em in Titillium),
+   so centered italic text looks off-center: pad the trailing side to compensate.
+   Numbers vary a lot by digit; italicCenterStyle() sets their exact --italic-pad */
+@utility italic-center {
+  padding-inline-end: var(--italic-pad, 0.14em);
+}
+
 @utility texture-carbon {
   background-image: var(--texture);
 }

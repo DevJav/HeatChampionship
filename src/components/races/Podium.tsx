@@ -28,7 +28,10 @@ export function Podium({ results }: { results: RaceResultDetail[] }) {
                   color={result.carColor?.hex ?? result.user.favoriteColor?.hex}
                   size={place === 1 ? "xl" : "lg"}
                 />
-                <span className="max-w-full px-1 text-center font-display text-lg leading-tight font-bold uppercase italic [overflow-wrap:anywhere]">
+                <span
+                  data-driver={result.user.username ?? undefined}
+                  className="max-w-full pl-1 pr-[calc(0.25rem+0.14em)] text-center font-display text-lg leading-tight font-bold uppercase italic [overflow-wrap:anywhere]"
+                >
                   {result.user.name}
                 </span>
                 <span className="text-sm text-fg-muted tabular-nums">{result.points} pts</span>

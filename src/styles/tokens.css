@@ -58,6 +58,10 @@
   --silver: #9ca3af;
   --bronze: #b0703c;
 
+  /* "You": the logged-in driver's name, and their line in the points chart */
+  --me-fg: var(--primary);
+  --me-line: #111214;
+
   /* Charts — categorical slots validated (CVD + contrast) on --surface as a set
      of three; beyond the top three, drivers fall back to the muted gray */
   --series-1: #2a78d6;

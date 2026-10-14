@@ -92,7 +92,7 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
                             className={cn(
                               "font-semibold",
                               position <= 3 &&
-                                "inline-block min-w-8 -skew-x-12 px-1.5 font-display text-sm font-bold italic",
+                                "inline-block min-w-8 -skew-x-12 pl-1.5 pr-[calc(0.375rem+0.14em)] font-display text-sm font-bold italic",
                               podiumChipClass(position),
                             )}
                             title={`${row.pointsByRace[race.id]} pts`}

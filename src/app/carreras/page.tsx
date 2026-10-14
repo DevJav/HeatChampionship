@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CalendarDays } from "lucide-react";
-import { Container, EmptyState, PageHeader, Section, Skeleton } from "@/components/ui";
+import { Container, EmptyState, PageHeader, Section, Skeleton, Tabs } from "@/components/ui";
+import { RaceCalendar } from "@/components/races/RaceCalendar";
 import { RaceRow } from "@/components/races/RaceRow";
 import { listPublishedRaces, type RaceListItem } from "@/lib/data/races";
+import { toLocalInput } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Carreras" };
 
@@ -33,6 +35,21 @@ async function RaceList() {
     );
   }
 
+  return (
+    <Tabs
+      items={[
+        { id: "lista", label: "Lista", content: <RaceSections upcoming={upcoming} finished={finished} /> },
+        {
+          id: "calendario",
+          label: "Calendario",
+          content: <RaceCalendar races={races} today={toLocalInput(new Date()).slice(0, 10)} />,
+        },
+      ]}
+    />
+  );
+}
+
+function RaceSections({ upcoming, finished }: { upcoming: RaceListItem[]; finished: RaceListItem[] }) {
   return (
     <div className="flex flex-col gap-10">
       {upcoming.length > 0 && (

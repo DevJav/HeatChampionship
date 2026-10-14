@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { FormState } from "@/lib/forms";
-import { Alert, ButtonLink, Checkbox, Field, Input, Select, SubmitButton, Textarea } from "@/components/ui";
+import { Alert, ButtonLink, Checkbox, DateTimePicker, Field, Input, Select, SubmitButton, Textarea } from "@/components/ui";
 
 /**
  * Form fields wired to a FormState: they show the field's error and, after a
@@ -85,6 +85,23 @@ export function SelectField({
           </option>
         ))}
       </Select>
+    </Field>
+  );
+}
+
+type DateTimeFieldProps = Common & {
+  /** "2026-11-14T19:30", Madrid wall-clock time */
+  defaultValue?: string | null;
+  /** Optional field: can be emptied */
+  clearable?: boolean;
+};
+
+/** Date and time with a Monday-first calendar and dd/mm/yyyy dates. */
+export function DateTimeField({ name, label, state, hint, className, defaultValue, clearable }: DateTimeFieldProps) {
+  const { error, ...props } = fieldProps({ name, state });
+  return (
+    <Field label={label} htmlFor={name} hint={hint} error={error} className={className}>
+      <DateTimePicker {...props} defaultValue={valueOf(state, name, defaultValue)} clearable={clearable} />
     </Field>
   );
 }

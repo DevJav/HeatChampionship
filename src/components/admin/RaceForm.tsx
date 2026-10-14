@@ -5,7 +5,7 @@ import { siteConfig } from "@/config/site";
 import type { Race, RaceStatus } from "@/generated/prisma/client";
 import { toLocalInput } from "@/lib/dates";
 import { RACE_STATUS } from "@/lib/races";
-import { FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
+import { DateTimeField, FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
 import type { FormAction } from "@/lib/forms";
 
 type Option = { id: string; name: string };
@@ -64,18 +64,17 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
           hint="Vacío = las del circuito"
           defaultValue={race?.laps}
         />
-        <TextField
+        <DateTimeField
           name="scheduledAt"
           label="Fecha y hora"
-          type="datetime-local"
           state={state}
           hint={`Hora de ${siteConfig.timeZone.split("/")[1]}`}
           defaultValue={race ? toLocalInput(race.scheduledAt) : undefined}
         />
-        <TextField
+        <DateTimeField
           name="signupDeadline"
           label="Cierre de inscripciones"
-          type="datetime-local"
+          clearable
           state={state}
           hint="Opcional. Sin fecha, se cierran al empezar la carrera."
           defaultValue={race?.signupDeadline ? toLocalInput(race.signupDeadline) : undefined}

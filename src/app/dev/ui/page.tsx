@@ -14,6 +14,7 @@ import {
   CardTitle,
   ChequeredStrip,
   Container,
+  DateTimePicker,
   EmptyState,
   Field,
   Input,
@@ -310,6 +311,9 @@ export default function UiKitPage() {
               error="Las vueltas deben estar entre 1 y 5"
             >
               <Input id="demo-laps" type="number" defaultValue={9} aria-invalid />
+            </Field>
+            <Field label="Fecha y hora" htmlFor="demo-date" hint="Lunes primero, dd/mm/aaaa">
+              <DateTimePicker id="demo-date" name="demo-date" defaultValue="2026-11-14T19:30" clearable />
             </Field>
             <Field label="Desactivado" htmlFor="demo-disabled">
               <Input id="demo-disabled" disabled value="Solo lectura" readOnly />

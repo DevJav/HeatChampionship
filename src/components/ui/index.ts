@@ -12,6 +12,7 @@ export {
   CardTitle,
 } from "./Card";
 export { ConfirmButton } from "./ConfirmButton";
+export { DateTimePicker } from "./DateTimePicker";
 export { ChequeredStrip, SpeedStripes } from "./Decorations";
 export { EmptyState } from "./EmptyState";
 export { Checkbox, Field, Input, Label, Select, Textarea } from "./Form";

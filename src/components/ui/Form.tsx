@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 /** Shared look for every text-like control (input, select, textarea). */
-const controlClass =
+export const controlClass =
   "w-full rounded-control border border-border border-b-2 border-b-border-strong bg-surface-2 px-3 text-sm text-fg placeholder:text-fg-subtle transition-colors focus:border-b-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-b-danger";
 
 export function Input({ className, ...props }: React.ComponentProps<"input">) {

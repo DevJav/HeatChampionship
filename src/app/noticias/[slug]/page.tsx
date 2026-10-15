@@ -29,8 +29,7 @@ export async function generateMetadata({ params }: PageProps<"/noticias/[slug]">
       title: article.title,
       description,
       publishedTime: article.publishedAt?.toISOString(),
-      // WhatsApp and friends show the cover, else the site's card (setting openGraph here drops the inherited one)
-      images: [absoluteUrl(article.coverImage ? `/media/${article.coverImage}` : "/opengraph-image")],
+      // The image comes from ./opengraph-image.tsx (cover, else the race's flag)
     },
   };
 }

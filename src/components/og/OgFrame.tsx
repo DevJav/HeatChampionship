@@ -50,11 +50,22 @@ function Brand() {
   );
 }
 
-/** Dark broadcast panel with the red edge, optional flag on the right, brand and chequered strip. */
-export function OgFrame({ flag, children }: { flag?: string | null; children: React.ReactNode }) {
+/**
+ * Dark broadcast panel with the red edge, brand and chequered strip. Behind the
+ * text: a full-bleed cover photo, or a flag on the right.
+ */
+export function OgFrame({ flag, cover, children }: { flag?: string | null; cover?: string | null; children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", width: "100%", height: "100%", background: BAR, position: "relative", fontFamily: "Titillium" }}>
-      {flag && (
+      {cover ? (
+        <div style={{ display: "flex", position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- Satori renders plain <img> */}
+          <img src={cover} width={1200} height={630} style={{ objectFit: "cover" }} alt="" />
+          {/* Darken the left and bottom, where the title and brand sit */}
+          <div style={{ display: "flex", position: "absolute", top: 0, left: 0, bottom: 0, right: 0, background: "linear-gradient(90deg, rgba(17,18,20,0.92) 0%, rgba(17,18,20,0.7) 45%, rgba(17,18,20,0.15) 100%)" }} />
+          <div style={{ display: "flex", position: "absolute", left: 0, bottom: 0, right: 0, height: 260, background: "linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)" }} />
+        </div>
+      ) : flag && (
         <div style={{ display: "flex", position: "absolute", top: 0, right: 0, bottom: 0, width: 720 }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- Satori renders plain <img> */}
           <img src={flag} width={720} height={630} style={{ objectFit: "cover", opacity: 0.6 }} alt="" />

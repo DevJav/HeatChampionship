@@ -38,11 +38,12 @@ import { getRace, type RaceDetail } from "@/lib/data/races";
 import { getRaceResults, type RaceResultDetail } from "@/lib/data/results";
 import { racePhase } from "@/lib/registration-rules";
 import { getCurrentUser, isAdmin } from "@/lib/session";
+import { t } from "@/i18n";
 
 export async function generateMetadata({ params }: PageProps<"/carreras/[id]">): Promise<Metadata> {
   const { id } = await params;
   const race = await getRace(id);
-  if (!race) return { title: "Carrera" };
+  if (!race) return { title: t.races.fallbackTitle };
   const description = [formatRaceDay(race.scheduledAt), race.location, race.season.name].filter(Boolean).join(" · ");
   return { title: raceTitle(race), description, openGraph: { title: raceTitle(race), description } };
 }
@@ -68,7 +69,7 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
       )}
       <div className="relative flex flex-col items-start gap-3 px-6 py-8 sm:px-10">
         <div className="flex flex-wrap gap-2">
-          <Badge tone="primary">Ronda {race.round}</Badge>
+          <Badge tone="primary">{t.common.round(race.round)}</Badge>
           <Badge tone="bar">{race.season.name}</Badge>
           <RaceStatusBadge race={race} />
         </div>
@@ -88,10 +89,10 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
         {admin && (
           <div className="flex flex-wrap gap-2">
             <ButtonLink href={`/admin/carreras/${race.id}`} variant="inverse" size="sm">
-              <Pencil /> Editar
+              <Pencil /> {t.common.edit}
             </ButtonLink>
             <ButtonLink href={`/admin/carreras/${race.id}/resultados`} variant="inverse" size="sm">
-              <Flag /> {race.status === "FINISHED" ? "Editar resultados" : "Resultados"}
+              <Flag /> {race.status === "FINISHED" ? t.races.editResults : t.races.results}
             </ButtonLink>
           </div>
         )}
@@ -105,7 +106,7 @@ function PhotosCard({ race, driverIds }: { race: RaceDetail; driverIds: string[]
   return (
     <Card id="fotos" className="scroll-mt-24">
       <CardHeader>
-        <CardTitle>Fotos</CardTitle>
+        <CardTitle>{t.races.photos}</CardTitle>
       </CardHeader>
       <CardBody>
         <Suspense fallback={<Skeleton className="h-40 w-full" />}>
@@ -120,7 +121,7 @@ function NotesCard({ notes }: { notes: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notas</CardTitle>
+        <CardTitle>{t.races.notes}</CardTitle>
       </CardHeader>
       <CardBody className="whitespace-pre-line text-sm text-fg-muted">{notes}</CardBody>
     </Card>
@@ -136,7 +137,7 @@ async function FinishedRace({ race, results }: { race: RaceDetail; results: Race
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Podio</CardTitle>
+          <CardTitle>{t.races.podium}</CardTitle>
         </CardHeader>
         <CardBody className="pt-8">
           <Podium results={results} />
@@ -144,14 +145,14 @@ async function FinishedRace({ race, results }: { race: RaceDetail; results: Race
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Clasificación de la carrera</CardTitle>
+          <CardTitle>{t.races.raceResults}</CardTitle>
         </CardHeader>
         <ResultsTable results={results} />
       </Card>
       {raceUnlocks.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Logros desbloqueados</CardTitle>
+            <CardTitle>{t.races.achievementsUnlocked}</CardTitle>
           </CardHeader>
           <CardBody>
             <RaceUnlocks unlocks={raceUnlocks} drivers={drivers} />
@@ -173,7 +174,7 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Parrilla</CardTitle>
+            <CardTitle>{t.races.grid}</CardTitle>
           </CardHeader>
           <CardBody>
             <EntryList entrants={race.registrations} maxPlayers={race.maxPlayers} />
@@ -183,7 +184,7 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Inscripción</CardTitle>
+              <CardTitle>{t.races.signup}</CardTitle>
             </CardHeader>
             <CardBody>
               <RaceSignupPanel race={race} />
@@ -210,7 +211,7 @@ async function RaceView({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="flex flex-col gap-8">
-      {race.status === "DRAFT" && <Alert tone="warning">Borrador: solo lo ven los administradores.</Alert>}
+      {race.status === "DRAFT" && <Alert tone="warning">{t.races.draftNotice}</Alert>}
       <RaceHero race={race} admin={admin} results={results} />
       <Suspense>
         <RaceArticles raceId={race.id} />

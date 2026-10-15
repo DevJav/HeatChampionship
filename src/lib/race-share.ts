@@ -5,6 +5,7 @@ import type { CalendarEvent } from "./calendar";
 import { formatRaceDay } from "./format";
 import { raceTitle } from "./races";
 import { racePhase, type WindowRace } from "./registration-rules";
+import { t } from "@/i18n";
 
 type ShareRace = WindowRace & {
   id: string;
@@ -47,14 +48,14 @@ export function raceShareText(race: ShareRace, url: string, { confirmed, podium 
 
   if (phase === "FINISHED" && podium.length > 0) {
     const [winner, ...rest] = podium;
-    const others = rest.map((name, i) => `${i + 2}º ${name}`).join(", ");
-    return [`🏆 ${title}: ganó ${winner}${others ? ` (${others})` : ""}.`, `Resultados: ${url}`].join("\n");
+    const others = rest.map((name, i) => `${t.common.ordinal(i + 2)} ${name}`).join(", ");
+    return [t.races.share.won(title, winner, others), t.races.share.results(url)].join("\n");
   }
 
   const seats =
     confirmed >= race.maxPlayers
-      ? `${race.maxPlayers}/${race.maxPlayers} plazas — apúntate a la lista de espera`
-      : `${confirmed}/${race.maxPlayers} plazas — ¡apúntate!`;
+      ? t.races.share.seatsFull(race.maxPlayers)
+      : t.races.share.seatsOpen(confirmed, race.maxPlayers);
   return [
     `🏁 ${title}`,
     `📅 ${formatRaceDay(race.scheduledAt)}`,

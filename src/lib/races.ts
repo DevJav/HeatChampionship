@@ -1,9 +1,10 @@
 import type { RaceStatus, SeasonStatus } from "@/generated/prisma/client";
 import type { RacePhase } from "./registration-rules";
+import { t } from "@/i18n";
 
 /** "Ronda 3 · Italia" */
 export function raceTitle(race: { round: number; track: { name: string } }) {
-  return `Ronda ${race.round} · ${race.track.name}`;
+  return `${t.common.round(race.round)} · ${race.track.name}`;
 }
 
 /** Laps set on the race, falling back to the track's default. */
@@ -15,25 +16,25 @@ type Tone = "neutral" | "primary" | "accent" | "success" | "warning" | "danger" 
 
 /** Labels for the status the admin sets (race form). */
 export const RACE_STATUS: Record<RaceStatus, { label: string; tone: Tone }> = {
-  DRAFT: { label: "Borrador", tone: "neutral" },
-  UPCOMING: { label: "Próximamente", tone: "accent" },
-  OPEN: { label: "Inscripción abierta", tone: "success" },
-  CLOSED: { label: "Inscripción cerrada", tone: "warning" },
-  FINISHED: { label: "Finalizada", tone: "bar" },
+  DRAFT: { label: t.races.status.DRAFT, tone: "neutral" },
+  UPCOMING: { label: t.races.status.UPCOMING, tone: "accent" },
+  OPEN: { label: t.races.status.OPEN, tone: "success" },
+  CLOSED: { label: t.races.status.CLOSED, tone: "warning" },
+  FINISHED: { label: t.races.status.FINISHED, tone: "bar" },
 };
 
 /** Labels for what players see (status + deadline + start time). */
 export const RACE_PHASE: Record<RacePhase, { label: string; tone: Tone }> = {
-  DRAFT: { label: "Borrador", tone: "neutral" },
-  UPCOMING: { label: "Próximamente", tone: "accent" },
-  OPEN: { label: "Inscripción abierta", tone: "success" },
-  CLOSED: { label: "Inscripción cerrada", tone: "warning" },
-  AWAITING_RESULTS: { label: "Pendiente de resultados", tone: "info" },
-  FINISHED: { label: "Finalizada", tone: "bar" },
+  DRAFT: { label: t.races.status.DRAFT, tone: "neutral" },
+  UPCOMING: { label: t.races.status.UPCOMING, tone: "accent" },
+  OPEN: { label: t.races.status.OPEN, tone: "success" },
+  CLOSED: { label: t.races.status.CLOSED, tone: "warning" },
+  AWAITING_RESULTS: { label: t.races.status.AWAITING_RESULTS, tone: "info" },
+  FINISHED: { label: t.races.status.FINISHED, tone: "bar" },
 };
 
 export const SEASON_STATUS: Record<SeasonStatus, { label: string; tone: Tone }> = {
-  UPCOMING: { label: "Próxima", tone: "info" },
-  ACTIVE: { label: "En curso", tone: "success" },
-  FINISHED: { label: "Terminada", tone: "bar" },
+  UPCOMING: { label: t.races.seasonStatus.UPCOMING, tone: "info" },
+  ACTIVE: { label: t.races.seasonStatus.ACTIVE, tone: "success" },
+  FINISHED: { label: t.races.seasonStatus.FINISHED, tone: "bar" },
 };

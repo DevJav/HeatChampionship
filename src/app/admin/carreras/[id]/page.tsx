@@ -22,8 +22,9 @@ import { listUsers } from "@/lib/data/users";
 import { raceTitle } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Editar carrera · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.racesAdmin.edit) };
 
 async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">) {
   const { id } = await params;
@@ -51,10 +52,10 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
         </div>
         <div className="flex gap-2">
           <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
-            <ExternalLink /> Ver página
+            <ExternalLink /> {t.admin.racesAdmin.viewPage}
           </ButtonLink>
           <ButtonLink href={`/admin/carreras/${race.id}/resultados`} size="sm">
-            <Flag /> {race.status === "FINISHED" ? "Editar resultados" : "Resultados"}
+            <Flag /> {race.status === "FINISHED" ? t.races.editResults : t.races.results}
           </ButtonLink>
         </div>
       </div>
@@ -62,7 +63,7 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
       <div className="grid items-start gap-6 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader>
-            <CardTitle>Datos de la carrera</CardTitle>
+            <CardTitle>{t.admin.racesAdmin.details}</CardTitle>
           </CardHeader>
           <CardBody>
             <RaceForm action={updateRace.bind(null, race.id)} seasons={seasons} tracks={trackOptions} race={race} />
@@ -72,8 +73,8 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
         <Card className="xl:col-span-2">
           <CardHeader>
             <div>
-              <CardTitle>Inscritos</CardTitle>
-              <CardDescription>Puedes inscribir o quitar pilotos aunque la inscripción esté cerrada.</CardDescription>
+              <CardTitle>{t.admin.racesAdmin.entrants}</CardTitle>
+              <CardDescription>{t.admin.racesAdmin.entrantsDescription}</CardDescription>
             </div>
           </CardHeader>
           <CardBody className="flex flex-col gap-6">
@@ -82,7 +83,7 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
               maxPlayers={race.maxPlayers}
               rowAction={(entrant) => (
                 <form action={removeEntrant.bind(null, race.id, entrant.user.id)}>
-                  <Button type="submit" variant="ghost" size="icon" aria-label={`Quitar a ${entrant.user.name}`} title="Quitar">
+                  <Button type="submit" variant="ghost" size="icon" aria-label={t.admin.racesAdmin.removeDriver(entrant.user.name)} title={t.admin.racesAdmin.remove}>
                     <X />
                   </Button>
                 </form>
@@ -95,14 +96,14 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
 
       <Card>
         <CardHeader>
-          <CardTitle>Zona peligrosa</CardTitle>
+          <CardTitle>{t.admin.racesAdmin.dangerZone}</CardTitle>
         </CardHeader>
         <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-fg-muted">Elimina la carrera con sus inscripciones y resultados. No se puede deshacer.</p>
+          <p className="text-sm text-fg-muted">{t.admin.racesAdmin.dangerDescription}</p>
           <DeleteForm
             action={deleteRace.bind(null, race.id)}
-            title="¿Eliminar la carrera?"
-            description={`${raceTitle(race)} y todas sus inscripciones y resultados se borrarán.`}
+            title={t.admin.racesAdmin.deleteTitle}
+            description={t.admin.racesAdmin.deleteDescription(raceTitle(race))}
           />
         </CardBody>
       </Card>

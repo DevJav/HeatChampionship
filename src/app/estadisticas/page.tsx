@@ -38,10 +38,11 @@ import {
   trackStats,
   upgradeStats,
 } from "@/lib/stats";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Estadísticas" };
+export const metadata: Metadata = { title: t.stats.title };
 
-const ALL_SEASONS = "Histórico";
+const ALL_SEASONS = t.stats.allSeasons;
 
 function BlockHeader({ title, description }: { title: string; description?: string }) {
   return (
@@ -64,8 +65,8 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
     <>
       <PageHeader
         eyebrow={season?.name ?? ALL_SEASONS}
-        title="Estadísticas"
-        description="Récords, cara a cara, parrilla, circuitos, coches y mejoras."
+        title={t.stats.title}
+        description={t.stats.description}
         className="pb-0"
       />
       <SeasonPicker
@@ -83,8 +84,8 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
         {header}
         <EmptyState
           icon={<ChartColumn />}
-          title="Aún no hay resultados"
-          description="Las estadísticas aparecerán cuando termine la primera carrera."
+          title={t.standings.noResults}
+          description={t.stats.noResultsDescription}
         />
       </div>
     );
@@ -109,78 +110,78 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
       {header}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Carreras" value={races.length} icon={<Flag />} />
-        <StatCard label="Pilotos" value={driverRows.length} icon={<Users />} />
-        <StatCard label="Ganadores distintos" value={winners.size} icon={<Trophy />} />
-        <StatCard label="Pilotos por carrera" value={formatDecimal(averageField)} icon={<Gauge />} />
+        <StatCard label={t.stats.races} value={races.length} icon={<Flag />} />
+        <StatCard label={t.stats.drivers} value={driverRows.length} icon={<Users />} />
+        <StatCard label={t.stats.distinctWinners} value={winners.size} icon={<Trophy />} />
+        <StatCard label={t.stats.driversPerRace} value={formatDecimal(averageField)} icon={<Gauge />} />
       </div>
 
       {hasPalmares && (
         <Card>
-          <BlockHeader title="Palmarés" description="Los tres primeros de cada temporada terminada." />
+          <BlockHeader title={t.stats.honours} description={t.stats.honoursDescription} />
           <PalmaresTable unlocks={unlocks} drivers={drivers} />
         </Card>
       )}
 
-      <Section title="Récords">
+      <Section title={t.stats.records}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <RecordCard label="Más victorias" icon={<Trophy />} record={records.mostWins} {...recordProps} />
-          <RecordCard label="Más podios" icon={<Medal />} record={records.mostPodiums} {...recordProps} />
-          <RecordCard label="Más puntos" icon={<Star />} record={records.mostPoints} {...recordProps} />
+          <RecordCard label={t.stats.mostWins} icon={<Trophy />} record={records.mostWins} {...recordProps} />
+          <RecordCard label={t.stats.mostPodiums} icon={<Medal />} record={records.mostPodiums} {...recordProps} />
+          <RecordCard label={t.stats.mostPoints} icon={<Star />} record={records.mostPoints} {...recordProps} />
           <RecordCard
-            label="Racha de victorias"
+            label={t.stats.winStreak}
             icon={<Flame />}
             record={records.winStreak}
-            caption="seguidas"
+            caption={t.stats.winStreakCaption}
             {...recordProps}
           />
           <RecordCard
-            label="Racha de podios"
+            label={t.stats.podiumStreak}
             icon={<Award />}
             record={records.podiumStreak}
-            caption="seguidos"
+            caption={t.stats.podiumStreakCaption}
             {...recordProps}
           />
           <RecordCard
-            label="Mejor llegada media"
+            label={t.stats.bestAverageFinish}
             icon={<Gauge />}
             record={records.bestAverageFinish}
             format={formatDecimal}
-            caption={`mín. ${records.minStarts} carreras`}
+            caption={t.stats.minRaces(records.minStarts)}
             {...recordProps}
           />
           <RecordCard
-            label="Mayor remontada"
+            label={t.stats.biggestComeback}
             icon={<TrendingUp />}
             record={records.biggestComeback}
             format={(v) => `+${v}`}
-            caption="posiciones"
+            caption={t.stats.biggestComebackCaption}
             {...recordProps}
           />
           <RecordCard
-            label="Victoria desde más atrás"
+            label={t.stats.winFromFurthestBack}
             icon={<Rocket />}
             record={records.winFromFurthestBack}
-            format={(v) => `${v}º`}
-            caption="en parrilla"
+            format={t.common.ordinal}
+            caption={t.stats.winFromFurthestBackCaption}
             {...recordProps}
           />
-          <RecordCard label="Más carreras" icon={<Flag />} record={records.mostStarts} {...recordProps} />
-          <RecordCard label="Más trompos" icon={<Tornado />} record={records.mostSpins} caption="en total" {...recordProps} />
+          <RecordCard label={t.stats.mostRaces} icon={<Flag />} record={records.mostStarts} {...recordProps} />
+          <RecordCard label={t.stats.mostSpins} icon={<Tornado />} record={records.mostSpins} caption={t.stats.mostSpinsCaption} {...recordProps} />
         </div>
-        <p className="text-xs text-fg-muted">Las rachas cuentan carreras disputadas seguidas: faltar a una no la corta.</p>
+        <p className="text-xs text-fg-muted">{t.stats.streaksNote}</p>
       </Section>
 
       <Card>
-        <BlockHeader title="Pilotos" description="Ordenados por puntos por carrera." />
+        <BlockHeader title={t.stats.drivers} description={t.stats.driversDescription} />
         <DriverStatsTable rows={driverRows} drivers={drivers} />
       </Card>
 
       {driverRows.length >= 2 && (
         <Card>
           <BlockHeader
-            title="Cara a cara"
-            description="Carreras en las que el piloto de la fila acabó por delante – por detrás del de la columna."
+            title={t.stats.headToHead}
+            description={t.stats.headToHeadDescription}
           />
           <CardBody>
             <HeadToHeadMatrix
@@ -202,18 +203,18 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
 
       {grid.length > 0 && (
         <Card>
-          <BlockHeader title="Parrilla" description="Porcentaje de victorias según la posición de salida." />
+          <BlockHeader title={t.stats.grid} description={t.stats.gridDescription} />
           <CardBody className="flex flex-col gap-4">
             <GridChart slots={grid} />
             <details className="group">
               <summary className="cursor-pointer text-sm font-semibold text-fg-muted hover:text-primary">
-                Ver como tabla
+                {t.stats.viewAsTable}
               </summary>
               <div className="mt-3">
                 <TallyTable
-                  labelHeader="Salida"
-                  usesHeader="Salidas"
-                  rows={grid.map((slot) => ({ key: slot.startPosition, label: `${slot.startPosition}º`, tally: slot }))}
+                  labelHeader={t.stats.start}
+                  usesHeader={t.stats.starts}
+                  rows={grid.map((slot) => ({ key: slot.startPosition, label: t.common.ordinal(slot.startPosition), tally: slot }))}
                 />
               </div>
             </details>
@@ -222,16 +223,16 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
       )}
 
       <Card>
-        <BlockHeader title="Circuitos" />
+        <BlockHeader title={t.stats.tracks} />
         <TrackStatsTable rows={trackStats(races)} drivers={drivers} />
       </Card>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <Card>
-          <BlockHeader title="Coches" description="Resultados según el color del coche." />
+          <BlockHeader title={t.stats.cars} description={t.stats.carsDescription} />
           {colors.length > 0 ? (
             <TallyTable
-              labelHeader="Color"
+              labelHeader={t.stats.color}
               rows={colors.map(({ color, ...tally }) => ({
                 key: color.id,
                 label: <CarColorChip name={color.name} hex={color.hex} />,
@@ -240,22 +241,22 @@ async function StatsView({ searchParams }: { searchParams: PageProps<"/estadisti
             />
           ) : (
             <CardBody>
-              <p className="text-sm text-fg-muted">No se han anotado colores de coche.</p>
+              <p className="text-sm text-fg-muted">{t.stats.noColors}</p>
             </CardBody>
           )}
         </Card>
 
         <Card>
-          <BlockHeader title="Mejoras" description="Resultados de quien llevaba cada mejora." />
+          <BlockHeader title={t.stats.upgrades} description={t.stats.upgradesDescription} />
           {upgrades.length > 0 ? (
             <TallyTable
-              labelHeader="Mejora"
+              labelHeader={t.stats.upgrade}
               rows={upgrades.map(({ upgrade, ...tally }) => ({ key: upgrade.id, label: upgrade.name, tally }))}
             />
           ) : (
             <CardBody>
               <p className="text-sm text-fg-muted">
-                Aún no se han anotado mejoras. Aparecerán aquí cuando se registren en los resultados.
+                {t.stats.noUpgrades}
               </p>
             </CardBody>
           )}

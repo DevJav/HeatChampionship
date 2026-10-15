@@ -4,13 +4,14 @@ import { EditCard } from "@/components/admin/EditCard";
 import { UpgradeForm } from "@/components/admin/UpgradeForm";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Nueva mejora · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.upgrades.new) };
 
 async function NewUpgradePageContent() {
   await requireAdmin("/admin/mejoras/nueva");
   return (
-    <EditCard title="Nueva mejora">
+    <EditCard title={t.admin.upgrades.new}>
       <UpgradeForm action={createUpgrade} />
     </EditCard>
   );

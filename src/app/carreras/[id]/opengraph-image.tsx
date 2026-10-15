@@ -6,8 +6,9 @@ import { getRaceResults } from "@/lib/data/results";
 import { formatRaceDay } from "@/lib/format";
 import { OG_SIZE, ogFonts } from "@/lib/og-fonts";
 import { racePhase } from "@/lib/registration-rules";
+import { t } from "@/i18n";
 
-export const alt = "Carrera del campeonato Heat";
+export const alt = t.og.raceAlt;
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
@@ -36,18 +37,18 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const status =
     phase === "FINISHED" ? (
       <OgTag background="#d4a017" color="#2a1f00">
-        {winner ? `🏆 Ganó ${winner}` : "Finalizada"}
+        {winner ? t.og.won(winner) : t.og.finished}
       </OgTag>
     ) : phase === "OPEN" ? (
       <OgTag background="#15803d">
-        {confirmed >= race.maxPlayers ? "Completa · lista de espera" : `Inscripción abierta · ${confirmed}/${race.maxPlayers}`}
+        {confirmed >= race.maxPlayers ? t.og.fullWaitlist : t.og.signupOpen(confirmed, race.maxPlayers)}
       </OgTag>
     ) : phase === "UPCOMING" ? (
-      <OgTag background="#475569">Próximamente</OgTag>
+      <OgTag background="#475569">{t.og.upcoming}</OgTag>
     ) : phase === "CLOSED" ? (
-      <OgTag background="#b45309">Inscripción cerrada</OgTag>
+      <OgTag background="#b45309">{t.og.closed}</OgTag>
     ) : (
-      <OgTag background="#2563eb">En marcha</OgTag>
+      <OgTag background="#2563eb">{t.og.underway}</OgTag>
     );
 
   return new ImageResponse(
@@ -55,7 +56,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       <OgFrame flag={flagDataUri(race.track.countryCode)}>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ display: "flex", gap: 16 }}>
-            <OgTag>Ronda {race.round}</OgTag>
+            <OgTag>{t.common.round(race.round)}</OgTag>
             <OgTag background="#000">{race.season.name}</OgTag>
           </div>
           <div style={{ display: "flex", fontSize: 140, fontWeight: 700, fontStyle: "italic", textTransform: "uppercase", color: "#fff", lineHeight: 0.95 }}>

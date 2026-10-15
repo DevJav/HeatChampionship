@@ -1,4 +1,5 @@
 import type { RaceStatus, RegistrationStatus } from "@/generated/prisma/client";
+import { t } from "@/i18n";
 
 /** Pure sign-up rules — no database access, unit-tested in registration-rules.test.ts. */
 
@@ -53,11 +54,5 @@ export function canWithdraw(race: WindowRace, now = new Date()) {
   return (race.status === "UPCOMING" || race.status === "OPEN" || race.status === "CLOSED") && now < race.scheduledAt;
 }
 
-export const SIGNUP_CLOSED_MESSAGES: Record<Exclude<SignupWindow, { open: true }>["reason"], string> = {
-  draft: "Esta carrera todavía no está publicada.",
-  upcoming: "Las inscripciones todavía no están abiertas.",
-  "not-open": "Las inscripciones están cerradas.",
-  deadline: "El plazo de inscripción ha terminado.",
-  started: "La carrera ya ha empezado.",
-  finished: "La carrera ya ha terminado.",
-};
+export const SIGNUP_CLOSED_MESSAGES: Record<Exclude<SignupWindow, { open: true }>["reason"], string> =
+  t.races.signupPanel.closed;

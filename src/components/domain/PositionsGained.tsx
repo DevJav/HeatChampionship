@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import { formatDecimal } from "@/lib/format";
+import { t } from "@/i18n";
 
 /** ▲3 / ▼2 / = — places gained from the starting grid (or an average, ▲1,5). */
 export function PositionsGained({ value, className }: { value: number | null; className?: string }) {
@@ -7,7 +8,8 @@ export function PositionsGained({ value, className }: { value: number | null; cl
   // Averages show one decimal; the sign follows what's displayed
   value = Math.round(value * 10) / 10;
   const amount = formatDecimal(Math.abs(value));
-  const label = value > 0 ? `Ganó ${amount} posiciones` : value < 0 ? `Perdió ${amount} posiciones` : "Mantuvo la posición";
+  const label =
+    value > 0 ? t.common.placesGained(amount) : value < 0 ? t.common.placesLost(amount) : t.common.placesHeld;
   return (
     <span
       title={label}

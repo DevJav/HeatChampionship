@@ -5,10 +5,12 @@ import { ButtonLink, Card, EmptyState, Section, Table, TBody, Td, Th, THead, Tr 
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { listAllRaces } from "@/lib/data/races";
 import { formatDateTime } from "@/lib/format";
+import { raceTitle } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Carreras · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.racesAdmin.title) };
 
 async function AdminRacesPageContent() {
   await requireAdmin("/admin/carreras");
@@ -16,25 +18,25 @@ async function AdminRacesPageContent() {
 
   return (
     <Section
-      title="Carreras"
+      title={t.admin.racesAdmin.title}
       actions={
         <ButtonLink href="/admin/carreras/nueva" size="sm">
-          <Plus /> Nueva carrera
+          <Plus /> {t.admin.racesAdmin.new}
         </ButtonLink>
       }
     >
       {races.length === 0 ? (
-        <EmptyState icon={<CalendarDays />} title="Sin carreras" description="Crea la primera carrera de la temporada." />
+        <EmptyState icon={<CalendarDays />} title={t.admin.racesAdmin.empty} description={t.admin.racesAdmin.emptyDescription} />
       ) : (
         <Card>
           <Table>
             <THead>
               <tr>
-                <Th>Carrera</Th>
-                <Th>Temporada</Th>
-                <Th>Fecha</Th>
-                <Th>Estado</Th>
-                <Th align="right">Inscritos</Th>
+                <Th>{t.admin.racesAdmin.race}</Th>
+                <Th>{t.admin.racesAdmin.season}</Th>
+                <Th>{t.admin.racesAdmin.date}</Th>
+                <Th>{t.admin.status}</Th>
+                <Th align="right">{t.admin.racesAdmin.entrants}</Th>
               </tr>
             </THead>
             <TBody>
@@ -42,7 +44,7 @@ async function AdminRacesPageContent() {
                 <Tr key={race.id}>
                   <Td>
                     <Link href={`/admin/carreras/${race.id}`} className="font-semibold hover:text-primary hover:underline">
-                      Ronda {race.round} · {race.track.name}
+                      {raceTitle(race)}
                     </Link>
                   </Td>
                   <Td className="text-fg-muted">{race.season.name}</Td>

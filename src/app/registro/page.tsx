@@ -7,15 +7,16 @@ import { FormSkeleton } from "@/components/auth/FormSkeleton";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { Alert } from "@/components/ui";
 import { getSettings } from "@/lib/data/settings";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Registro" };
+export const metadata: Metadata = { title: t.auth.signUp };
 
 async function RegistrationGate() {
   const { registrationOpen } = await getSettings();
   if (!registrationOpen) {
     return (
       <Alert tone="warning" icon={<Lock />}>
-        El registro de nuevos pilotos está cerrado. Pide al organizador que lo abra.
+        {t.auth.registrationClosedNotice}
       </Alert>
     );
   }
@@ -25,13 +26,13 @@ async function RegistrationGate() {
 export default function SignUpPage() {
   return (
     <AuthCard
-      title="Registro"
-      description="Crea tu cuenta de piloto."
+      title={t.auth.signUp}
+      description={t.auth.signUpDescription}
       footer={
         <>
-          ¿Ya tienes cuenta?{" "}
+          {t.auth.haveAccount}{" "}
           <Link href="/entrar" className="font-semibold text-primary hover:underline">
-            Entra
+            {t.auth.logInLink}
           </Link>
         </>
       }

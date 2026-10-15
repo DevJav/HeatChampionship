@@ -4,19 +4,20 @@ import { Suspense } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { FormSkeleton } from "@/components/auth/FormSkeleton";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Entrar" };
+export const metadata: Metadata = { title: t.auth.logIn };
 
 export default function LoginPage() {
   return (
     <AuthCard
-      title="Entrar"
-      description="Accede para inscribirte en las carreras."
+      title={t.auth.logIn}
+      description={t.auth.logInDescription}
       footer={
         <>
-          ¿Aún no tienes cuenta?{" "}
+          {t.auth.noAccount}{" "}
           <Link href="/registro" className="font-semibold text-primary hover:underline">
-            Regístrate
+            {t.auth.signUpLink}
           </Link>
         </>
       }

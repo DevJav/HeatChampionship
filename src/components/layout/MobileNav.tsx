@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui";
 import type { NavItem } from "@/config/site";
 import { NavLinks } from "./NavLinks";
+import { t } from "@/i18n";
 
 type MobileNavProps = {
   items: readonly NavItem[];
@@ -20,7 +21,7 @@ export function MobileNav({ items, children }: MobileNavProps) {
       <Button
         variant="inverse"
         size="icon"
-        aria-label={open ? "Cerrar menú" : "Abrir menú"}
+        aria-label={open ? t.layout.closeMenu : t.layout.openMenu}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >

@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 import { countdownParts } from "@/lib/countdown";
 import { SegmentDisplay } from "@/components/ui";
+import { t } from "@/i18n";
 
 // A shared one-second clock. The server has no "now" worth rendering (it would
 // mismatch on hydration), so it renders dashes and the browser fills them in.
@@ -77,27 +78,27 @@ export function RaceCountdown({ target, className }: RaceCountdownProps) {
         role="timer"
         aria-label={
           parts && !started
-            ? `Salida en ${parts.days} días, ${parts.hours} horas, ${parts.minutes} minutos`
-            : "Cuenta atrás para la salida"
+            ? t.races.countdown.label(parts.days, parts.hours, parts.minutes)
+            : t.races.countdown.fallbackLabel
         }
         className="relative overflow-hidden bg-linear-to-b from-(--led-face) to-(--led-face-dark) px-3 py-2.5 @sm:px-5 @sm:py-3.5"
       >
         {started ? (
           <div className="flex flex-col items-center gap-2">
-            <Label>¡Luces fuera!</Label>
+            <Label>{t.races.countdown.lightsOut}</Label>
             <Window>
               <SegmentDisplay value="00:00:00" className={cn(digits, "animate-pulse")} />
             </Window>
           </div>
         ) : (
           <div className="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] items-end gap-x-1 gap-y-1.5 @sm:gap-x-2">
-            <Label>{parts?.days === 1 ? "Día" : "Días"}</Label>
+            <Label>{parts?.days === 1 ? t.races.countdown.day : t.races.countdown.days}</Label>
             <span />
-            <Label>Horas</Label>
+            <Label>{t.races.countdown.hours}</Label>
             <span />
-            <Label>Minutos</Label>
+            <Label>{t.races.countdown.minutes}</Label>
             <span />
-            <Label>Segundos</Label>
+            <Label>{t.races.countdown.seconds}</Label>
 
             <Window>
               <SegmentDisplay value={parts ? String(parts.days).padStart(2, "0") : "--"} className={digits} />

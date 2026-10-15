@@ -3,6 +3,7 @@ import type { StatsDriver } from "@/lib/data/stats";
 import { formatDecimal } from "@/lib/format";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
+import { t } from "@/i18n";
 
 type TrackStatsTableProps = { rows: TrackStats[]; drivers: Map<string, StatsDriver> };
 
@@ -24,14 +25,14 @@ export function TrackStatsTable({ rows, drivers }: TrackStatsTableProps) {
     <Table>
       <THead>
         <tr>
-          <Th>Circuito</Th>
-          <Th align="center" title="Carreras disputadas">
-            Carr.
+          <Th>{t.stats.columns.track}</Th>
+          <Th align="center" title={t.stats.columns.races}>
+            {t.stats.columns.racesShort}
           </Th>
-          <Th>Más victorias</Th>
-          <Th className="max-md:hidden">Último ganador</Th>
-          <Th align="right" className="max-sm:hidden" title="Pilotos por carrera de media">
-            Pilotos
+          <Th>{t.stats.mostWins}</Th>
+          <Th className="max-md:hidden">{t.stats.columns.lastWinner}</Th>
+          <Th align="right" className="max-sm:hidden" title={t.stats.columns.averageField}>
+            {t.stats.columns.field}
           </Th>
         </tr>
       </THead>
@@ -45,7 +46,7 @@ export function TrackStatsTable({ rows, drivers }: TrackStatsTableProps) {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                   {track.topWinners.userIds.map(driverName)}
                   <span className="text-xs text-fg-muted">
-                    {track.topWinners.wins} {track.topWinners.wins === 1 ? "victoria" : "victorias"}
+                    {t.common.wins(track.topWinners.wins)}
                   </span>
                 </div>
               ) : (

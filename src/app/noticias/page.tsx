@@ -7,14 +7,15 @@ import { tabItemClass, tabListClass } from "@/components/ui/tabStyles";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { ARTICLE_CATEGORIES, ARTICLE_CATEGORY, categoryFromParam } from "@/lib/articles";
 import { listPublishedArticles } from "@/lib/data/articles";
+import { t } from "@/i18n";
 
 export const metadata: Metadata = {
-  title: "Noticias",
-  description: "Previas, crónicas, novedades y reglamento del campeonato.",
+  title: t.articles.title,
+  description: t.articles.description,
 };
 
 const filters = [
-  { label: "Todo", href: "/noticias", category: null },
+  { label: t.articles.all, href: "/noticias", category: null },
   ...ARTICLE_CATEGORIES.map((category) => ({
     label: ARTICLE_CATEGORY[category].plural,
     href: `/noticias?categoria=${ARTICLE_CATEGORY[category].param}`,
@@ -29,7 +30,7 @@ async function NewsView({ searchParams }: { searchParams: PageProps<"/noticias">
 
   return (
     <div className="flex flex-col gap-6">
-      <nav className={tabListClass} aria-label="Categorías">
+      <nav className={tabListClass} aria-label={t.articles.categories}>
         {filters.map((filter) => (
           <Link
             key={filter.href}
@@ -55,8 +56,8 @@ async function NewsView({ searchParams }: { searchParams: PageProps<"/noticias">
       ) : (
         <EmptyState
           icon={<Newspaper />}
-          title="Aún no hay artículos"
-          description="Aquí aparecerán las previas, crónicas y novedades del campeonato."
+          title={t.articles.empty}
+          description={t.articles.emptyDescription}
         />
       )}
     </div>
@@ -66,7 +67,7 @@ async function NewsView({ searchParams }: { searchParams: PageProps<"/noticias">
 export default function NewsPage({ searchParams }: PageProps<"/noticias">) {
   return (
     <Container>
-      <PageHeader title="Noticias" description="Previas, crónicas, novedades y reglamento del campeonato." />
+      <PageHeader title={t.articles.title} description={t.articles.description} />
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <NewsView searchParams={searchParams} />
       </Suspense>

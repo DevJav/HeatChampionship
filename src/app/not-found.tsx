@@ -2,22 +2,23 @@ import type { Metadata } from "next";
 import { CalendarDays, Home } from "lucide-react";
 import { ButtonLink } from "@/components/ui";
 import { StatusPage } from "@/components/layout/StatusPage";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Página no encontrada" };
+export const metadata: Metadata = { title: t.errors.notFoundTitle };
 
 export default function NotFound() {
   return (
     <StatusPage
       code="404"
-      title="Fuera de pista"
-      description="Esta página no existe o se ha retirado de la carrera. Puede que el enlace esté mal o que la hayan borrado."
+      title={t.errors.notFoundHeading}
+      description={t.errors.notFoundDescription}
       actions={
         <>
           <ButtonLink href="/" variant="accent">
-            <Home /> Volver al inicio
+            <Home /> {t.errors.backHome}
           </ButtonLink>
           <ButtonLink href="/carreras" variant="inverse">
-            <CalendarDays /> Ver carreras
+            <CalendarDays /> {t.errors.viewRaces}
           </ButtonLink>
         </>
       }

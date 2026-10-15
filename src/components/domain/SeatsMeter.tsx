@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { t } from "@/i18n";
 
 type SeatsMeterProps = {
   taken: number;
@@ -20,7 +21,7 @@ export function SeatsMeter({ taken, max, className }: SeatsMeterProps) {
         ))}
       </div>
       <span className="font-display text-sm font-bold italic tabular-nums">
-        {taken}/{max} <span className="font-normal not-italic text-fg-muted">{full ? "completo" : "plazas"}</span>
+        {taken}/{max} <span className="font-normal not-italic text-fg-muted">{full ? t.races.seats.full : t.races.seats.seats}</span>
       </span>
     </div>
   );

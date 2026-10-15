@@ -6,6 +6,7 @@ import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { RaceCountdown } from "./RaceCountdown";
 import { RaceMeta } from "./RaceMeta";
 import { RaceSignupPanel } from "./RaceSignupPanel";
+import { t } from "@/i18n";
 
 /** Home page card for the upcoming race. Reads DB + session: render inside <Suspense>. */
 export async function NextRaceCard() {
@@ -14,7 +15,7 @@ export async function NextRaceCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Próxima carrera</CardTitle>
+        <CardTitle>{t.races.nextRace}</CardTitle>
         {race && <RaceStatusBadge race={race} />}
       </CardHeader>
       {race ? (
@@ -29,7 +30,7 @@ export async function NextRaceCard() {
           </CardBody>
           <CardFooter>
             <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
-              Ver parrilla <ChevronRight />
+              {t.races.viewGrid} <ChevronRight />
             </ButtonLink>
           </CardFooter>
         </>
@@ -37,8 +38,8 @@ export async function NextRaceCard() {
         <CardBody>
           <EmptyState
             icon={<Flag />}
-            title="No hay carreras programadas"
-            description="Cuando se programe una carrera aparecerá aquí con el botón de inscripción."
+            title={t.races.noneScheduled}
+            description={t.races.nextRaceEmpty}
           />
         </CardBody>
       )}

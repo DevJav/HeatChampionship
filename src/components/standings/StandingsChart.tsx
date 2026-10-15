@@ -1,10 +1,11 @@
 import type { SeasonStandings } from "@/lib/data/standings";
+import { t } from "@/i18n";
 import { PointsChart, type ChartSeries } from "./PointsChart";
 
 /** Adapts season standings to the points-progression chart (top three highlighted). */
 export function StandingsChart({ standings }: { standings: SeasonStandings }) {
   const { races, rows, drivers, progression } = standings;
-  const rounds = races.map((race) => ({ label: `R${race.round}`, title: `Ronda ${race.round} · ${race.track.name}` }));
+  const rounds = races.map((race) => ({ label: t.common.roundShort(race.round), title: `${t.common.round(race.round)} · ${race.track.name}` }));
   const series: ChartSeries[] = rows.map((row, index) => ({
     id: row.userId,
     name: drivers.get(row.userId)?.name ?? "—",

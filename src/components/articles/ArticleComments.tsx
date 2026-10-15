@@ -10,13 +10,14 @@ import {
   type MentionedDriver,
 } from "@/lib/data/articles";
 import type { FormAction } from "@/lib/forms";
-import { formatDateTime, plural } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 import { isAdmin, type CurrentUser } from "@/lib/session";
 import { Avatar, Card, CardBody, ConfirmButton, Section } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { ArticleMarkdown } from "./ArticleMarkdown";
 import { CommentForm } from "./CommentForm";
 import { CommentReply } from "./CommentReply";
+import { t } from "@/i18n";
 
 type ThreadContext = {
   user: CurrentUser | null;
@@ -64,11 +65,11 @@ function CommentCard({
                 variant="ghost"
                 size="icon"
                 className="size-8"
-                title="¿Eliminar el comentario?"
-                description={replies > 0 ? `También se borrarán sus ${plural(replies, "respuesta", "respuestas")}.` : undefined}
-                confirmLabel="Eliminar"
+                title={t.articles.commentList.deleteTitle}
+                description={replies > 0 ? t.articles.commentList.deleteReplies(replies) : undefined}
+                confirmLabel={t.articles.commentList.delete}
               >
-                <Trash2 aria-label="Eliminar comentario" />
+                <Trash2 aria-label={t.articles.commentList.deleteLabel} />
               </ConfirmButton>
             </form>
           )}
@@ -111,9 +112,9 @@ export async function ArticleComments({ article, user }: ArticleCommentsProps) {
   }
 
   return (
-    <Section id="comentarios" title={comments.length > 0 ? `Comentarios (${comments.length})` : "Comentarios"} className="scroll-mt-24">
+    <Section id="comentarios" title={comments.length > 0 ? t.articles.commentList.titleWithCount(comments.length) : t.articles.commentList.title} className="scroll-mt-24">
       {threads.length === 0 ? (
-        <p className="text-sm text-fg-muted">Nadie ha comentado todavía. ¡Abre la conversación!</p>
+        <p className="text-sm text-fg-muted">{t.articles.commentList.empty}</p>
       ) : (
         <ol className="flex flex-col gap-4">
           {threads.map((thread) => {
@@ -145,9 +146,9 @@ export async function ArticleComments({ article, user }: ArticleCommentsProps) {
               href={`/entrar?volver=${encodeURIComponent(`/noticias/${article.slug}#comentarios`)}`}
               className="font-semibold text-primary hover:underline"
             >
-              Entra
+              {t.articles.commentList.logIn}
             </Link>{" "}
-            para comentar y responder.
+            {t.articles.commentList.logInSuffix}
           </CardBody>
         </Card>
       )}

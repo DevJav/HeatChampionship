@@ -4,6 +4,7 @@ import { formatDecimal, formatPercent } from "@/lib/format";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionsGained } from "@/components/domain/PositionsGained";
+import { t } from "@/i18n";
 
 const zero = <span className="text-fg-subtle">0</span>;
 
@@ -13,30 +14,30 @@ export function DriverStatsTable({ rows, drivers }: { rows: DriverStats[]; drive
     <Table>
       <THead>
         <tr>
-          <Th>Piloto</Th>
-          <Th align="center" title="Carreras disputadas">
-            Carr.
+          <Th>{t.common.columns.driver}</Th>
+          <Th align="center" title={t.stats.columns.races}>
+            {t.stats.columns.racesShort}
           </Th>
-          <Th align="center" title="Victorias">
-            V
+          <Th align="center" title={t.common.columns.wins}>
+            {t.common.columns.winsShort}
           </Th>
-          <Th align="center" title="Podios">
-            P
+          <Th align="center" title={t.common.columns.podiums}>
+            {t.common.columns.podiumsShort}
           </Th>
-          <Th align="right" className="max-sm:hidden" title="Porcentaje de victorias">
-            % V
+          <Th align="right" className="max-sm:hidden" title={t.stats.columns.winRate}>
+            {t.stats.columns.winRateShort}
           </Th>
-          <Th align="right" className="max-md:hidden" title="Posición media de llegada">
-            Media
+          <Th align="right" className="max-md:hidden" title={t.stats.columns.average}>
+            {t.stats.columns.averageShort}
           </Th>
-          <Th align="center" className="max-md:hidden" title="Posiciones ganadas de media desde la parrilla">
+          <Th align="center" className="max-md:hidden" title={t.stats.columns.gained}>
             +/−
           </Th>
-          <Th align="center" className="max-lg:hidden" title="Trompos">
-            Tromp.
+          <Th align="center" className="max-lg:hidden" title={t.common.columns.spins}>
+            {t.common.columns.spinsShort}
           </Th>
-          <Th align="right" title="Puntos por carrera">
-            Pts/c.
+          <Th align="right" title={t.stats.columns.pointsPerRace}>
+            {t.stats.columns.pointsPerRaceShort}
           </Th>
         </tr>
       </THead>

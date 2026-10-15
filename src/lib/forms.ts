@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { t } from "@/i18n";
 
 /**
  * State returned by form server actions and consumed with useActionState.
@@ -49,24 +50,24 @@ export function parseForm<T extends z.ZodType>(schema: T, formData: FormData): P
 
 /** Required trimmed text. */
 export const text = (max = 200) =>
-  z.string().trim().min(1, "Obligatorio.").max(max, `Máximo ${max} caracteres.`);
+  z.string().trim().min(1, t.forms.required).max(max, t.forms.maxChars(max));
 
 /** Optional trimmed text; empty string becomes null. */
 export const optionalText = (max = 2000) =>
   z
     .string()
     .trim()
-    .max(max, `Máximo ${max} caracteres.`)
+    .max(max, t.forms.maxChars(max))
     .optional()
     .transform((value) => (value ? value : null));
 
 /** Required whole number within bounds. */
 export const int = (min: number, max: number) =>
   z.coerce
-    .number({ error: "Introduce un número." })
-    .int("Debe ser un número entero.")
-    .min(min, `Mínimo ${min}.`)
-    .max(max, `Máximo ${max}.`);
+    .number({ error: t.forms.enterNumber })
+    .int(t.forms.wholeNumber)
+    .min(min, t.forms.min(min))
+    .max(max, t.forms.max(max));
 
 /** Optional whole number; empty string becomes null. */
 export const optionalInt = (min: number, max: number) =>

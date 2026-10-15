@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn, type AuthFormState } from "@/actions/auth";
 import { Alert, Field, Input, SubmitButton } from "@/components/ui";
+import { t } from "@/i18n";
 
 export function LoginForm() {
   const [state, action] = useActionState<AuthFormState, FormData>(signIn, {});
@@ -13,7 +14,7 @@ export function LoginForm() {
     <form action={action} className="flex flex-col gap-4">
       {state.error && <Alert tone="danger">{state.error}</Alert>}
       <input type="hidden" name="volver" value={returnTo} />
-      <Field label="Usuario" htmlFor="username">
+      <Field label={t.auth.username} htmlFor="username">
         <Input
           id="username"
           name="username"
@@ -23,7 +24,7 @@ export function LoginForm() {
           defaultValue={state.values?.username}
         />
       </Field>
-      <Field label="Contraseña" htmlFor="password">
+      <Field label={t.auth.password} htmlFor="password">
         <Input
           id="password"
           name="password"
@@ -33,7 +34,7 @@ export function LoginForm() {
         />
       </Field>
       <SubmitButton fullWidth size="lg" className="mt-2">
-        Entrar
+        {t.auth.logIn}
       </SubmitButton>
     </form>
   );

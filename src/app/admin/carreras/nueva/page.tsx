@@ -7,8 +7,9 @@ import { getCurrentSeason, listSeasons, listTracks } from "@/lib/data/catalog";
 import { nextRoundNumber } from "@/lib/data/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Nueva carrera · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.racesAdmin.new) };
 
 async function NewRacePageContent() {
   await requireAdmin("/admin/carreras/nueva");
@@ -22,9 +23,9 @@ async function NewRacePageContent() {
     return (
       <EmptyState
         icon={<Flag />}
-        title="Faltan datos"
-        description="Necesitas al menos una temporada y un circuito activo para crear carreras."
-        action={<ButtonLink href={seasons.length === 0 ? "/admin/temporadas/nueva" : "/admin/circuitos/nuevo"}>Crear</ButtonLink>}
+        title={t.admin.racesAdmin.missingData}
+        description={t.admin.racesAdmin.missingDataDescription}
+        action={<ButtonLink href={seasons.length === 0 ? "/admin/temporadas/nueva" : "/admin/circuitos/nuevo"}>{t.admin.racesAdmin.createMissing}</ButtonLink>}
       />
     );
   }
@@ -34,7 +35,7 @@ async function NewRacePageContent() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Nueva carrera</CardTitle>
+        <CardTitle>{t.admin.racesAdmin.new}</CardTitle>
       </CardHeader>
       <CardBody>
         <RaceForm

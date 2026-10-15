@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { t } from "@/i18n";
 import { niceTicks } from "@/lib/chart-scale";
 import { ChartTooltip } from "@/components/charts/ChartTooltip";
 import { useElementWidth } from "@/components/charts/useElementWidth";
@@ -62,7 +63,7 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-fg-muted" aria-label="Leyenda">
+      <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-fg-muted" aria-label={t.standings.chart.legend}>
         {leaders.map((s) => (
           <li key={s.id} className="flex items-center gap-2">
             <span aria-hidden className="h-0.5 w-4" style={{ background: strokeFor(s.slot) }} />
@@ -85,7 +86,7 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
         {series.length > leaders.length && (
           <li className="flex items-center gap-2">
             <span aria-hidden className="h-0.5 w-4" style={{ background: strokeFor(null) }} />
-            Resto de pilotos
+            {t.standings.chart.otherDrivers}
           </li>
         )}
       </ul>
@@ -95,7 +96,7 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
           width={width}
           height={HEIGHT}
           role="img"
-          aria-label="Evolución de puntos por ronda. Usa las flechas para recorrer las rondas."
+          aria-label={t.standings.chart.label}
           tabIndex={0}
           className="block touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onPointerMove={(e) => pick(e.clientX)}
@@ -110,11 +111,11 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
           }}
         >
           {/* Grid and y axis */}
-          {ticks.map((t) => (
-            <g key={t}>
-              <line x1={PAD.left} x2={PAD.left + plotWidth} y1={y(t)} y2={y(t)} stroke="var(--chart-grid)" strokeWidth={1} />
-              <text x={PAD.left - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-fg-subtle text-[11px] tabular-nums">
-                {t}
+          {ticks.map((tick) => (
+            <g key={tick}>
+              <line x1={PAD.left} x2={PAD.left + plotWidth} y1={y(tick)} y2={y(tick)} stroke="var(--chart-grid)" strokeWidth={1} />
+              <text x={PAD.left - 8} y={y(tick)} dy="0.32em" textAnchor="end" className="fill-fg-subtle text-[11px] tabular-nums">
+                {tick}
               </text>
             </g>
           ))}

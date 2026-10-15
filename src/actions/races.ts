@@ -13,6 +13,7 @@ import { joinRace, leaveRace, rebalanceSeats, RegistrationError } from "@/lib/re
 import { recomputeSeasonPoints } from "@/lib/results";
 import { requireAdmin, requireUser } from "@/lib/session";
 import { deleteStoredPhoto } from "@/lib/uploads";
+import { t } from "@/i18n";
 
 // ---------------------------------------------------------------------------
 // Player sign-ups
@@ -56,7 +57,7 @@ const optionalDateTime = z
     if (!value) return null;
     const date = fromLocalInput(value);
     if (!date) {
-      ctx.addIssue({ code: "custom", message: "Fecha no válida." });
+      ctx.addIssue({ code: "custom", message: t.admin.racesAdmin.invalidDate });
       return z.NEVER;
     }
     return date;
@@ -67,7 +68,7 @@ const raceSchema = z
     seasonId: text(),
     trackId: text(),
     round: int(1, 99),
-    scheduledAt: dateTime("Indica la fecha y hora de la carrera."),
+    scheduledAt: dateTime(t.admin.racesAdmin.dateRequired),
     signupDeadline: optionalDateTime,
     location: optionalText(120),
     laps: optionalInt(1, 10),
@@ -78,10 +79,10 @@ const raceSchema = z
   })
   .refine((race) => !race.signupDeadline || race.signupDeadline <= race.scheduledAt, {
     path: ["signupDeadline"],
-    message: "El cierre de inscripciones debe ser antes de la carrera.",
+    message: t.admin.racesAdmin.deadlineAfterRace,
   });
 
-const DUPLICATE_ROUND = "Ya hay una carrera con esa ronda en la temporada.";
+const DUPLICATE_ROUND = t.admin.racesAdmin.duplicateRound;
 
 export async function createRace(_prev: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin();
@@ -149,7 +150,7 @@ export async function deleteRace(raceId: string) {
 export async function addEntrant(raceId: string, _prev: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin();
   const userId = String(formData.get("userId") ?? "");
-  if (!userId) return { error: "Elige un piloto." };
+  if (!userId) return { error: t.admin.racesAdmin.chooseDriverError };
 
   try {
     await joinRace(raceId, userId, { force: true });

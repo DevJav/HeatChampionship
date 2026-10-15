@@ -6,6 +6,7 @@ import type { MentionCandidate } from "@/lib/articles";
 import type { FormAction } from "@/lib/forms";
 import { Button } from "@/components/ui";
 import { CommentForm } from "./CommentForm";
+import { t } from "@/i18n";
 
 type CommentReplyProps = {
   action: FormAction;
@@ -16,7 +17,7 @@ type CommentReplyProps = {
   mention: string | null;
 };
 
-/** "Responder" link that opens a reply box below the comment. */
+/** "Reply" link that opens a reply box below the comment. */
 export function CommentReply({ action, drivers, parentId, mention }: CommentReplyProps) {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
@@ -24,7 +25,7 @@ export function CommentReply({ action, drivers, parentId, mention }: CommentRepl
   if (!open) {
     return (
       <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className="h-7 self-start px-2 text-xs">
-        <Reply /> Responder
+        <Reply /> {t.articles.commentList.reply}
       </Button>
     );
   }

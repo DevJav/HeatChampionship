@@ -5,6 +5,7 @@ import type { Track } from "@/generated/prisma/client";
 import { CheckboxField, FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
 import { countryOptions } from "@/lib/countries";
 import type { FormAction } from "@/lib/forms";
+import { t } from "@/i18n";
 
 const countries = countryOptions();
 
@@ -13,27 +14,27 @@ export function TrackForm({ action, track }: { action: FormAction; track?: Track
 
   return (
     <form action={formAction}>
-      <FormLayout state={state} submitLabel={track ? "Guardar cambios" : "Crear circuito"} cancelHref="/admin/circuitos">
-        <TextField name="name" label="Nombre" state={state} placeholder="Italia" defaultValue={track?.name} />
+      <FormLayout state={state} submitLabel={track ? t.admin.saveChanges : t.admin.tracks.create} cancelHref="/admin/circuitos">
+        <TextField name="name" label={t.admin.name} state={state} placeholder={t.admin.tracks.namePlaceholder} defaultValue={track?.name} />
         <SelectField
           name="countryCode"
-          label="País"
-          hint="Su bandera aparece en la cabecera de las carreras."
+          label={t.admin.tracks.country}
+          hint={t.admin.tracks.countryHint}
           state={state}
           options={countries}
-          placeholder="Sin país"
+          placeholder={t.admin.noCountry}
           defaultValue={track?.countryCode ?? ""}
         />
         <TextField
           name="expansion"
-          label="Juego / expansión"
+          label={t.admin.expansion}
           state={state}
-          placeholder="Juego base"
+          placeholder={t.admin.expansionPlaceholder}
           defaultValue={track?.expansion}
         />
         <TextField
           name="defaultLaps"
-          label="Vueltas por defecto"
+          label={t.admin.tracks.defaultLaps}
           type="number"
           min={1}
           state={state}
@@ -41,14 +42,14 @@ export function TrackForm({ action, track }: { action: FormAction; track?: Track
         />
         <TextareaField
           name="description"
-          label="Descripción"
+          label={t.admin.description}
           state={state}
           className="md:col-span-2"
           defaultValue={track?.description}
         />
         <CheckboxField
           name="active"
-          label="Activo (se puede elegir en carreras nuevas)"
+          label={t.admin.tracks.activeLabel}
           state={state}
           defaultChecked={track?.active ?? true}
         />

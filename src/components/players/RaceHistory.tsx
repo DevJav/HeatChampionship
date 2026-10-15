@@ -6,6 +6,7 @@ import { EmptyState, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { PositionsGained } from "@/components/domain/PositionsGained";
 import { SpinCount } from "@/components/domain/SpinCount";
+import { t } from "@/i18n";
 
 type HistoryRow = {
   position: number;
@@ -19,7 +20,7 @@ type HistoryRow = {
 /** A driver's finished races, newest first. */
 export function RaceHistory({ results }: { results: HistoryRow[] }) {
   if (results.length === 0) {
-    return <EmptyState icon={<History />} title="Todavía sin carreras" className="m-5 py-8" />;
+    return <EmptyState icon={<History />} title={t.drivers.noHistory} className="m-5 py-8" />;
   }
   const showSpins = results.some((r) => r.spins > 0);
   return (
@@ -27,17 +28,17 @@ export function RaceHistory({ results }: { results: HistoryRow[] }) {
       <THead>
         <tr>
           <Th align="center" className="w-20">
-            Pos.
+            {t.common.columns.position}
           </Th>
-          <Th>Carrera</Th>
-          <Th className="max-sm:hidden">Fecha</Th>
-          <Th align="center">Salida</Th>
+          <Th>{t.drivers.race}</Th>
+          <Th className="max-sm:hidden">{t.drivers.date}</Th>
+          <Th align="center">{t.common.columns.start}</Th>
           {showSpins && (
-            <Th align="center" title="Trompos">
-              Tromp.
+            <Th align="center" title={t.common.columns.spins}>
+              {t.common.columns.spinsShort}
             </Th>
           )}
-          <Th align="right">Pts</Th>
+          <Th align="right">{t.common.columns.points}</Th>
         </tr>
       </THead>
       <TBody>
@@ -51,14 +52,14 @@ export function RaceHistory({ results }: { results: HistoryRow[] }) {
                 {result.race.track.name}
               </Link>
               <span className="block text-xs text-fg-muted">
-                Ronda {result.race.round} · {result.race.season.name}
+                {t.common.round(result.race.round)} · {result.race.season.name}
               </span>
             </Td>
             <Td className="text-fg-muted max-sm:hidden">{formatDate(result.race.scheduledAt)}</Td>
             <Td align="center" className="whitespace-nowrap">
               {result.startPosition ? (
                 <>
-                  <span className="text-fg-muted">{result.startPosition}º</span>{" "}
+                  <span className="text-fg-muted">{t.common.ordinal(result.startPosition)}</span>{" "}
                   <PositionsGained value={positionsGained(result.startPosition, result.position)} />
                 </>
               ) : (

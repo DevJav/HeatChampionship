@@ -21,8 +21,9 @@ import { ProfileForm } from "@/components/players/ProfileForm";
 import { listCarColors } from "@/lib/data/catalog";
 import { getEditableProfile } from "@/lib/data/players";
 import { requireUser } from "@/lib/session";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Mi perfil" };
+export const metadata: Metadata = { title: t.profile.title };
 
 async function ProfileSettings() {
   const user = await requireUser("/perfil");
@@ -34,13 +35,13 @@ async function ProfileSettings() {
     <div className="flex flex-col gap-6">
       <div className="flex justify-end">
         <ButtonLink href={`/pilotos/${profile.username}`} variant="secondary" size="sm">
-          <ExternalLink /> Ver mi perfil público
+          <ExternalLink /> {t.profile.viewPublic}
         </ButtonLink>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Datos</CardTitle>
+          <CardTitle>{t.profile.details}</CardTitle>
         </CardHeader>
         <CardBody>
           <ProfileForm profile={profile} colors={activeColors} />
@@ -50,8 +51,8 @@ async function ProfileSettings() {
       <Card>
         <CardHeader>
           <div>
-            <CardTitle>Foto</CardTitle>
-            <CardDescription>Se recorta en cuadrado. Sin foto se muestran tus iniciales.</CardDescription>
+            <CardTitle>{t.profile.photo}</CardTitle>
+            <CardDescription>{t.profile.photoHint}</CardDescription>
           </div>
         </CardHeader>
         <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -61,7 +62,7 @@ async function ProfileSettings() {
             {profile.image && (
               <form action={removeAvatar}>
                 <SubmitButton variant="ghost" size="sm">
-                  <Trash2 /> Quitar foto
+                  <Trash2 /> {t.profile.removePhoto}
                 </SubmitButton>
               </form>
             )}
@@ -72,8 +73,8 @@ async function ProfileSettings() {
       <Card>
         <CardHeader>
           <div>
-            <CardTitle>Contraseña</CardTitle>
-            <CardDescription>Al cambiarla se cierra la sesión en tus otros dispositivos.</CardDescription>
+            <CardTitle>{t.profile.password}</CardTitle>
+            <CardDescription>{t.profile.passwordHint}</CardDescription>
           </div>
         </CardHeader>
         <CardBody>
@@ -87,7 +88,7 @@ async function ProfileSettings() {
 export default function ProfileSettingsPage() {
   return (
     <Container className="max-w-3xl">
-      <PageHeader title="Mi perfil" description="Cómo te ven los demás pilotos." />
+      <PageHeader title={t.profile.title} description={t.profile.description} />
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <ProfileSettings />
       </Suspense>

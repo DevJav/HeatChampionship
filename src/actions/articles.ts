@@ -9,12 +9,13 @@ import { requireAdmin } from "@/lib/session";
 import { notifyArticleMentions } from "@/lib/notify";
 import { slugify } from "@/lib/slug";
 import { deleteStoredFile, storeArticleImage, UploadError } from "@/lib/uploads";
+import { t } from "@/i18n";
 
 const articleSchema = z.object({
   title: text(140),
   excerpt: optionalText(300),
   body: text(50_000),
-  category: z.enum(["PREVIEW", "REPORT", "NEWS", "RULES"], { error: "Elige una categoría." }),
+  category: z.enum(["PREVIEW", "REPORT", "NEWS", "RULES"], { error: t.admin.articles.chooseCategory }),
   status: z.enum(["DRAFT", "PUBLISHED"]),
   raceId: optionalText(40),
   pinned: checkbox(),
@@ -22,7 +23,7 @@ const articleSchema = z.object({
 
 /** Slug from the title, with -2, -3… when another article already has it. */
 async function uniqueSlug(title: string, articleId?: string) {
-  const base = slugify(title).slice(0, 80).replace(/-$/, "") || "articulo";
+  const base = slugify(title).slice(0, 80).replace(/-$/, "") || t.admin.articles.fallbackSlug;
   for (let n = 1; ; n++) {
     const slug = n === 1 ? base : `${base}-${n}`;
     const taken = await db.article.findFirst({ where: { slug, id: { not: articleId } }, select: { id: true } });
@@ -99,7 +100,7 @@ export async function updateArticle(articleId: string, _prev: FormState, formDat
   const values = formValues(formData);
   delete values.removeCover;
   return {
-    message: parsed.data.status === "PUBLISHED" ? "Guardado y publicado." : "Borrador guardado.",
+    message: parsed.data.status === "PUBLISHED" ? t.admin.articles.savedPublished : t.admin.articles.savedDraft,
     values,
   };
 }
@@ -118,7 +119,7 @@ export async function deleteArticle(articleId: string) {
 export async function uploadArticleImage(formData: FormData): Promise<{ url: string } | { error: string }> {
   await requireAdmin();
   const file = formData.get("image");
-  if (!(file instanceof File) || file.size === 0) return { error: "Elige una imagen." };
+  if (!(file instanceof File) || file.size === 0) return { error: t.forms.uploads.chooseImage };
   try {
     return { url: `/media/${await storeArticleImage(file)}` };
   } catch (error) {

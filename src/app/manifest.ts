@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: siteConfig.name,
     short_name: "Heat",
     description: siteConfig.description,
-    lang: "es-ES",
+    lang: siteConfig.locale,
     start_url: "/",
     display: "standalone",
     background_color: "#e4e5e8",

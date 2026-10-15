@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/format";
 import { raceTitle } from "@/lib/races";
 import { Badge, SpeedStripes } from "@/components/ui";
 import { FlagBackdrop } from "@/components/domain/CountryFlag";
+import { t } from "@/i18n";
 
 export function ArticleCategoryBadge({ category }: { category: ArticleListItem["category"] }) {
   const { label, tone } = ARTICLE_CATEGORY[category];
@@ -83,7 +84,7 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
             {article.race && <Badge tone="bar">{raceTitle(article.race)}</Badge>}
             {featured && article.pinned && (
               <Badge tone="bar">
-                <Pin className="size-3" aria-hidden /> Destacado
+                <Pin className="size-3" aria-hidden /> {t.articles.pinned}
               </Badge>
             )}
           </div>
@@ -104,9 +105,9 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
                 {article.author && ` · ${article.author.name}`}
               </span>
               {article._count.comments > 0 && (
-                <span className="flex shrink-0 items-center gap-1" title="Comentarios">
+                <span className="flex shrink-0 items-center gap-1" title={t.articles.commentList.title}>
                   <MessageSquare className="size-3.5" aria-hidden /> {article._count.comments}
-                  <span className="sr-only">comentarios</span>
+                  <span className="sr-only">{t.articles.commentList.title}</span>
                 </span>
               )}
             </p>

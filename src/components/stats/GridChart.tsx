@@ -6,6 +6,7 @@ import { formatDecimal, formatPercent } from "@/lib/format";
 import type { Tally } from "@/lib/stats";
 import { ChartTooltip } from "@/components/charts/ChartTooltip";
 import { useElementWidth } from "@/components/charts/useElementWidth";
+import { t } from "@/i18n";
 
 export type GridSlot = Tally & { startPosition: number };
 
@@ -43,7 +44,7 @@ export function GridChart({ slots }: { slots: GridSlot[] }) {
         width={width}
         height={HEIGHT}
         role="img"
-        aria-label="Porcentaje de victorias según la posición de salida. Usa las flechas para recorrer las posiciones."
+        aria-label={t.stats.gridChart.label}
         tabIndex={0}
         className="block touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onPointerLeave={() => setActive(null)}
@@ -56,11 +57,11 @@ export function GridChart({ slots }: { slots: GridSlot[] }) {
         }}
       >
         {/* Grid and y axis */}
-        {ticks.map((t) => (
-          <g key={t}>
-            <line x1={PAD.left} x2={PAD.left + plotWidth} y1={y(t)} y2={y(t)} stroke="var(--chart-grid)" strokeWidth={1} />
-            <text x={PAD.left - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-fg-subtle text-[11px] tabular-nums">
-              {formatPercent(t / 100)}
+        {ticks.map((tick) => (
+          <g key={tick}>
+            <line x1={PAD.left} x2={PAD.left + plotWidth} y1={y(tick)} y2={y(tick)} stroke="var(--chart-grid)" strokeWidth={1} />
+            <text x={PAD.left - 8} y={y(tick)} dy="0.32em" textAnchor="end" className="fill-fg-subtle text-[11px] tabular-nums">
+              {formatPercent(tick / 100)}
             </text>
           </g>
         ))}
@@ -104,7 +105,7 @@ export function GridChart({ slots }: { slots: GridSlot[] }) {
                 textAnchor="middle"
                 className="pointer-events-none fill-fg-subtle text-[11px] font-semibold"
               >
-                {s.startPosition}º
+                {t.common.ordinal(s.startPosition)}
               </text>
             </g>
           );
@@ -115,23 +116,23 @@ export function GridChart({ slots }: { slots: GridSlot[] }) {
 
       {slot && active != null && (
         <ChartTooltip
-          title={`Saliendo ${slot.startPosition}º`}
+          title={t.stats.gridChart.startingFrom(t.common.ordinal(slot.startPosition))}
           className="top-2"
           style={center(active) > width / 2 ? { right: width - center(active) + 16 } : { left: center(active) + 16 }}
         >
           {slot.uses === 0 ? (
-            <p className="text-fg-muted">Nadie ha salido desde aquí.</p>
+            <p className="text-fg-muted">{t.stats.gridChart.nobody}</p>
           ) : (
             <dl className="grid grid-cols-[auto_auto] gap-x-4 gap-y-0.5 text-fg-muted">
-              <dt>Salidas</dt>
+              <dt>{t.stats.starts}</dt>
               <dd className="text-right font-bold text-fg tabular-nums">{slot.uses}</dd>
-              <dt>Victorias</dt>
+              <dt>{t.common.columns.wins}</dt>
               <dd className="text-right font-bold text-fg tabular-nums">
                 {slot.wins} ({formatPercent(slot.winRate)})
               </dd>
-              <dt>Podios</dt>
+              <dt>{t.common.columns.podiums}</dt>
               <dd className="text-right font-bold text-fg tabular-nums">{slot.podiums}</dd>
-              <dt>Llegada media</dt>
+              <dt>{t.stats.gridChart.averageFinish}</dt>
               <dd className="text-right font-bold text-fg tabular-nums">
                 {slot.averageFinish == null ? "—" : formatDecimal(slot.averageFinish)}
               </dd>

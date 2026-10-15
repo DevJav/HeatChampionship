@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { parseForm, text, type FormState } from "@/lib/forms";
 import { notifyNewComment } from "@/lib/notify";
 import { getCurrentUser, isAdmin, requireUser } from "@/lib/session";
+import { t } from "@/i18n";
 
 const commentSchema = z.object({
   body: text(COMMENT_MAX),
@@ -19,7 +20,7 @@ const commentSchema = z.object({
 /** Any logged-in driver can comment on a published article, or reply to a comment there. */
 export async function addComment(articleId: string, _prev: FormState, formData: FormData): Promise<FormState> {
   const article = await db.article.findUnique({ where: { id: articleId }, select: { status: true, slug: true } });
-  if (!article || article.status !== "PUBLISHED") return { error: "Este artículo no admite comentarios." };
+  if (!article || article.status !== "PUBLISHED") return { error: t.notifications.commentsClosed };
   const user = await requireUser(`/noticias/${article.slug}`);
 
   const parsed = parseForm(commentSchema, formData);
@@ -32,7 +33,7 @@ export async function addComment(articleId: string, _prev: FormState, formData: 
       where: { id: parsed.data.parentId },
       select: { id: true, articleId: true, parentId: true },
     });
-    if (!parent || parent.articleId !== articleId) return { error: "El comentario al que respondes ya no existe." };
+    if (!parent || parent.articleId !== articleId) return { error: t.notifications.parentGone };
     parentId = parent.parentId ?? parent.id;
   }
 
@@ -41,7 +42,7 @@ export async function addComment(articleId: string, _prev: FormState, formData: 
   });
   await notifyNewComment(comment.id);
   refresh();
-  return { message: "Comentario publicado." };
+  return { message: t.notifications.commentPosted };
 }
 
 /** Drivers can delete their own comments; admins any. Replies go with it. */

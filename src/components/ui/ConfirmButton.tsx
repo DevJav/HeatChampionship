@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button, type ButtonVariantProps } from "./Button";
 import { Modal } from "./Modal";
 import { SubmitButton } from "./SubmitButton";
+import { t } from "@/i18n";
 
 type ConfirmButtonProps = ButtonVariantProps & {
   /** Dialog title, e.g. "¿Eliminar carrera?" */
@@ -22,7 +23,7 @@ type ConfirmButtonProps = ButtonVariantProps & {
 export function ConfirmButton({
   title,
   description,
-  confirmLabel = "Confirmar",
+  confirmLabel = t.forms.confirm,
   variant = "danger",
   size,
   className,
@@ -43,7 +44,7 @@ export function ConfirmButton({
         footer={
           <>
             <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancelar
+              {t.forms.cancel}
             </Button>
             <SubmitButton variant={variant === "danger" ? "danger" : "primary"}>
               {confirmLabel}

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Home, RotateCcw } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui";
 import { StatusPage } from "@/components/layout/StatusPage";
+import { t } from "@/i18n";
 
 export default function Error({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
@@ -13,19 +14,19 @@ export default function Error({ error, retry }: { error: Error & { digest?: stri
   return (
     <StatusPage
       code="!"
-      title="Bandera roja"
-      description="Algo ha fallado y la carrera está neutralizada. Prueba otra vez; si sigue pasando, avisa al organizador."
+      title={t.errors.errorHeading}
+      description={t.errors.errorDescription}
       actions={
         <>
           <Button variant="accent" onClick={() => retry()}>
-            <RotateCcw /> Reintentar
+            <RotateCcw /> {t.errors.retry}
           </Button>
           <ButtonLink href="/" variant="inverse">
-            <Home /> Volver al inicio
+            <Home /> {t.errors.backHome}
           </ButtonLink>
         </>
       }
-      footnote={error.digest && `Referencia: ${error.digest}`}
+      footnote={error.digest && t.errors.reference(error.digest)}
     />
   );
 }

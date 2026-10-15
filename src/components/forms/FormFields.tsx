@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FormState } from "@/lib/forms";
 import { Alert, ButtonLink, Checkbox, DateTimePicker, Field, Input, Select, SubmitButton, Textarea } from "@/components/ui";
+import { t } from "@/i18n";
 
 /**
  * Form fields wired to a FormState: they show the field's error and, after a
@@ -149,7 +150,7 @@ export function FormLayout({ state, submitLabel, cancelHref, children }: FormLay
       <div className="flex justify-end gap-2 border-t border-border pt-4">
         {cancelHref && (
           <ButtonLink href={cancelHref} variant="ghost">
-            Cancelar
+            {t.forms.cancel}
           </ButtonLink>
         )}
         <SubmitButton>{submitLabel}</SubmitButton>

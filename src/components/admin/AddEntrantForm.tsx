@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { UserPlus } from "lucide-react";
 import { Alert, Select, SubmitButton } from "@/components/ui";
 import type { FormAction } from "@/lib/forms";
+import { t } from "@/i18n";
 
 type AddEntrantFormProps = {
   action: FormAction;
@@ -15,16 +16,16 @@ export function AddEntrantForm({ action, players }: AddEntrantFormProps) {
   const [state, formAction] = useActionState(action, {});
 
   if (players.length === 0) {
-    return <p className="text-sm text-fg-muted">Todos los pilotos están inscritos.</p>;
+    return <p className="text-sm text-fg-muted">{t.admin.racesAdmin.allEntered}</p>;
   }
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
       {state.error && <Alert tone="danger">{state.error}</Alert>}
       <div className="flex gap-2">
-        <Select name="userId" aria-label="Piloto" defaultValue="">
+        <Select name="userId" aria-label={t.admin.users.driver} defaultValue="">
           <option value="" disabled>
-            Elige un piloto…
+            {t.admin.racesAdmin.chooseDriver}
           </option>
           {players.map((player) => (
             <option key={player.id} value={player.id}>
@@ -33,7 +34,7 @@ export function AddEntrantForm({ action, players }: AddEntrantFormProps) {
           ))}
         </Select>
         <SubmitButton variant="secondary">
-          <UserPlus /> Añadir
+          <UserPlus /> {t.admin.racesAdmin.add}
         </SubmitButton>
       </div>
     </form>

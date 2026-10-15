@@ -4,6 +4,8 @@
  * toLocalInput — so grids never shift with the viewer's time zone.
  */
 
+import { t } from "@/i18n";
+
 export type CalendarDay = {
   /** "2026-11-14" */
   key: string;
@@ -13,7 +15,7 @@ export type CalendarDay = {
 };
 
 /** Column headers, Monday first. */
-export const WEEKDAYS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"] as const;
+export const WEEKDAYS = t.common.weekdays;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -65,23 +67,8 @@ export function formatDayKey(day: string) {
   return `${date}/${mon}/${year}`;
 }
 
-const MONTHS = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
-
 /** "2026-11" → "noviembre 2026" */
 export function formatMonth(month: string) {
   const { year, mon } = parseMonth(month);
-  return `${MONTHS[mon - 1]} ${year}`;
+  return `${t.common.months[mon - 1]} ${year}`;
 }

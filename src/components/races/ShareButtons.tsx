@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Link2, MessageCircle } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui";
+import { t } from "@/i18n";
 
 type ShareButtonsProps = {
   /** wa.me link with the message ready */
@@ -23,7 +24,7 @@ export function ShareButtons({ whatsappHref, url, variant = "inverse" }: ShareBu
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard blocked (e.g. plain http): let the browser show the URL to copy by hand
-      window.prompt("Copia el enlace:", url);
+      window.prompt(t.races.share.copyPrompt, url);
     }
   }
 
@@ -38,7 +39,7 @@ export function ShareButtons({ whatsappHref, url, variant = "inverse" }: ShareBu
         <MessageCircle /> WhatsApp
       </a>
       <Button type="button" onClick={copy} variant={variant} size="sm" aria-live="polite">
-        {copied ? <Check /> : <Link2 />} {copied ? "¡Copiado!" : "Copiar enlace"}
+        {copied ? <Check /> : <Link2 />} {copied ? t.races.share.copied : t.races.share.copy}
       </Button>
     </>
   );

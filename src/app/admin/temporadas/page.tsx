@@ -6,8 +6,9 @@ import { listSeasons } from "@/lib/data/catalog";
 import { SEASON_STATUS } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Temporadas · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.seasons.title) };
 
 async function AdminSeasonsPageContent() {
   await requireAdmin("/admin/temporadas");
@@ -15,10 +16,10 @@ async function AdminSeasonsPageContent() {
 
   return (
     <Section
-      title="Temporadas"
+      title={t.admin.seasons.title}
       actions={
         <ButtonLink href="/admin/temporadas/nueva" size="sm">
-          <Plus /> Nueva temporada
+          <Plus /> {t.admin.seasons.new}
         </ButtonLink>
       }
     >
@@ -26,10 +27,10 @@ async function AdminSeasonsPageContent() {
         <Table>
           <THead>
             <tr>
-              <Th>Temporada</Th>
-              <Th>Estado</Th>
-              <Th>Puntos</Th>
-              <Th align="right">Carreras</Th>
+              <Th>{t.admin.seasons.season}</Th>
+              <Th>{t.admin.status}</Th>
+              <Th>{t.admin.seasons.points}</Th>
+              <Th align="right">{t.admin.races}</Th>
             </tr>
           </THead>
           <TBody>

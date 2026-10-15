@@ -1,6 +1,7 @@
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 import { italicCenterStyle } from "@/lib/italic-center";
+import { t } from "@/i18n";
 
 /**
  * Timing-tower position tag: slanted, bold italic number. Podium places are
@@ -44,7 +45,7 @@ export function PositionBadge({ position, size, neutral = false, className }: Po
     <span
       className={cn(positionVariants({ place, size }), className)}
       style={italicCenterStyle(position)}
-      aria-label={`Posición ${position}`}
+      aria-label={t.common.position(position)}
     >
       {position}
     </span>

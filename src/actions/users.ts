@@ -10,12 +10,13 @@ import { checkbox, parseForm, type FormState } from "@/lib/forms";
 import { temporaryPassword } from "@/lib/passwords";
 import { requireAdmin } from "@/lib/session";
 import { deleteStoredFile, storedPathFromUrl } from "@/lib/uploads";
+import { t } from "@/i18n";
 
 // Admin management of player accounts. Better Auth's admin endpoints check
 // the caller's role again, on top of requireAdmin().
 
 const nameSchema = z.object({
-  name: z.string().trim().min(2, "Mínimo 2 caracteres.").max(40, "Máximo 40 caracteres."),
+  name: z.string().trim().min(2, t.forms.minChars(2)).max(40, t.forms.maxChars(40)),
 });
 
 export async function renameUser(userId: string, _prev: FormState, formData: FormData): Promise<FormState> {
@@ -24,7 +25,7 @@ export async function renameUser(userId: string, _prev: FormState, formData: For
   if (!parsed.ok) return parsed.state;
   await db.user.update({ where: { id: userId }, data: { name: parsed.data.name } });
   refresh();
-  return { message: "Nombre guardado." };
+  return { message: t.admin.users.nameSaved };
 }
 
 const passwordSchema = z.object({
@@ -32,7 +33,7 @@ const passwordSchema = z.object({
     .string()
     .trim()
     .max(128)
-    .refine((value) => value === "" || value.length >= PASSWORD_MIN, `Mínimo ${PASSWORD_MIN} caracteres.`),
+    .refine((value) => value === "" || value.length >= PASSWORD_MIN, t.forms.minChars(PASSWORD_MIN)),
   logout: checkbox(),
 });
 
@@ -49,9 +50,7 @@ export async function resetUserPassword(userId: string, _prev: FormState, formDa
   await auth.api.setUserPassword({ body: { userId, newPassword }, headers: requestHeaders });
   if (parsed.data.logout) await auth.api.revokeUserSessions({ body: { userId }, headers: requestHeaders });
   return {
-    message: `Contraseña nueva: ${newPassword} — pásasela y que la cambie en su perfil.${
-      parsed.data.logout ? " Se han cerrado sus sesiones." : ""
-    }`,
+    message: t.admin.users.passwordSet(newPassword, parsed.data.logout),
   };
 }
 

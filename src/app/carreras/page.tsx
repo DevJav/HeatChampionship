@@ -6,8 +6,9 @@ import { RaceCalendar } from "@/components/races/RaceCalendar";
 import { RaceRow } from "@/components/races/RaceRow";
 import { listPublishedRaces, type RaceListItem } from "@/lib/data/races";
 import { toLocalInput } from "@/lib/dates";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Carreras" };
+export const metadata: Metadata = { title: t.races.title };
 
 /** Races grouped by season, keeping their order. */
 function bySeason(races: RaceListItem[]) {
@@ -29,8 +30,8 @@ async function RaceList() {
     return (
       <EmptyState
         icon={<CalendarDays />}
-        title="No hay carreras programadas"
-        description="El organizador publicará aquí la próxima carrera."
+        title={t.races.noneScheduled}
+        description={t.races.noneScheduledDescription}
       />
     );
   }
@@ -38,10 +39,10 @@ async function RaceList() {
   return (
     <Tabs
       items={[
-        { id: "lista", label: "Lista", content: <RaceSections upcoming={upcoming} finished={finished} /> },
+        { id: "lista", label: t.races.list, content: <RaceSections upcoming={upcoming} finished={finished} /> },
         {
           id: "calendario",
-          label: "Calendario",
+          label: t.races.calendar,
           content: <RaceCalendar races={races} today={toLocalInput(new Date()).slice(0, 10)} />,
         },
       ]}
@@ -53,7 +54,7 @@ function RaceSections({ upcoming, finished }: { upcoming: RaceListItem[]; finish
   return (
     <div className="flex flex-col gap-10">
       {upcoming.length > 0 && (
-        <Section title="Próximas">
+        <Section title={t.races.upcoming}>
           <ol className="flex flex-col gap-3">
             {upcoming.map((race) => (
               <RaceRow key={race.id} race={race} />
@@ -62,7 +63,7 @@ function RaceSections({ upcoming, finished }: { upcoming: RaceListItem[]; finish
         </Section>
       )}
       {finished.length > 0 && (
-        <Section title="Disputadas">
+        <Section title={t.races.finished}>
           {bySeason(finished).map(([seasonId, season]) => (
             <div key={seasonId} className="flex flex-col gap-3">
               <h3 className="font-display text-sm font-bold uppercase tracking-wider text-fg-muted not-italic">
@@ -84,7 +85,7 @@ function RaceSections({ upcoming, finished }: { upcoming: RaceListItem[]; finish
 export default function RacesPage() {
   return (
     <Container>
-      <PageHeader title="Carreras" description="Calendario de la temporada, inscripciones y resultados." />
+      <PageHeader title={t.races.title} description={t.races.description} />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
         <RaceList />
       </Suspense>

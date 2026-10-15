@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { signUp, type AuthFormState } from "@/actions/auth";
 import { Alert, Field, Input, SubmitButton } from "@/components/ui";
+import { t } from "@/i18n";
 
 export function SignUpForm() {
   const [state, action] = useActionState<AuthFormState, FormData>(signUp, {});
@@ -12,9 +13,9 @@ export function SignUpForm() {
     <form action={action} className="flex flex-col gap-4" noValidate>
       {state.error && <Alert tone="danger">{state.error}</Alert>}
       <Field
-        label="Usuario"
+        label={t.auth.username}
         htmlFor="username"
-        hint="Para entrar. Minúsculas, números, punto y guion bajo."
+        hint={t.auth.usernameHint}
         error={errors.username}
       >
         <Input
@@ -28,9 +29,9 @@ export function SignUpForm() {
         />
       </Field>
       <Field
-        label="Nombre de piloto"
+        label={t.auth.driverName}
         htmlFor="name"
-        hint="Así aparecerás en la clasificación."
+        hint={t.auth.driverNameHint}
         error={errors.name}
       >
         <Input
@@ -42,7 +43,7 @@ export function SignUpForm() {
           aria-invalid={!!errors.name}
         />
       </Field>
-      <Field label="Contraseña" htmlFor="password" error={errors.password}>
+      <Field label={t.auth.password} htmlFor="password" error={errors.password}>
         <Input
           id="password"
           name="password"
@@ -52,7 +53,7 @@ export function SignUpForm() {
           aria-invalid={!!errors.password}
         />
       </Field>
-      <Field label="Repite la contraseña" htmlFor="confirm" error={errors.confirm}>
+      <Field label={t.auth.confirmPassword} htmlFor="confirm" error={errors.confirm}>
         <Input
           id="confirm"
           name="confirm"
@@ -63,7 +64,7 @@ export function SignUpForm() {
         />
       </Field>
       <SubmitButton fullWidth size="lg" className="mt-2">
-        Crear cuenta
+        {t.auth.createAccount}
       </SubmitButton>
     </form>
   );

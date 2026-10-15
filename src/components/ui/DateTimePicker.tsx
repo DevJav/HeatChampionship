@@ -7,6 +7,7 @@ import { toLocalInput } from "@/lib/dates";
 import { addMonths, formatDayKey, formatMonth, monthOf, monthWeeks, WEEKDAYS } from "@/lib/month-calendar";
 import { Button } from "./Button";
 import { controlClass, Select } from "./Form";
+import { t } from "@/i18n";
 
 /** Time set when a day is picked before any time */
 const DEFAULT_TIME = "20:00";
@@ -93,7 +94,7 @@ export function DateTimePicker({ id, name, defaultValue = "", clearable, ...aria
         {...aria}
       >
         <span className={cn("flex-1", !value && "text-fg-subtle")}>
-          {value ? `${formatDayKey(day)} ${time}` : "dd/mm/aaaa hh:mm"}
+          {value ? `${formatDayKey(day)} ${time}` : t.forms.datePicker.placeholder}
         </span>
         <CalendarDays className="size-4 text-fg-muted" aria-hidden />
       </button>
@@ -103,18 +104,18 @@ export function DateTimePicker({ id, name, defaultValue = "", clearable, ...aria
         id={popoverId}
         popover="auto"
         role="dialog"
-        aria-label="Elegir fecha y hora"
+        aria-label={t.forms.datePicker.label}
         onToggle={(e) => setOpen(e.newState === "open")}
         className="fixed inset-auto m-0 w-72 overflow-visible border-0 bg-transparent p-0 text-fg drop-shadow-[var(--overlay-shadow)]"
       >
         {open && (
           <div className="flex flex-col gap-3 bg-surface p-3 surface-panel clip-chamfer">
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="icon" aria-label="Mes anterior" onClick={() => setMonth(addMonths(month, -1))}>
+              <Button variant="ghost" size="icon" aria-label={t.races.previousMonth} onClick={() => setMonth(addMonths(month, -1))}>
                 <ChevronLeft />
               </Button>
               <span className="font-display text-base font-bold uppercase italic">{formatMonth(month)}</span>
-              <Button variant="ghost" size="icon" aria-label="Mes siguiente" onClick={() => setMonth(addMonths(month, 1))}>
+              <Button variant="ghost" size="icon" aria-label={t.races.nextMonth} onClick={() => setMonth(addMonths(month, 1))}>
                 <ChevronRight />
               </Button>
             </div>
@@ -148,9 +149,9 @@ export function DateTimePicker({ id, name, defaultValue = "", clearable, ...aria
             </div>
 
             <div className="flex items-center gap-2 border-t border-border pt-3">
-              <span className="font-display text-xs font-bold uppercase tracking-wider text-fg-muted">Hora</span>
+              <span className="font-display text-xs font-bold uppercase tracking-wider text-fg-muted">{t.forms.datePicker.time}</span>
               <Select
-                aria-label="Hora"
+                aria-label={t.forms.datePicker.time}
                 className="w-auto flex-1"
                 disabled={!day}
                 value={hour ?? ""}
@@ -163,7 +164,7 @@ export function DateTimePicker({ id, name, defaultValue = "", clearable, ...aria
               </Select>
               <span aria-hidden>:</span>
               <Select
-                aria-label="Minutos"
+                aria-label={t.forms.datePicker.minutes}
                 className="w-auto flex-1"
                 disabled={!day}
                 value={minute ?? ""}
@@ -180,11 +181,11 @@ export function DateTimePicker({ id, name, defaultValue = "", clearable, ...aria
             <div className="flex justify-end gap-2">
               {clearable && value && (
                 <Button variant="ghost" size="sm" onClick={() => setValue("")}>
-                  Borrar
+                  {t.forms.datePicker.clear}
                 </Button>
               )}
               <Button size="sm" popoverTarget={popoverId} popoverTargetAction="hide">
-                Listo
+                {t.forms.datePicker.done}
               </Button>
             </div>
           </div>

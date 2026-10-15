@@ -4,6 +4,7 @@ import type { AchievementTier, Award } from "@/lib/achievements";
 import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/format";
 import { AchievementIcon } from "./AchievementIcon";
+import { t } from "@/i18n";
 
 /** Medallion colors per tier (text color chosen for contrast on each fill) */
 export const tierClass: Record<AchievementTier, string> = {
@@ -19,7 +20,7 @@ function UnlockWhere({ unlock }: { unlock: Award["unlocks"][number] }) {
   if (unlock.race) {
     return (
       <Link href={`/carreras/${unlock.race.id}`} className="hover:text-primary hover:underline">
-        {unlock.race.trackName} · R{unlock.race.round} · {unlock.race.seasonName}
+        {unlock.race.trackName} · {t.common.roundShort(unlock.race.round)} · {unlock.race.seasonName}
       </Link>
     );
   }
@@ -62,7 +63,7 @@ export function AchievementBadge({ award }: { award: Award }) {
         <span className="text-xs text-fg-muted">{achievement.description}</span>
         {last && (
           <span className="text-xs text-fg-subtle">
-            {unlocks.length > 1 ? "Última: " : ""}
+            {unlocks.length > 1 ? t.achievements.lastUnlock : ""}
             <UnlockWhere unlock={last} />
           </span>
         )}

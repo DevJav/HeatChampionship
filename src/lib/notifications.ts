@@ -1,5 +1,6 @@
 import type { NotificationType } from "@/generated/prisma/client";
 import { raceTitle } from "./races";
+import { t } from "@/i18n";
 
 /** A stored notification with what's needed to describe it (see lib/data/notifications.ts). */
 export type NotificationRecord = {
@@ -12,23 +13,23 @@ export type NotificationRecord = {
 
 /** Sentence and link for a notification. Built when shown, so edited results or titles stay current. */
 export function describeNotification(n: NotificationRecord): { message: string; href: string } {
-  const who = n.actor?.name ?? "Alguien";
-  const title = n.article ? `«${n.article.title}»` : "un artículo";
+  const who = n.actor?.name ?? t.notifications.someone;
+  const title = n.article ? t.notifications.quoted(n.article.title) : t.notifications.anArticle;
   const articleHref = n.article ? `/noticias/${n.article.slug}` : "/noticias";
   const commentHref = n.commentId ? `${articleHref}#comentario-${n.commentId}` : articleHref;
 
   switch (n.type) {
     case "ARTICLE_MENTION":
-      return { message: `${who} te ha mencionado en ${title}`, href: articleHref };
+      return { message: t.notifications.articleMention(who, title), href: articleHref };
     case "COMMENT_MENTION":
-      return { message: `${who} te ha mencionado en un comentario en ${title}`, href: commentHref };
+      return { message: t.notifications.commentMention(who, title), href: commentHref };
     case "COMMENT_REPLY":
-      return { message: `${who} ha respondido a tu comentario en ${title}`, href: commentHref };
+      return { message: t.notifications.commentReply(who, title), href: commentHref };
     case "RACE_RESULTS": {
-      if (!n.race) return { message: "Ya están los resultados de la carrera", href: "/carreras" };
+      if (!n.race) return { message: t.notifications.resultsGeneric, href: "/carreras" };
       const result = n.race.results[0];
-      const finish = result ? `: terminaste ${result.position}º (${result.points} pts)` : "";
-      return { message: `Ya están los resultados de ${raceTitle(n.race)}${finish}`, href: `/carreras/${n.race.id}` };
+      const finish = result ? t.notifications.yourFinish(t.common.ordinal(result.position), result.points) : "";
+      return { message: `${t.notifications.results(raceTitle(n.race))}${finish}`, href: `/carreras/${n.race.id}` };
     }
   }
 }

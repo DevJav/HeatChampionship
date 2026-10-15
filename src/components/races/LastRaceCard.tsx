@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/format";
 import { raceTitle } from "@/lib/races";
 import { ButtonLink, Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui";
 import { Podium } from "./Podium";
+import { t } from "@/i18n";
 
 /** Podium of the latest finished race; nothing before the first race. Reads the DB: render inside <Suspense>. */
 export async function LastRaceCard() {
@@ -16,7 +17,7 @@ export async function LastRaceCard() {
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Última carrera · {raceTitle(race)}</CardTitle>
+          <CardTitle>{t.races.lastRace(raceTitle(race))}</CardTitle>
           <CardDescription>
             {race.season.name} · {formatDate(race.scheduledAt)}
           </CardDescription>
@@ -27,7 +28,7 @@ export async function LastRaceCard() {
       </CardBody>
       <CardFooter>
         <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
-          Ver resultados <ChevronRight />
+          {t.races.viewResults} <ChevronRight />
         </ButtonLink>
       </CardFooter>
     </Card>

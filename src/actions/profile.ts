@@ -10,9 +10,10 @@ import { db } from "@/lib/db";
 import { formValues, optionalText, parseForm, type FormState } from "@/lib/forms";
 import { requireUser, type CurrentUser } from "@/lib/session";
 import { deleteStoredFile, storeAvatar, storedPathFromUrl, UploadError } from "@/lib/uploads";
+import { t } from "@/i18n";
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2, "Mínimo 2 caracteres.").max(40, "Máximo 40 caracteres."),
+  name: z.string().trim().min(2, t.forms.minChars(2)).max(40, t.forms.maxChars(40)),
   bio: optionalText(300),
   favoriteColorId: z
     .string()
@@ -53,22 +54,22 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   if (!parsed.ok) return parsed.state;
 
   if (!(await isValidColor(parsed.data.favoriteColorId))) {
-    return { fieldErrors: { favoriteColorId: "Color no válido." } };
+    return { fieldErrors: { favoriteColorId: t.forms.invalidColor } };
   }
   await db.user.update({ where: { id: user.id }, data: parsed.data });
   refresh();
-  return { message: "Perfil guardado." };
+  return { message: t.profile.saved };
 }
 
 export async function uploadAvatar(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireUser("/perfil");
   const file = pickedFile(formData, "avatar");
-  if (!file) return { error: "Elige una imagen." };
+  if (!file) return { error: t.forms.uploads.chooseImage };
 
   const error = await replaceAvatar(user, file);
   if (error) return { error };
   refresh();
-  return { message: "Foto actualizada." };
+  return { message: t.profile.photoUpdated };
 }
 
 // The name was just chosen at sign-up, so the welcome step only asks for the extras
@@ -81,7 +82,7 @@ export async function completeProfileSetup(_prev: FormState, formData: FormData)
   if (!parsed.ok) return parsed.state;
 
   if (!(await isValidColor(parsed.data.favoriteColorId))) {
-    return { fieldErrors: { favoriteColorId: "Color no válido." }, values: formValues(formData) };
+    return { fieldErrors: { favoriteColorId: t.forms.invalidColor }, values: formValues(formData) };
   }
   const file = pickedFile(formData, "avatar");
   if (file) {
@@ -102,13 +103,13 @@ export async function removeAvatar() {
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Obligatorio."),
-    newPassword: z.string().min(PASSWORD_MIN, `Mínimo ${PASSWORD_MIN} caracteres.`).max(128),
+    currentPassword: z.string().min(1, t.forms.required),
+    newPassword: z.string().min(PASSWORD_MIN, t.forms.minChars(PASSWORD_MIN)).max(128),
     confirm: z.string(),
   })
   .refine((data) => data.newPassword === data.confirm, {
     path: ["confirm"],
-    message: "Las contraseñas no coinciden.",
+    message: t.forms.passwordsDontMatch,
   });
 
 export async function changePassword(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -129,13 +130,13 @@ export async function changePassword(_prev: FormState, formData: FormData): Prom
     });
   } catch (error) {
     const code = error instanceof APIError ? (error.body as { code?: string } | undefined)?.code : undefined;
-    if (code === "INVALID_PASSWORD") return { fieldErrors: { currentPassword: "La contraseña actual no es correcta." } };
+    if (code === "INVALID_PASSWORD") return { fieldErrors: { currentPassword: t.profile.wrongPassword } };
     console.error(error);
-    return { error: "No se pudo cambiar la contraseña." };
+    return { error: t.profile.passwordChangeFailed };
   }
   // Log out other devices but keep this session. (changePassword's own
   // revokeOtherSessions option replaces the current session too, which
   // logged the user out here.)
   await auth.api.revokeOtherSessions({ headers: requestHeaders });
-  return { message: "Contraseña cambiada. Se ha cerrado la sesión en tus otros dispositivos." };
+  return { message: t.profile.passwordChanged };
 }

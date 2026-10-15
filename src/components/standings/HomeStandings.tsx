@@ -1,6 +1,7 @@
 import { ChevronRight, Trophy } from "lucide-react";
 import { getCurrentSeason } from "@/lib/data/catalog";
 import { getSeasonStandings } from "@/lib/data/standings";
+import { t } from "@/i18n";
 import { ButtonLink, Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { StandingsTable } from "./StandingsTable";
 
@@ -13,7 +14,7 @@ export async function HomeStandings() {
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Clasificación</CardTitle>
+          <CardTitle>{t.standings.title}</CardTitle>
           {season && <CardDescription>{season.name}</CardDescription>}
         </div>
       </CardHeader>
@@ -22,7 +23,7 @@ export async function HomeStandings() {
           <StandingsTable standings={standings} limit={5} compact />
           <CardFooter>
             <ButtonLink href="/clasificacion" variant="secondary" size="sm">
-              Clasificación completa <ChevronRight />
+              {t.standings.fullStandings} <ChevronRight />
             </ButtonLink>
           </CardFooter>
         </>
@@ -30,8 +31,8 @@ export async function HomeStandings() {
         <CardBody>
           <EmptyState
             icon={<Trophy />}
-            title="Aún no hay resultados"
-            description="La cabeza de la clasificación aparecerá tras la primera carrera."
+            title={t.standings.noResults}
+            description={t.standings.homeNoResultsDescription}
           />
         </CardBody>
       )}

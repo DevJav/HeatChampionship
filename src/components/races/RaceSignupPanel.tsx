@@ -1,11 +1,12 @@
 import { CheckCircle2, Clock, Lock, LogIn } from "lucide-react";
 import type { RaceDetail } from "@/lib/data/races";
 import { formatDateTime } from "@/lib/format";
-import { canWithdraw, SIGNUP_CLOSED_MESSAGES, signupWindow } from "@/lib/registration-rules";
+import { canWithdraw, signupWindow } from "@/lib/registration-rules";
 import { getCurrentUser } from "@/lib/session";
 import { Alert, ButtonLink } from "@/components/ui";
 import { SeatsMeter } from "@/components/domain/SeatsMeter";
 import { SignupForm } from "./SignupForm";
+import { t } from "@/i18n";
 
 /**
  * Everything a player needs to join or leave a race: seat count, their
@@ -24,19 +25,19 @@ export async function RaceSignupPanel({ race }: { race: RaceDetail }) {
       <SeatsMeter taken={confirmed.length} max={race.maxPlayers} />
       {race.signupDeadline && signup.open && (
         <p className="text-sm text-fg-muted">
-          Inscripción hasta el {formatDateTime(race.signupDeadline)}
+          {t.races.signupPanel.deadline(formatDateTime(race.signupDeadline))}
         </p>
       )}
 
       {mine?.status === "CONFIRMED" && (
         <Alert tone="success" icon={<CheckCircle2 />}>
-          <strong>Tienes plaza.</strong> ¡Nos vemos en la parrilla!
+          <strong>{t.races.signupPanel.confirmedTitle}</strong> {t.races.signupPanel.confirmedBody}
         </Alert>
       )}
       {mine?.status === "WAITLIST" && (
         <Alert tone="warning" icon={<Clock />}>
-          <strong>Estás en lista de espera</strong> (posición {waitlist.findIndex((r) => r.id === mine.id) + 1}).
-          Si alguien se retira, entras automáticamente.
+          <strong>{t.races.signupPanel.waitlistTitle}</strong>{" "}
+          {t.races.signupPanel.waitlistBody(waitlist.findIndex((r) => r.id === mine.id) + 1)}
         </Alert>
       )}
 
@@ -47,8 +48,8 @@ export async function RaceSignupPanel({ race }: { race: RaceDetail }) {
             intent="leave"
             leaveWarning={
               mine.status === "CONFIRMED" && waitlist.length > 0
-                ? "Tu plaza pasará al primero de la lista de espera. Si vuelves a inscribirte, irás al final de la cola."
-                : "Si vuelves a inscribirte, irás al final de la cola."
+                ? t.races.signupPanel.leaveWarningWaitlist
+                : t.races.signupPanel.leaveWarning
             }
           />
         )
@@ -57,16 +58,16 @@ export async function RaceSignupPanel({ race }: { race: RaceDetail }) {
           <SignupForm
             raceId={race.id}
             intent="join"
-            label={full ? "Apuntarme a la lista de espera" : "Inscribirme"}
+            label={full ? t.races.signupPanel.joinWaitlist : t.races.signupPanel.join}
           />
         ) : (
           <ButtonLink href={`/entrar?volver=/carreras/${race.id}`} size="lg" fullWidth>
-            <LogIn /> Entra para inscribirte
+            <LogIn /> {t.races.signupPanel.logInToJoin}
           </ButtonLink>
         )
       ) : (
         <Alert tone="info" icon={<Lock />}>
-          {SIGNUP_CLOSED_MESSAGES[signup.reason]}
+          {t.races.signupPanel.closed[signup.reason]}
         </Alert>
       )}
     </div>

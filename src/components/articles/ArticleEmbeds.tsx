@@ -31,6 +31,7 @@ import { RaceMeta } from "@/components/races/RaceMeta";
 import { RaceSignupPanel } from "@/components/races/RaceSignupPanel";
 import { ResultsTable } from "@/components/races/ResultsTable";
 import { StandingsTable } from "@/components/standings/StandingsTable";
+import { t } from "@/i18n";
 
 type EmbedProps = { embed: Embed; preview: boolean };
 
@@ -47,8 +48,8 @@ function Unavailable({ embed, preview, reason }: EmbedProps & { reason: string }
   );
 }
 
-const RACE_MISSING = "No se encuentra la carrera (¿está en borrador?).";
-const NO_RESULTS = "La carrera aún no tiene resultados; aparecerán cuando se registren.";
+const RACE_MISSING = t.articles.embeds.raceMissing;
+const NO_RESULTS = t.articles.embeds.noResults;
 
 function SeeMore({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -66,7 +67,7 @@ function SeeMore({ href, children }: { href: string; children: React.ReactNode }
 
 async function RaceWinners({ race }: { race: RaceDetail }) {
   const podium = (await getRaceResults(race.id)).filter((r) => r.position <= 3);
-  if (podium.length === 0) return <p className="text-sm text-fg-muted">Pendiente de resultados.</p>;
+  if (podium.length === 0) return <p className="text-sm text-fg-muted">{t.articles.embeds.awaitingResults}</p>;
   return (
     <ul className="flex flex-wrap gap-x-6 gap-y-2">
       {podium.map((result) => (
@@ -100,7 +101,7 @@ async function RaceCardEmbed(props: EmbedProps) {
         )}
         <div className="relative flex flex-col items-start gap-2 px-5 py-5">
           <div className="flex flex-wrap gap-2">
-            <Badge tone="primary">Ronda {race.round}</Badge>
+            <Badge tone="primary">{t.common.round(race.round)}</Badge>
             <Badge tone="bar">{race.season.name}</Badge>
             <RaceStatusBadge race={race} />
           </div>
@@ -114,7 +115,7 @@ async function RaceCardEmbed(props: EmbedProps) {
         {upcoming && <RaceCountdown target={race.scheduledAt.toISOString()} />}
         {race.status === "FINISHED" ? <RaceWinners race={race} /> : <RaceSignupPanel race={race} />}
       </CardBody>
-      <SeeMore href={`/carreras/${race.id}`}>{race.status === "FINISHED" ? "Ver resultados" : "Ver parrilla"}</SeeMore>
+      <SeeMore href={`/carreras/${race.id}`}>{race.status === "FINISHED" ? t.races.viewResults : t.races.viewGrid}</SeeMore>
     </Card>
   );
 }
@@ -139,12 +140,12 @@ async function ResultsEmbed(props: EmbedProps) {
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Resultados · {raceTitle(race)}</CardTitle>
+          <CardTitle>{t.articles.embeds.results(raceTitle(race))}</CardTitle>
           <CardDescription>{race.season.name}</CardDescription>
         </div>
       </CardHeader>
       <ResultsTable results={results} />
-      <SeeMore href={`/carreras/${race.id}`}>Ver carrera</SeeMore>
+      <SeeMore href={`/carreras/${race.id}`}>{t.articles.embeds.viewRace}</SeeMore>
     </Card>
   );
 }
@@ -157,7 +158,7 @@ async function PodiumEmbed(props: EmbedProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Podio · {raceTitle(race)}</CardTitle>
+        <CardTitle>{t.articles.embeds.podium(raceTitle(race))}</CardTitle>
       </CardHeader>
       <CardBody className="pt-8">
         <Podium results={results} />
@@ -175,34 +176,34 @@ async function StandingsAfterRaceEmbed(props: EmbedProps) {
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Clasificación tras la ronda {race.round}</CardTitle>
+          <CardTitle>{t.articles.embeds.standingsAfter(race.round)}</CardTitle>
           <CardDescription>{race.season.name}</CardDescription>
         </div>
       </CardHeader>
       <StandingsTable standings={standings} />
-      <SeeMore href={`/clasificacion?temporada=${race.seasonId}`}>Clasificación actual</SeeMore>
+      <SeeMore href={`/clasificacion?temporada=${race.seasonId}`}>{t.articles.embeds.currentStandings}</SeeMore>
     </Card>
   );
 }
 
 async function StandingsEmbed(props: EmbedProps) {
   const season = props.embed.ref ? await getSeason(props.embed.ref) : await getCurrentSeason();
-  if (!season) return <Unavailable {...props} reason="No se encuentra la temporada." />;
+  if (!season) return <Unavailable {...props} reason={t.articles.embeds.seasonMissing} />;
   const standings = await getSeasonStandings(season.id);
   if (standings.rows.length === 0) {
-    return <Unavailable {...props} reason="La temporada aún no tiene resultados; la tabla aparecerá tras la primera carrera." />;
+    return <Unavailable {...props} reason={t.articles.embeds.seasonNoResults} />;
   }
 
   return (
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Clasificación</CardTitle>
+          <CardTitle>{t.standings.title}</CardTitle>
           <CardDescription>{season.name}</CardDescription>
         </div>
       </CardHeader>
       <StandingsTable standings={standings} />
-      <SeeMore href={`/clasificacion?temporada=${season.id}`}>Clasificación completa</SeeMore>
+      <SeeMore href={`/clasificacion?temporada=${season.id}`}>{t.standings.fullStandings}</SeeMore>
     </Card>
   );
 }
@@ -217,7 +218,7 @@ async function PlayerEmbed(props: EmbedProps) {
     username ? getPlayerProfile(username) : null,
     getAchievements(),
   ]);
-  if (!player) return <Unavailable {...props} reason="No se encuentra el piloto." />;
+  if (!player) return <Unavailable {...props} reason={t.articles.embeds.driverMissing} />;
 
   return (
     <div className="max-w-sm">

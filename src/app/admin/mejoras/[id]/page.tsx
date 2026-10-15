@@ -7,8 +7,9 @@ import { UpgradeForm } from "@/components/admin/UpgradeForm";
 import { getUpgrade } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Editar mejora · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.upgrades.edit) };
 
 async function EditUpgradePageContent({ params }: PageProps<"/admin/mejoras/[id]">) {
   const { id } = await params;
@@ -20,7 +21,7 @@ async function EditUpgradePageContent({ params }: PageProps<"/admin/mejoras/[id]
     <EditCard
       title={upgrade.name}
       actions={
-        upgrade._count.results === 0 && <DeleteForm action={deleteUpgrade.bind(null, id)} title="¿Eliminar la mejora?" />
+        upgrade._count.results === 0 && <DeleteForm action={deleteUpgrade.bind(null, id)} title={t.admin.upgrades.deleteTitle} />
       }
     >
       <UpgradeForm action={updateUpgrade.bind(null, id)} upgrade={upgrade} />

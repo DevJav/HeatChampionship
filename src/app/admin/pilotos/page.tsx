@@ -5,25 +5,26 @@ import { AdminSuspense } from "@/components/admin/AdminSuspense";
 import { listUsers } from "@/lib/data/users";
 import { formatDate } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Pilotos · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.users.title) };
 
 async function AdminPlayersPageContent() {
   await requireAdmin("/admin/pilotos");
   const users = await listUsers();
 
   return (
-    <Section title="Pilotos">
+    <Section title={t.admin.users.title}>
       <Card>
         <Table>
           <THead>
             <tr>
-              <Th>Piloto</Th>
-              <Th className="max-sm:hidden">Usuario</Th>
-              <Th>Rol</Th>
-              <Th align="center">Carreras</Th>
+              <Th>{t.admin.users.driver}</Th>
+              <Th className="max-sm:hidden">{t.admin.users.username}</Th>
+              <Th>{t.admin.users.role}</Th>
+              <Th align="center">{t.admin.races}</Th>
               <Th align="right" className="max-md:hidden">
-                Alta
+                {t.admin.users.joined}
               </Th>
             </tr>
           </THead>
@@ -40,7 +41,7 @@ async function AdminPlayersPageContent() {
                   </Link>
                 </Td>
                 <Td className="text-fg-muted max-sm:hidden">@{user.username}</Td>
-                <Td>{user.role === "admin" ? <Badge tone="primary">Admin</Badge> : <Badge>Piloto</Badge>}</Td>
+                <Td>{user.role === "admin" ? <Badge tone="primary">{t.admin.users.admin}</Badge> : <Badge>{t.admin.users.driver}</Badge>}</Td>
                 <Td align="center">{user._count.results}</Td>
                 <Td align="right" className="text-fg-muted max-md:hidden">
                   {formatDate(user.createdAt)}

@@ -2,6 +2,7 @@ import { CalendarDays, MapPin, RotateCw } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { formatDateTime } from "@/lib/format";
 import { raceLaps } from "@/lib/races";
+import { t } from "@/i18n";
 
 type RaceMetaProps = {
   race: {
@@ -28,7 +29,7 @@ export function RaceMeta({ race, className }: RaceMetaProps) {
       )}
       {laps && (
         <li className="flex items-center gap-1.5">
-          <RotateCw /> {laps} {laps === 1 ? "vuelta" : "vueltas"}
+          <RotateCw /> {t.common.laps(laps)}
         </li>
       )}
     </ul>

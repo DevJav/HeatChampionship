@@ -29,8 +29,9 @@ import { getSeasonStandings } from "@/lib/data/standings";
 import { formatDecimal, formatSigned } from "@/lib/format";
 import { summarizePlayer } from "@/lib/player-stats";
 import { getCurrentUser } from "@/lib/session";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Piloto" };
+export const metadata: Metadata = { title: t.drivers.fallbackTitle };
 
 async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]">["params"] }) {
   const { username } = await params;
@@ -62,7 +63,7 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
             <div className="flex flex-wrap gap-2">
               {seasonRow && season && (
                 <Badge tone="primary">
-                  {seasonRow.rank}º en {season.name}
+                  {t.drivers.seasonRank(t.common.ordinal(seasonRow.rank), season.name)}
                 </Badge>
               )}
               <Badge tone="bar">@{player.username}</Badge>
@@ -73,12 +74,12 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
             <div className="flex flex-wrap items-center gap-4 text-sm text-bar-fg/80">
               {player.favoriteColor && (
                 <span className="flex items-center gap-2">
-                  Coche favorito: <CarColorChip name={player.favoriteColor.name} hex={player.favoriteColor.hex} />
+                  {t.drivers.favoriteCar} <CarColorChip name={player.favoriteColor.name} hex={player.favoriteColor.hex} />
                 </span>
               )}
               {isMe && (
                 <ButtonLink href="/perfil" variant="inverse" size="sm">
-                  <Pencil /> Editar perfil
+                  <Pencil /> {t.drivers.editProfile}
                 </ButtonLink>
               )}
             </div>
@@ -88,32 +89,32 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
       </section>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="Carreras" value={summary.starts} icon={<Flag />} hint={summary.spins ? `${summary.spins} ${summary.spins === 1 ? "trompo" : "trompos"}` : undefined} />
-        <StatCard label="Victorias" value={summary.wins} icon={<Trophy />} />
-        <StatCard label="Podios" value={summary.podiums} icon={<Medal />} />
+        <StatCard label={t.drivers.races} value={summary.starts} icon={<Flag />} hint={summary.spins ? t.common.spins(summary.spins) : undefined} />
+        <StatCard label={t.drivers.wins} value={summary.wins} icon={<Trophy />} />
+        <StatCard label={t.drivers.podiums} value={summary.podiums} icon={<Medal />} />
         <StatCard
-          label="Puntos"
+          label={t.drivers.points}
           value={summary.points}
           icon={<Award />}
-          hint={seasonRow && season ? `${seasonRow.points} en ${season.name}` : undefined}
+          hint={seasonRow && season ? t.drivers.seasonPoints(seasonRow.points, season.name) : undefined}
         />
         <StatCard
-          label="Posición media"
+          label={t.drivers.averageFinish}
           value={summary.averageFinish != null ? formatDecimal(summary.averageFinish) : "—"}
           icon={<Gauge />}
-          hint={summary.bestFinish ? `Mejor: ${summary.bestFinish}º` : undefined}
+          hint={summary.bestFinish ? t.drivers.best(t.common.ordinal(summary.bestFinish)) : undefined}
         />
         <StatCard
-          label="Remontada media"
+          label={t.drivers.averageGained}
           value={summary.averageGained != null ? formatSigned(summary.averageGained) : "—"}
           icon={<TrendingUp />}
-          hint="Puestos ganados desde la salida"
+          hint={t.drivers.averageGainedHint}
         />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Logros</CardTitle>
+          <CardTitle>{t.drivers.achievements}</CardTitle>
           <Badge tone="bar">
             {earnedBadges}/{badges.length}
           </Badge>
@@ -126,12 +127,12 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-fg-muted">Todavía ninguno: el primero llega con la primera carrera.</p>
+            <p className="text-sm text-fg-muted">{t.drivers.noAchievements}</p>
           )}
           {locked.length > 0 && (
             <details className="group">
               <summary className="cursor-pointer text-sm font-semibold text-fg-muted hover:text-primary">
-                Por conseguir ({locked.length})
+                {t.drivers.lockedAchievements(locked.length)}
               </summary>
               <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {locked.map((award) => (
@@ -146,16 +147,16 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Forma</CardTitle>
+            <CardTitle>{t.drivers.form}</CardTitle>
           </CardHeader>
           <CardBody className="flex flex-col gap-2">
             <FormStrip form={summary.form} />
-            <p className="text-xs text-fg-subtle">Últimas 5 carreras, de la más reciente a la más antigua.</p>
+            <p className="text-xs text-fg-subtle">{t.drivers.formHint}</p>
           </CardBody>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Mejor circuito</CardTitle>
+            <CardTitle>{t.drivers.bestTrack}</CardTitle>
           </CardHeader>
           <CardBody>
             {summary.bestTrack ? (
@@ -163,12 +164,11 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
                 <MapPin className="size-5 text-primary" />
                 <span className="font-display text-2xl font-bold uppercase italic">{summary.bestTrack.trackName}</span>
                 <span className="text-sm text-fg-muted">
-                  posición media {formatDecimal(summary.bestTrack.averageFinish)} en {summary.bestTrack.starts}{" "}
-                  {summary.bestTrack.starts === 1 ? "carrera" : "carreras"}
+                  {t.drivers.bestTrackDetail(formatDecimal(summary.bestTrack.averageFinish), t.common.races(summary.bestTrack.starts))}
                 </span>
               </p>
             ) : (
-              <span className="text-sm text-fg-subtle">Sin datos todavía</span>
+              <span className="text-sm text-fg-subtle">{t.drivers.noData}</span>
             )}
           </CardBody>
         </Card>
@@ -176,7 +176,7 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
 
       <Card>
         <CardHeader>
-          <CardTitle>Historial</CardTitle>
+          <CardTitle>{t.drivers.history}</CardTitle>
         </CardHeader>
         <RaceHistory results={player.results} />
       </Card>

@@ -3,6 +3,7 @@ import type { StatsDriver } from "@/lib/data/stats";
 import { cn } from "@/lib/cn";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
+import { t } from "@/i18n";
 
 const MEDAL = { 1: "bg-gold", 2: "bg-silver", 3: "bg-bronze" } as const;
 
@@ -28,10 +29,10 @@ export function PalmaresTable({ unlocks, drivers }: { unlocks: Unlock[]; drivers
     <Table>
       <THead>
         <tr>
-          <Th>Temporada</Th>
-          <Th>Campeón</Th>
-          <Th className="max-sm:hidden">Subcampeón</Th>
-          <Th className="max-md:hidden">Tercero</Th>
+          <Th>{t.achievements.season}</Th>
+          <Th>{t.achievements.champion}</Th>
+          <Th className="max-sm:hidden">{t.achievements.runnerUp}</Th>
+          <Th className="max-md:hidden">{t.achievements.third}</Th>
         </tr>
       </THead>
       <TBody>

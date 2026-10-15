@@ -6,6 +6,7 @@ import type { NotificationItem } from "@/lib/data/notifications";
 import { cn } from "@/lib/cn";
 import { formatRelative } from "@/lib/format";
 import { Avatar } from "@/components/ui";
+import { t } from "@/i18n";
 
 const TYPE_ICON = {
   ARTICLE_MENTION: AtSign,
@@ -63,7 +64,7 @@ export function NotificationList({ items, onOpen, className }: NotificationListP
                   {formatRelative(item.createdAt)}
                 </time>
               </span>
-              {!item.read && <span aria-label="Sin leer" className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />}
+              {!item.read && <span aria-label={t.notifications.unread} className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />}
             </Link>
           </li>
         );

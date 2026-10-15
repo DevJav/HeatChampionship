@@ -7,8 +7,9 @@ import { SeasonForm } from "@/components/admin/SeasonForm";
 import { getSeason } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Editar temporada · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.seasons.edit) };
 
 async function EditSeasonPageContent({ params }: PageProps<"/admin/temporadas/[id]">) {
   const { id } = await params;
@@ -21,7 +22,7 @@ async function EditSeasonPageContent({ params }: PageProps<"/admin/temporadas/[i
       title={season.name}
       actions={
         season._count.races === 0 && (
-          <DeleteForm action={deleteSeason.bind(null, id)} title="¿Eliminar la temporada?" />
+          <DeleteForm action={deleteSeason.bind(null, id)} title={t.admin.seasons.deleteTitle} />
         )
       }
     >

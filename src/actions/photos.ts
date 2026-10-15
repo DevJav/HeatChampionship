@@ -6,6 +6,7 @@ import type { FormState } from "@/lib/forms";
 import { logPhotosAdded } from "@/lib/log-activity";
 import { getCurrentUser, isAdmin, requireUser } from "@/lib/session";
 import { deleteStoredPhoto, MAX_FILES_PER_UPLOAD, storeRacePhoto, UploadError } from "@/lib/uploads";
+import { t } from "@/i18n";
 
 /** Admins and the race's drivers can add photos. */
 async function canAddPhotos(raceId: string, user: { id: string; role?: string | null }) {
@@ -19,11 +20,11 @@ async function canAddPhotos(raceId: string, user: { id: string; role?: string | 
 
 export async function uploadRacePhotos(raceId: string, _prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireUser(`/carreras/${raceId}`);
-  if (!(await canAddPhotos(raceId, user))) return { error: "Solo los pilotos de la carrera pueden subir fotos." };
+  if (!(await canAddPhotos(raceId, user))) return { error: t.forms.uploads.onlyDrivers };
 
   const files = formData.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
-  if (files.length === 0) return { error: "Elige al menos una foto." };
-  if (files.length > MAX_FILES_PER_UPLOAD) return { error: `Máximo ${MAX_FILES_PER_UPLOAD} fotos a la vez.` };
+  if (files.length === 0) return { error: t.forms.uploads.choosePhoto };
+  if (files.length > MAX_FILES_PER_UPLOAD) return { error: t.forms.uploads.tooManyPhotos(MAX_FILES_PER_UPLOAD) };
   const caption = String(formData.get("caption") ?? "").trim().slice(0, 200) || null;
 
   let added = 0;

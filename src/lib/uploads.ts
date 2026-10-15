@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { t } from "@/i18n";
 
 /**
  * Uploaded photos live on disk next to the database (data/uploads by default)
@@ -36,13 +37,13 @@ export class UploadError extends Error {}
  * Returns the stored path relative to UPLOAD_DIR.
  */
 export async function storeRacePhoto(raceId: string, file: File) {
-  if (!file.type.startsWith("image/")) throw new UploadError(`"${file.name}" no es una imagen.`);
-  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError(`"${file.name}" pesa más de 15 MB.`);
+  if (!file.type.startsWith("image/")) throw new UploadError(t.forms.uploads.notAnImageNamed(file.name));
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError(t.forms.uploads.tooBigNamed(file.name));
 
   const input = Buffer.from(await file.arrayBuffer());
   const storedPath = path.posix.join("races", raceId, `${randomUUID()}.webp`);
   const absolute = resolveUpload(storedPath);
-  if (!absolute) throw new UploadError("Ruta no válida.");
+  if (!absolute) throw new UploadError(t.forms.uploads.invalidPath);
   await mkdir(path.dirname(absolute), { recursive: true });
 
   try {
@@ -55,7 +56,7 @@ export async function storeRacePhoto(raceId: string, file: File) {
     await writeFile(absolute, full);
     await writeFile(absolute.replace(/\.webp$/, "-thumb.webp"), thumb);
   } catch {
-    throw new UploadError(`No se pudo procesar "${file.name}".`);
+    throw new UploadError(t.forms.uploads.couldNotProcessNamed(file.name));
   }
 
   return storedPath;
@@ -63,12 +64,12 @@ export async function storeRacePhoto(raceId: string, file: File) {
 
 /** Store a profile picture as a 256px square WebP. Returns the path relative to UPLOAD_DIR. */
 export async function storeAvatar(userId: string, file: File) {
-  if (!file.type.startsWith("image/")) throw new UploadError("El archivo no es una imagen.");
-  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("La imagen pesa más de 15 MB.");
+  if (!file.type.startsWith("image/")) throw new UploadError(t.forms.uploads.notAnImage);
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError(t.forms.uploads.tooBig);
 
   const storedPath = path.posix.join("users", userId, `${randomUUID()}.webp`);
   const absolute = resolveUpload(storedPath);
-  if (!absolute) throw new UploadError("Ruta no válida.");
+  if (!absolute) throw new UploadError(t.forms.uploads.invalidPath);
   await mkdir(path.dirname(absolute), { recursive: true });
 
   try {
@@ -79,19 +80,19 @@ export async function storeAvatar(userId: string, file: File) {
       .toBuffer();
     await writeFile(absolute, avatar);
   } catch {
-    throw new UploadError("No se pudo procesar la imagen.");
+    throw new UploadError(t.forms.uploads.couldNotProcess);
   }
   return storedPath;
 }
 
 /** Store an article image (banner or inline) as WebP, max 2000px. Returns the path relative to UPLOAD_DIR. */
 export async function storeArticleImage(file: File) {
-  if (!file.type.startsWith("image/")) throw new UploadError("El archivo no es una imagen.");
-  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("La imagen pesa más de 15 MB.");
+  if (!file.type.startsWith("image/")) throw new UploadError(t.forms.uploads.notAnImage);
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError(t.forms.uploads.tooBig);
 
   const storedPath = path.posix.join("articles", `${randomUUID()}.webp`);
   const absolute = resolveUpload(storedPath);
-  if (!absolute) throw new UploadError("Ruta no válida.");
+  if (!absolute) throw new UploadError(t.forms.uploads.invalidPath);
   await mkdir(path.dirname(absolute), { recursive: true });
 
   try {
@@ -102,7 +103,7 @@ export async function storeArticleImage(file: File) {
       .toBuffer();
     await writeFile(absolute, cover);
   } catch {
-    throw new UploadError("No se pudo procesar la imagen.");
+    throw new UploadError(t.forms.uploads.couldNotProcess);
   }
   return storedPath;
 }

@@ -5,6 +5,7 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 import { photoUrls } from "@/lib/uploads";
 import { Button, EmptyState } from "@/components/ui";
 import { PhotoUploadForm } from "./PhotoUploadForm";
+import { t } from "@/i18n";
 
 type RacePhotosProps = {
   raceId: string;
@@ -23,8 +24,8 @@ export async function RacePhotos({ raceId, driverIds }: RacePhotosProps) {
       {photos.length === 0 ? (
         <EmptyState
           icon={<Camera />}
-          title="Sin fotos"
-          description={canUpload ? "Sube una foto del tablero final." : undefined}
+          title={t.races.photoList.empty}
+          description={canUpload ? t.races.photoList.emptyCanUpload : undefined}
           className="py-8"
         />
       ) : (
@@ -38,7 +39,7 @@ export async function RacePhotos({ raceId, driverIds }: RacePhotosProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element -- already resized on upload */}
                   <img
                     src={urls.thumb}
-                    alt={photo.caption ?? "Foto de la carrera"}
+                    alt={photo.caption ?? t.races.photoList.alt}
                     loading="lazy"
                     className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
                   />
@@ -52,7 +53,7 @@ export async function RacePhotos({ raceId, driverIds }: RacePhotosProps) {
                 )}
                 {canDelete && (
                   <form action={deleteRacePhoto.bind(null, photo.id)} className="absolute top-1 right-1">
-                    <Button type="submit" size="icon" variant="danger" aria-label="Borrar foto" className="size-7">
+                    <Button type="submit" size="icon" variant="danger" aria-label={t.races.photoList.delete} className="size-7">
                       <X />
                     </Button>
                   </form>

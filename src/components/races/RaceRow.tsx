@@ -9,6 +9,7 @@ import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { SeatsMeter } from "@/components/domain/SeatsMeter";
+import { t } from "@/i18n";
 
 /**
  * One race in the list, as a full-width timing row: date block, track, and
@@ -37,7 +38,7 @@ export function RaceRow({ race }: { race: RaceListItem }) {
         <span className="flex min-w-0 flex-col gap-1">
           <span className="flex flex-wrap items-center gap-2">
             <span className="font-display text-xs font-bold uppercase tracking-wider text-fg-muted">
-              Ronda {race.round}
+              {t.common.round(race.round)}
             </span>
             <RaceStatusBadge race={race} />
           </span>
@@ -80,7 +81,7 @@ export function RaceRow({ race }: { race: RaceListItem }) {
                 </span>
               ))
             ) : (
-              <span className="text-sm text-fg-subtle">Sin resultados</span>
+              <span className="text-sm text-fg-subtle">{t.races.noResults}</span>
             )
           ) : (
             <SeatsMeter taken={race._count.registrations} max={race.maxPlayers} />

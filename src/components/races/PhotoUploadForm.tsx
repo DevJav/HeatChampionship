@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { ImagePlus } from "lucide-react";
 import type { FormAction, FormState } from "@/lib/forms";
 import { Alert, Input, SubmitButton } from "@/components/ui";
+import { t } from "@/i18n";
 
 /** Upload one or more photos with an optional shared caption. */
 export function PhotoUploadForm({ action }: { action: FormAction }) {
@@ -19,12 +20,12 @@ export function PhotoUploadForm({ action }: { action: FormAction }) {
           accept="image/*"
           multiple
           required
-          aria-label="Fotos"
+          aria-label={t.races.photos}
           className="file:mr-3 file:border-0 file:bg-border file:px-3 file:py-1 file:text-sm file:font-semibold sm:flex-1 h-auto py-1.5"
         />
-        <Input name="caption" placeholder="Pie de foto (opcional)" maxLength={200} className="sm:flex-1" />
+        <Input name="caption" placeholder={t.races.photoList.caption} maxLength={200} className="sm:flex-1" />
         <SubmitButton variant="secondary">
-          <ImagePlus /> Subir
+          <ImagePlus /> {t.races.photoList.upload}
         </SubmitButton>
       </div>
     </form>

@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 import { needsOutline } from "@/lib/colors";
 import { remarkMentions } from "@/lib/remark-mentions";
 import { ChequeredStrip, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
+import { t } from "@/i18n";
 
 const linkClass = "font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary";
 
@@ -46,7 +47,7 @@ const cellAlign = (align: string | undefined) =>
 function ArticleFigure({ src, alt }: { src: string; alt: string }) {
   return (
     <figure className="flex flex-col items-center gap-2">
-      <a href={src} target="_blank" rel="noopener noreferrer" className="max-w-full" title="Ver a tamaño completo">
+      <a href={src} target="_blank" rel="noopener noreferrer" className="max-w-full" title={t.articles.embeds.fullSize}>
         {/* Any URL the admin pastes, so next/image's allowlist doesn't apply */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={alt} loading="lazy" className="max-h-[40rem] w-auto max-w-full clip-chamfer" />

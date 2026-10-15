@@ -4,6 +4,7 @@ import type { ActivityItem } from "@/lib/data/activity";
 import { cn } from "@/lib/cn";
 import { dateParts, formatDate, formatRelative } from "@/lib/format";
 import { Avatar } from "@/components/ui";
+import { t } from "@/i18n";
 
 const TYPE_ICON = {
   PLAYER_JOINED: UserPlus,
@@ -73,11 +74,11 @@ export function ActivityList({
   );
 }
 
-/** "Hoy", "Ayer" or the date, in the site's time zone. */
+/** "Today", "Yesterday" or the date, in the site's time zone. */
 function dayLabel(date: Date, now: Date) {
   const day = formatDate(date);
-  if (day === formatDate(now)) return "Hoy";
-  if (day === formatDate(new Date(now.getTime() - 86_400_000))) return "Ayer";
+  if (day === formatDate(now)) return t.activity.today;
+  if (day === formatDate(new Date(now.getTime() - 86_400_000))) return t.activity.yesterday;
   return day;
 }
 

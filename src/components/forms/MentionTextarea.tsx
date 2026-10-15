@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 import { needsOutline } from "@/lib/colors";
 import { Textarea } from "@/components/ui";
 import { caretPosition, replaceSelection } from "./textareaEdit";
+import { t } from "@/i18n";
 
 const LIST_WIDTH = 256;
 
@@ -121,7 +122,7 @@ export function MentionTextarea({ drivers, ref, onKeyDown, onSelect, onInput, on
         <ul
           id={listId}
           role="listbox"
-          aria-label="Pilotos"
+          aria-label={t.forms.mentionSuggestions}
           className="absolute z-30 max-h-64 overflow-y-auto border border-border surface-panel py-1 shadow-overlay"
           style={{ top: suggesting!.top, left: suggesting!.left, width: LIST_WIDTH }}
         >

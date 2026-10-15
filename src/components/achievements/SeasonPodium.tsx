@@ -1,6 +1,7 @@
 import { Medal, Trophy } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { DriverName } from "@/components/domain/DriverName";
+import { t } from "@/i18n";
 
 type PodiumDriver = { name: string; username: string | null; favoriteColor: { hex: string } | null };
 
@@ -11,9 +12,9 @@ type SeasonPodiumProps = {
 };
 
 const PLACE = {
-  1: { label: "Campeón", icon: Trophy, medal: "bg-gold text-[#2a1f00]", ring: "border-gold" },
-  2: { label: "Subcampeón", icon: Medal, medal: "bg-silver text-[#16181b]", ring: "border-silver" },
-  3: { label: "Tercero", icon: Medal, medal: "bg-bronze text-[#1e1206]", ring: "border-bronze" },
+  1: { label: t.achievements.champion, icon: Trophy, medal: "bg-gold text-[#2a1f00]", ring: "border-gold" },
+  2: { label: t.achievements.runnerUp, icon: Medal, medal: "bg-silver text-[#16181b]", ring: "border-silver" },
+  3: { label: t.achievements.third, icon: Medal, medal: "bg-bronze text-[#1e1206]", ring: "border-bronze" },
 } as const;
 
 /** Final top three of a finished season, champion first and biggest. */
@@ -46,7 +47,7 @@ export function SeasonPodium({ places, drivers }: SeasonPodiumProps) {
               <span className="flex min-w-0 flex-col gap-1">
                 <span className="font-display text-xs font-bold uppercase tracking-wider text-fg-muted">{style.label}</span>
                 <DriverName name={driver?.name ?? "—"} username={driver?.username} color={driver?.favoriteColor?.hex} />
-                <span className="font-display text-sm font-bold italic tabular-nums text-fg-muted">{place.points} pts</span>
+                <span className="font-display text-sm font-bold italic tabular-nums text-fg-muted">{place.points} {t.common.pts}</span>
               </span>
             </li>
           );

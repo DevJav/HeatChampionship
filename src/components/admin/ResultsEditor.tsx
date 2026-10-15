@@ -8,6 +8,7 @@ import { MAX_SPINS, type ResultRow, type ResultsValidation, type RowField } from
 import { scoreRace } from "@/lib/scoring";
 import { Alert, Avatar, Button, Input, Select } from "@/components/ui";
 import { PositionBadge } from "@/components/domain/PositionBadge";
+import { t } from "@/i18n";
 
 type Player = { id: string; name: string; image: string | null };
 type Option = { id: string; name: string };
@@ -91,8 +92,8 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
     const missing = players.filter((p) => rows[p.id].position === "");
     if (missing.length > 0) {
       setValidation({
-        error: "Indica la posición de todos los pilotos.",
-        rowErrors: Object.fromEntries(missing.map((p) => [p.id, { position: "Falta la posición." }])),
+        error: t.admin.results.allPositions,
+        rowErrors: Object.fromEntries(missing.map((p) => [p.id, { position: t.admin.results.missingPosition }])),
       });
       return;
     }
@@ -122,9 +123,9 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                   {player.name}
                 </div>
 
-                <SelectCell label="Posición" error={errorFor(player.id, "position")}>
+                <SelectCell label={t.admin.results.position} error={errorFor(player.id, "position")}>
                   <Select
-                    aria-label={`Posición de ${player.name}`}
+                    aria-label={t.admin.results.positionOf(player.name)}
                     value={row.position}
                     aria-invalid={!!errorFor(player.id, "position")}
                     onChange={(e) => update(player.id, { position: e.target.value })}
@@ -132,15 +133,15 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                     <option value="">—</option>
                     {positions.map((p) => (
                       <option key={p} value={p}>
-                        {p}º
+                        {t.common.ordinal(Number(p))}
                       </option>
                     ))}
                   </Select>
                 </SelectCell>
 
-                <SelectCell label="Salida" error={errorFor(player.id, "startPosition")}>
+                <SelectCell label={t.admin.results.start} error={errorFor(player.id, "startPosition")}>
                   <Select
-                    aria-label={`Salida de ${player.name}`}
+                    aria-label={t.admin.results.startOf(player.name)}
                     value={row.startPosition}
                     aria-invalid={!!errorFor(player.id, "startPosition")}
                     onChange={(e) => update(player.id, { startPosition: e.target.value })}
@@ -148,15 +149,15 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                     <option value="">—</option>
                     {positions.map((p) => (
                       <option key={p} value={p}>
-                        {p}º
+                        {t.common.ordinal(Number(p))}
                       </option>
                     ))}
                   </Select>
                 </SelectCell>
 
-                <SelectCell label="Coche" error={errorFor(player.id, "carColorId")}>
+                <SelectCell label={t.admin.results.car} error={errorFor(player.id, "carColorId")}>
                   <Select
-                    aria-label={`Coche de ${player.name}`}
+                    aria-label={t.admin.results.carOf(player.name)}
                     value={row.carColorId}
                     aria-invalid={!!errorFor(player.id, "carColorId")}
                     onChange={(e) => update(player.id, { carColorId: e.target.value })}
@@ -170,7 +171,7 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                   </Select>
                 </SelectCell>
 
-                <SelectCell label="Trompos" error={errorFor(player.id, "spins")}>
+                <SelectCell label={t.admin.results.spins} error={errorFor(player.id, "spins")}>
                   <SpinStepper
                     name={player.name}
                     value={row.spins}
@@ -179,7 +180,7 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
                 </SelectCell>
 
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-fg-muted">Pts</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-fg-muted">{t.common.columns.points}</span>
                   <div className="flex items-center gap-1">
                     {finishing && finishing <= 3 && <PositionBadge position={finishing} size="sm" />}
                     <span className="font-display text-2xl font-bold italic tabular-nums">
@@ -191,7 +192,7 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
 
               {upgrades.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="mr-1 text-xs font-bold uppercase tracking-wider text-fg-muted">Mejoras</span>
+                  <span className="mr-1 text-xs font-bold uppercase tracking-wider text-fg-muted">{t.admin.results.upgrades}</span>
                   {upgrades.map((upgrade) => {
                     const on = row.upgradeIds.includes(upgrade.id);
                     return (
@@ -213,8 +214,8 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
               )}
 
               <Input
-                aria-label={`Nota sobre ${player.name}`}
-                placeholder="Nota (opcional): remontada épica, rebufo en la última curva…"
+                aria-label={t.admin.results.noteOf(player.name)}
+                placeholder={t.admin.results.notePlaceholder}
                 value={row.notes}
                 maxLength={300}
                 onChange={(e) => update(player.id, { notes: e.target.value })}
@@ -227,13 +228,13 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
 
       {upgrades.length === 0 && (
         <p className="text-sm text-fg-muted">
-          No hay mejoras en el catálogo. Añádelas en Administración › Mejoras para registrar cuáles usa cada piloto.
+          {t.admin.results.noUpgrades}
         </p>
       )}
 
       <div className="flex justify-end border-t border-border pt-4">
         <Button size="lg" loading={pending} onClick={submit}>
-          <Flag /> Guardar resultados
+          <Flag /> {t.admin.results.save}
         </Button>
       </div>
     </div>
@@ -244,14 +245,14 @@ export function ResultsEditor({ raceId, players, carColors, upgrades, pointsTabl
 function SpinStepper({ name, value, onChange }: { name: string; value: number; onChange: (value: number) => void }) {
   const step = "flex size-10 items-center justify-center bg-surface-2 text-fg transition-colors hover:bg-border focus-inset disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4";
   return (
-    <div role="group" aria-label={`Trompos de ${name}`} className="flex items-center gap-1">
-      <button type="button" className={step} aria-label="Un trompo menos" disabled={value <= 0} onClick={() => onChange(value - 1)}>
+    <div role="group" aria-label={t.admin.results.spinsOf(name)} className="flex items-center gap-1">
+      <button type="button" className={step} aria-label={t.admin.results.oneSpinLess} disabled={value <= 0} onClick={() => onChange(value - 1)}>
         <Minus />
       </button>
       <span aria-live="polite" className="w-8 text-center font-display text-xl font-bold italic tabular-nums">
         {value}
       </span>
-      <button type="button" className={step} aria-label="Un trompo más" disabled={value >= MAX_SPINS} onClick={() => onChange(value + 1)}>
+      <button type="button" className={step} aria-label={t.admin.results.oneSpinMore} disabled={value >= MAX_SPINS} onClick={() => onChange(value + 1)}>
         <Plus />
       </button>
     </div>

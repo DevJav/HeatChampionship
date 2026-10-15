@@ -5,11 +5,12 @@ import { LogOut, UserPlus } from "lucide-react";
 import { updateMyRegistration } from "@/actions/races";
 import type { FormState } from "@/lib/forms";
 import { Alert, ConfirmButton, SubmitButton } from "@/components/ui";
+import { t } from "@/i18n";
 
 type SignupFormProps = {
   raceId: string;
   intent: "join" | "leave";
-  /** Join button label, e.g. "Inscribirme" or "Apuntarme a la lista de espera" */
+  /** Join button label: sign up or join the waitlist */
   label?: string;
   /** Warning shown in the confirmation dialog before leaving */
   leaveWarning?: string;
@@ -25,17 +26,17 @@ export function SignupForm({ raceId, intent, label, leaveWarning }: SignupFormPr
       {state.error && <Alert tone="danger">{state.error}</Alert>}
       {intent === "join" ? (
         <SubmitButton size="lg" fullWidth>
-          <UserPlus /> {label ?? "Inscribirme"}
+          <UserPlus /> {label ?? t.races.signupPanel.join}
         </SubmitButton>
       ) : (
         <ConfirmButton
           variant="secondary"
-          title="¿Retirarte de la carrera?"
+          title={t.races.signupPanel.leaveTitle}
           description={leaveWarning}
-          confirmLabel="Sí, retirarme"
+          confirmLabel={t.races.signupPanel.leaveConfirm}
           className="w-full"
         >
-          <LogOut /> Retirarme
+          <LogOut /> {t.races.signupPanel.leave}
         </ConfirmButton>
       )}
     </form>

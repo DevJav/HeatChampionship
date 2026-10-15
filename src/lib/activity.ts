@@ -1,6 +1,7 @@
 import type { ActivityType } from "@/generated/prisma/client";
 import { formatShortDate } from "./format";
 import { raceTitle } from "./races";
+import { t } from "@/i18n";
 
 /** A stored feed entry with what's needed to describe it (see lib/data/activity.ts). */
 export type ActivityRecord = {
@@ -17,39 +18,37 @@ export type ActivityRecord = {
  */
 export function describeActivity(a: ActivityRecord): { subject: string | null; text: string; href: string } {
   const subject = a.actor?.name ?? null;
-  const race = a.race ? raceTitle(a.race) : "una carrera";
+  const race = a.race ? raceTitle(a.race) : t.activity.aRace;
   const raceHref = a.race ? `/carreras/${a.race.id}` : "/carreras";
-  const season = a.season?.name ?? "la temporada";
+  const season = a.season?.name ?? t.activity.theSeason;
   const seasonHref = a.season ? `/clasificacion?temporada=${a.season.id}` : "/clasificacion";
 
   switch (a.type) {
     case "PLAYER_JOINED":
       return {
         subject,
-        text: "se ha unido al campeonato",
+        text: t.activity.joined,
         href: a.actor?.username ? `/pilotos/${a.actor.username}` : "/pilotos",
       };
     case "RACE_ANNOUNCED": {
-      const when = a.race ? ` (${formatShortDate(a.race.scheduledAt)})` : "";
-      return { subject: null, text: `Nueva carrera en el calendario: ${race}${when}`, href: raceHref };
+      const when = a.race ? formatShortDate(a.race.scheduledAt) : "";
+      return { subject: null, text: t.activity.raceAnnounced(race, when), href: raceHref };
     }
     case "SIGNUPS_OPENED":
-      return { subject: null, text: `Inscripciones abiertas para ${race}`, href: raceHref };
+      return { subject: null, text: t.activity.signupsOpened(race), href: raceHref };
     case "RACE_SIGNUP":
-      return { subject, text: `se ha apuntado a ${race}`, href: raceHref };
+      return { subject, text: t.activity.signedUp(race), href: raceHref };
     case "RACE_WITHDRAWAL":
-      return { subject, text: `se ha retirado de ${race}`, href: raceHref };
+      return { subject, text: t.activity.withdrew(race), href: raceHref };
     case "RESULTS_PUBLISHED": {
-      const winner = a.race?.winner ? `: victoria de ${a.race.winner}` : "";
-      return { subject: null, text: `Ya están los resultados de ${race}${winner}`, href: raceHref };
+      return { subject: null, text: t.activity.results(race, a.race?.winner ?? null), href: raceHref };
     }
     case "PHOTOS_ADDED":
-      return { subject, text: `ha subido fotos de ${race}`, href: `${raceHref}#fotos` };
+      return { subject, text: t.activity.photos(race), href: `${raceHref}#fotos` };
     case "SEASON_STARTED":
-      return { subject: null, text: `Arranca ${season}`, href: seasonHref };
+      return { subject: null, text: t.activity.seasonStarted(season), href: seasonHref };
     case "SEASON_FINISHED": {
-      const champion = a.season?.champion ? `: el título es para ${a.season.champion}` : "";
-      return { subject: null, text: `Termina ${season}${champion}`, href: seasonHref };
+      return { subject: null, text: t.activity.seasonFinished(season, a.season?.champion ?? null), href: seasonHref };
     }
   }
 }

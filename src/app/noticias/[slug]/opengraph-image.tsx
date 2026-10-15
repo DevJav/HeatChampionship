@@ -9,8 +9,9 @@ import { formatDate } from "@/lib/format";
 import { OG_SIZE, ogFonts } from "@/lib/og-fonts";
 import { raceTitle } from "@/lib/races";
 import { resolveUpload } from "@/lib/uploads";
+import { t } from "@/i18n";
 
-export const alt = "Noticia del campeonato Heat";
+export const alt = t.og.articleAlt;
 export const size = OG_SIZE;
 // JPEG: a photo as PNG weighs over a megabyte, and WhatsApp skips heavy previews
 export const contentType = "image/jpeg";

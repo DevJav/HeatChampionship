@@ -9,8 +9,9 @@ import { ButtonLink } from "@/components/ui";
 import { getArticle, getArticleEditorOptions } from "@/lib/data/articles";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Editar artículo · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.articles.edit) };
 
 async function EditArticlePageContent({ params }: PageProps<"/admin/noticias/[id]">) {
   const { id } = await params;
@@ -24,9 +25,9 @@ async function EditArticlePageContent({ params }: PageProps<"/admin/noticias/[id
       actions={
         <div className="flex gap-1">
           <ButtonLink href={`/noticias/${article.slug}`} variant="inverse" size="sm">
-            <ExternalLink /> Ver
+            <ExternalLink /> {t.admin.articles.view}
           </ButtonLink>
-          <DeleteForm action={deleteArticle.bind(null, id)} title="¿Eliminar el artículo?" />
+          <DeleteForm action={deleteArticle.bind(null, id)} title={t.admin.articles.deleteTitle} />
         </div>
       }
     >

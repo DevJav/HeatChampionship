@@ -5,8 +5,9 @@ import { Badge, ButtonLink, Card, EmptyState, Section, Table, TBody, Td, Th, THe
 import { listUpgrades } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Mejoras · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.upgrades.title) };
 
 async function AdminUpgradesPageContent() {
   await requireAdmin("/admin/mejoras");
@@ -14,28 +15,28 @@ async function AdminUpgradesPageContent() {
 
   return (
     <Section
-      title="Mejoras"
+      title={t.admin.upgrades.title}
       actions={
         <ButtonLink href="/admin/mejoras/nueva" size="sm">
-          <Plus /> Nueva mejora
+          <Plus /> {t.admin.upgrades.new}
         </ButtonLink>
       }
     >
       {upgrades.length === 0 ? (
         <EmptyState
           icon={<Wrench />}
-          title="Sin mejoras"
-          description="Añade las cartas de mejora de tu edición para registrar cuáles usa cada piloto."
+          title={t.admin.upgrades.empty}
+          description={t.admin.upgrades.emptyDescription}
         />
       ) : (
         <Card>
           <Table>
             <THead>
               <tr>
-                <Th>Mejora</Th>
-                <Th>Juego</Th>
-                <Th align="center">Usos</Th>
-                <Th align="right">Estado</Th>
+                <Th>{t.admin.upgrades.upgrade}</Th>
+                <Th>{t.admin.game}</Th>
+                <Th align="center">{t.admin.uses}</Th>
+                <Th align="right">{t.admin.status}</Th>
               </tr>
             </THead>
             <TBody>
@@ -48,7 +49,7 @@ async function AdminUpgradesPageContent() {
                   </Td>
                   <Td className="text-fg-muted">{upgrade.expansion ?? "—"}</Td>
                   <Td align="center">{upgrade._count.results}</Td>
-                  <Td align="right">{upgrade.active ? <Badge tone="success">Activa</Badge> : <Badge>Inactiva</Badge>}</Td>
+                  <Td align="right">{upgrade.active ? <Badge tone="success">{t.admin.activeF}</Badge> : <Badge>{t.admin.inactiveF}</Badge>}</Td>
                 </Tr>
               ))}
             </TBody>

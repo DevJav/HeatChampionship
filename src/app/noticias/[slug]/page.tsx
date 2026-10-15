@@ -10,16 +10,17 @@ import { ArticleBackdrop, ArticleCategoryBadge } from "@/components/articles/Art
 import { ShareButtons } from "@/components/races/ShareButtons";
 import { plainExcerpt } from "@/lib/articles";
 import { getArticleBySlug, type ArticleListItem } from "@/lib/data/articles";
-import { formatDate, plural } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { whatsappUrl } from "@/lib/race-share";
 import { raceTitle } from "@/lib/races";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { absoluteUrl } from "@/lib/site-url";
+import { t } from "@/i18n";
 
 export async function generateMetadata({ params }: PageProps<"/noticias/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
-  if (!article) return { title: "Noticias" };
+  if (!article) return { title: t.articles.title };
   const description = article.excerpt ?? plainExcerpt(article.body);
   return {
     title: article.title,
@@ -53,13 +54,13 @@ function ArticleHero({ article, admin }: { article: ArticleListItem; admin: bool
         <h1 className="max-w-4xl text-4xl [text-shadow:0_2px_12px_rgb(0_0_0/0.5)] sm:text-6xl">{article.title}</h1>
         {article.excerpt && <p className="max-w-3xl text-lg text-bar-fg/85">{article.excerpt}</p>}
         <p className="text-sm text-bar-fg/70">
-          {article.publishedAt ? formatDate(article.publishedAt) : "Sin publicar"}
+          {article.publishedAt ? formatDate(article.publishedAt) : t.articles.unpublished}
           {article.author && ` · ${article.author.name}`}
           {article.status === "PUBLISHED" && (
             <>
               {" · "}
               <a href="#comentarios" className="hover:text-bar-fg hover:underline">
-                {plural(article._count.comments, "comentario", "comentarios")}
+                {t.articles.comments(article._count.comments)}
               </a>
             </>
           )}
@@ -68,7 +69,7 @@ function ArticleHero({ article, admin }: { article: ArticleListItem; admin: bool
           {article.status === "PUBLISHED" && <ShareButtons whatsappHref={whatsappUrl(`${article.title}\n${url}`)} url={url} />}
           {admin && (
             <ButtonLink href={`/admin/noticias/${article.id}`} variant="inverse" size="sm">
-              <Pencil /> Editar
+              <Pencil /> {t.common.edit}
             </ButtonLink>
           )}
         </div>
@@ -87,7 +88,7 @@ async function ArticleView({ params }: { params: PageProps<"/noticias/[slug]">["
 
   return (
     <article className="flex flex-col gap-8">
-      {article.status === "DRAFT" && <Alert tone="warning">Borrador: solo lo ven los administradores.</Alert>}
+      {article.status === "DRAFT" && <Alert tone="warning">{t.races.draftNotice}</Alert>}
       <ArticleHero article={article} admin={admin} />
       <div className="mx-auto w-full max-w-3xl">
         <ArticleBody body={article.body} />
@@ -95,7 +96,7 @@ async function ArticleView({ params }: { params: PageProps<"/noticias/[slug]">["
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 border-t border-border pt-6">
         {article.status === "PUBLISHED" && <ArticleComments article={article} user={user} />}
         <ButtonLink href="/noticias" variant="secondary" size="sm" className="self-start">
-          <ChevronLeft /> Todas las noticias
+          <ChevronLeft /> {t.articles.allNews}
         </ButtonLink>
       </div>
     </article>

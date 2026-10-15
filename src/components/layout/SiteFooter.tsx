@@ -1,5 +1,6 @@
 import { siteConfig } from "@/config/site";
 import { ChequeredStrip, Container } from "@/components/ui";
+import { t } from "@/i18n";
 
 export function SiteFooter() {
   return (
@@ -9,7 +10,7 @@ export function SiteFooter() {
         <span className="font-display font-bold uppercase italic tracking-wide text-bar-fg">
           {siteConfig.name}
         </span>
-        <span>Liga no oficial de Heat: Pedal to the Metal</span>
+        <span>{t.layout.footer}</span>
       </Container>
     </footer>
   );

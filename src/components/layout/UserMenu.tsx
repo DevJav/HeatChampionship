@@ -8,6 +8,7 @@ import { getFavoriteColorHex } from "@/lib/data/players";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { cn } from "@/lib/cn";
 import { navItemClass } from "./navStyles";
+import { t } from "@/i18n";
 
 /** Login button, or the current user with admin/logout shortcuts. Reads cookies: render inside <Suspense>. */
 export async function UserMenu() {
@@ -15,10 +16,10 @@ export async function UserMenu() {
 
   if (!user) {
     return (
-      <ButtonLink href="/entrar" size="sm" aria-label="Entrar">
+      <ButtonLink href="/entrar" size="sm" aria-label={t.layout.logIn}>
         <LogIn />
         {/* Icon only on very narrow phones so the header fits */}
-        <span className="max-[379px]:hidden">Entrar</span>
+        <span className="max-[379px]:hidden">{t.layout.logIn}</span>
       </ButtonLink>
     );
   }
@@ -33,8 +34,8 @@ export async function UserMenu() {
           href="/admin"
           variant="inverse"
           size="icon"
-          aria-label="Administración"
-          title="Administración"
+          aria-label={t.layout.admin}
+          title={t.layout.admin}
           className="max-sm:hidden"
         >
           <Shield />
@@ -43,7 +44,7 @@ export async function UserMenu() {
       <NotificationBell initial={notifications} />
       <Link
         href={`/pilotos/${user.username}`}
-        title="Mi perfil"
+        title={t.layout.myProfile}
         className="flex items-center gap-2 px-2 text-bar-fg hover:text-bar-fg/80"
       >
         <Avatar name={user.name} src={user.image} color={color} size="sm" />
@@ -52,7 +53,7 @@ export async function UserMenu() {
         </span>
       </Link>
       <form action={signOut} className="max-sm:hidden">
-        <Button type="submit" variant="inverse" size="icon" aria-label="Salir" title="Salir">
+        <Button type="submit" variant="inverse" size="icon" aria-label={t.layout.logOut} title={t.layout.logOut}>
           <LogOut />
         </Button>
       </form>
@@ -68,16 +69,16 @@ export async function MobileUserLinks() {
   return (
     <div className="flex flex-col gap-1">
       <Link href="/perfil" className={navItemClass()}>
-        <UserRound /> Mi perfil
+        <UserRound /> {t.layout.myProfile}
       </Link>
       {isAdmin(user) && (
         <Link href="/admin" className={navItemClass()}>
-          <Shield /> Administración
+          <Shield /> {t.layout.admin}
         </Link>
       )}
       <form action={signOut}>
         <button type="submit" className={cn(navItemClass(), "w-full")}>
-          <LogOut /> Salir
+          <LogOut /> {t.layout.logOut}
         </button>
       </form>
     </div>

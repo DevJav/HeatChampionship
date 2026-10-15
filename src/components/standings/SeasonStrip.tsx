@@ -3,6 +3,7 @@ import { Crown } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { getCurrentSeason } from "@/lib/data/catalog";
 import { getSeasonStandings } from "@/lib/data/standings";
+import { t } from "@/i18n";
 import { Badge, SpeedStripes } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 
@@ -28,7 +29,7 @@ export async function SeasonStrip() {
 
         {total > 0 && (
           <div className="flex items-center gap-3">
-            <span className="font-display text-xs font-bold uppercase tracking-wider text-bar-fg/70">Ronda</span>
+            <span className="font-display text-xs font-bold uppercase tracking-wider text-bar-fg/70">{t.common.roundLabel}</span>
             <span className="font-display text-lg font-bold italic tabular-nums">
               {races.length}
               <span className="text-bar-fg/60">/{total}</span>
@@ -44,13 +45,13 @@ export async function SeasonStrip() {
         {leader && (
           <div className="flex items-center gap-3">
             <Crown aria-hidden className="size-4 text-accent" />
-            <span className="font-display text-xs font-bold uppercase tracking-wider text-bar-fg/70">Líder</span>
+            <span className="font-display text-xs font-bold uppercase tracking-wider text-bar-fg/70">{t.standings.leader}</span>
             <DriverName name={leader.name} username={leader.username} color={leader.favoriteColor?.hex} />
             <span className="font-display text-lg font-bold italic whitespace-nowrap tabular-nums">
               {rows[0].points}
-              <span className="text-sm font-normal not-italic text-bar-fg/70"> pts</span>
+              <span className="text-sm font-normal not-italic text-bar-fg/70"> {t.common.pts}</span>
             </span>
-            {lead != null && lead > 0 && <span className="text-xs whitespace-nowrap text-bar-fg/60 max-sm:hidden">+{lead} sobre el 2º</span>}
+            {lead != null && lead > 0 && <span className="text-xs whitespace-nowrap text-bar-fg/60 max-sm:hidden">{t.standings.leadOverSecond(lead)}</span>}
           </div>
         )}
       </div>

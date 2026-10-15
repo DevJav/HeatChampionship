@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { duelStep, type Duel } from "@/lib/stats";
 import { ChartTooltip } from "@/components/charts/ChartTooltip";
 import { DriverName } from "@/components/domain/DriverName";
+import { t } from "@/i18n";
 
 export type MatrixDriver = { id: string; name: string; username: string | null; color: string | null; code: string };
 
@@ -81,7 +82,7 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
       <div
         tabIndex={0}
         role="group"
-        aria-label="Cara a cara. Usa las flechas para recorrer las casillas."
+        aria-label={t.stats.matrix.label}
         className="overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onKeyDown={onKeyDown}
         onFocus={(e) => e.target === e.currentTarget && !active && activate(0, 1)}
@@ -92,7 +93,7 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
           <thead>
             <tr>
               <th scope="col" className="sr-only">
-                Piloto
+                {t.common.columns.driver}
               </th>
               {drivers.map((d, col) => (
                 <th
@@ -142,7 +143,7 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
                       )}
                       style={d ? { background: fillFor(step), color: inkFor(step) } : undefined}
                     >
-                      {d ? `${d.ahead}–${d.behind}` : <span className="sr-only">Sin carreras juntos</span>}
+                      {d ? `${d.ahead}–${d.behind}` : <span className="sr-only">{t.stats.matrix.noRacesTogether}</span>}
                     </td>
                   );
                 })}
@@ -154,13 +155,13 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fg-muted">
-        <span>Casi siempre detrás</span>
+        <span>{t.stats.matrix.mostlyBehind}</span>
         <span aria-hidden className="flex gap-0.5">
           {STEPS.map((step) => (
             <span key={step} className="h-3 w-5" style={{ background: fillFor(step) }} />
           ))}
         </span>
-        <span>Casi siempre delante</span>
+        <span>{t.stats.matrix.mostlyAhead}</span>
       </div>
 
       {active && rowDriver && colDriver && (
@@ -172,17 +173,17 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
             <ul className="flex flex-col gap-0.5 text-fg-muted">
               <li>
                 <span className="font-bold text-fg tabular-nums">{duel.meetings}</span>{" "}
-                {duel.meetings === 1 ? "carrera juntos" : "carreras juntos"}
+                {t.stats.matrix.racesTogether(duel.meetings)}
               </li>
               <li>
-                {rowDriver.name} por delante: <span className="font-bold text-fg tabular-nums">{duel.ahead}</span>
+                {t.stats.matrix.ahead(rowDriver.name)} <span className="font-bold text-fg tabular-nums">{duel.ahead}</span>
               </li>
               <li>
-                {colDriver.name} por delante: <span className="font-bold text-fg tabular-nums">{duel.behind}</span>
+                {t.stats.matrix.ahead(colDriver.name)} <span className="font-bold text-fg tabular-nums">{duel.behind}</span>
               </li>
             </ul>
           ) : (
-            <p className="text-fg-muted">Aún no han coincidido en una carrera.</p>
+            <p className="text-fg-muted">{t.stats.matrix.neverMet}</p>
           )}
         </ChartTooltip>
       )}

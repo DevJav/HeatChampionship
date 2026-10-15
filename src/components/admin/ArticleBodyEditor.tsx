@@ -27,6 +27,7 @@ import { cn } from "@/lib/cn";
 import { Button, Field, Label, Modal, Select, Spinner } from "@/components/ui";
 import { MentionTextarea } from "@/components/forms/MentionTextarea";
 import { tabItemClass, tabListClass } from "@/components/ui/tabStyles";
+import { t } from "@/i18n";
 
 // ---------------------------------------------------------------------------
 // Toolbar edits
@@ -68,7 +69,7 @@ function insertImage(textarea: HTMLTextAreaElement, url: string) {
 /** Image files from a paste, drop or file picker. */
 const imagesIn = (files: FileList | null | undefined) => Array.from(files ?? []).filter((f) => f.type.startsWith("image/"));
 
-const TABLE_TEMPLATE = "| Piloto | Puntos |\n| --- | ---: |\n| Nombre | 0 |";
+const TABLE_TEMPLATE = t.admin.articles.editor.tableTemplate;
 
 // ---------------------------------------------------------------------------
 // Pickers
@@ -77,10 +78,10 @@ const TABLE_TEMPLATE = "| Piloto | Puntos |\n| --- | ---: |\n| Nombre | 0 |";
 type Picker = "driver" | "race" | "standings";
 
 const RACE_EMBEDS: { kind: EmbedKind; label: string; finishedOnly: boolean }[] = [
-  { kind: "carrera", label: "Tarjeta de la carrera (cuenta atrás e inscripción, o podio)", finishedOnly: false },
-  { kind: "resultados", label: "Tabla de resultados", finishedOnly: true },
-  { kind: "podio", label: "Podio", finishedOnly: true },
-  { kind: "clasificacion-tras", label: "Clasificación del campeonato tras la carrera", finishedOnly: true },
+  { kind: "carrera", label: t.admin.articles.editor.embedRaceCard, finishedOnly: false },
+  { kind: "resultados", label: t.admin.articles.editor.embedResults, finishedOnly: true },
+  { kind: "podio", label: t.admin.articles.editor.embedPodium, finishedOnly: true },
+  { kind: "clasificacion-tras", label: t.admin.articles.editor.embedStandingsAfter, finishedOnly: true },
 ];
 
 type PickerProps = {
@@ -107,21 +108,21 @@ function DriverPicker({ options, onClose, onInsertText, onInsertBlock }: PickerP
     <Modal
       open
       onClose={onClose}
-      title="Mencionar piloto"
-      description="La mención enlaza a su perfil y lleva su color. También puedes escribir @usuario directamente."
+      title={t.admin.articles.editor.mentionTitle}
+      description={t.admin.articles.editor.mentionDescription}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t.forms.cancel}
           </Button>
           <Button onClick={insert} disabled={!driver}>
-            Insertar
+            {t.admin.articles.editor.insert}
           </Button>
         </>
       }
     >
       <div className="flex flex-col gap-4">
-        <Field label="Piloto" htmlFor="picker-driver">
+        <Field label={t.admin.articles.editor.driver} htmlFor="picker-driver">
           <Select id="picker-driver" value={username} onChange={(e) => setUsername(e.target.value)}>
             {options.drivers.map((d) => (
               <option key={d.username} value={d.username}>
@@ -130,10 +131,10 @@ function DriverPicker({ options, onClose, onInsertText, onInsertBlock }: PickerP
             ))}
           </Select>
         </Field>
-        <Field label="Cómo" htmlFor="picker-driver-as">
+        <Field label={t.admin.articles.editor.how} htmlFor="picker-driver-as">
           <Select id="picker-driver-as" value={as} onChange={(e) => setAs(e.target.value as typeof as)}>
-            <option value="mention">Mención en el texto</option>
-            <option value="card">Ficha del piloto (bloque con sus estadísticas)</option>
+            <option value="mention">{t.admin.articles.editor.asMention}</option>
+            <option value="card">{t.admin.articles.editor.asCard}</option>
           </Select>
         </Field>
       </div>
@@ -157,21 +158,21 @@ function RacePicker({ options, onClose, onInsertBlock, initialRaceId }: PickerPr
     <Modal
       open
       onClose={onClose}
-      title="Insertar carrera"
-      description="Los datos se leen en directo: la tarjeta pasa de cuenta atrás a podio cuando termina la carrera."
+      title={t.admin.articles.editor.raceTitle}
+      description={t.admin.articles.editor.raceDescription}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t.forms.cancel}
           </Button>
           <Button onClick={insert} disabled={!race}>
-            Insertar
+            {t.admin.articles.editor.insert}
           </Button>
         </>
       }
     >
       <div className="flex flex-col gap-4">
-        <Field label="Carrera" htmlFor="picker-race">
+        <Field label={t.admin.articles.editor.race} htmlFor="picker-race">
           <Select id="picker-race" value={raceId} onChange={(e) => setRaceId(e.target.value)}>
             {options.races.map((r) => (
               <option key={r.id} value={r.id}>
@@ -181,11 +182,11 @@ function RacePicker({ options, onClose, onInsertBlock, initialRaceId }: PickerPr
           </Select>
         </Field>
         <Field
-          label="Qué mostrar"
+          label={t.admin.articles.editor.whatToShow}
           htmlFor="picker-race-kind"
           hint={
             choice.finishedOnly && !finished
-              ? "La carrera aún no ha terminado: el bloque aparecerá cuando tenga resultados."
+              ? t.admin.articles.editor.notFinishedHint
               : undefined
           }
         >
@@ -214,20 +215,20 @@ function StandingsPicker({ options, onClose, onInsertBlock }: PickerProps) {
     <Modal
       open
       onClose={onClose}
-      title="Insertar clasificación"
-      description="La tabla del campeonato, siempre al día. Para la clasificación justo después de una carrera, usa «Insertar carrera»."
+      title={t.admin.articles.editor.standingsTitle}
+      description={t.admin.articles.editor.standingsDescription}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t.forms.cancel}
           </Button>
-          <Button onClick={insert}>Insertar</Button>
+          <Button onClick={insert}>{t.admin.articles.editor.insert}</Button>
         </>
       }
     >
-      <Field label="Temporada" htmlFor="picker-season">
+      <Field label={t.admin.articles.editor.season} htmlFor="picker-season">
         <Select id="picker-season" value={seasonId} onChange={(e) => setSeasonId(e.target.value)}>
-          <option value="">La temporada en curso (cambia sola)</option>
+          <option value="">{t.admin.articles.editor.currentSeason}</option>
           {options.seasons.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -287,9 +288,9 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
       try {
         const result = await uploadArticleImage(data);
         if ("error" in result) setUploadError(result.error);
-        else edit((t) => insertImage(t, result.url));
+        else edit((ta) => insertImage(ta, result.url));
       } catch {
-        setUploadError(`No se pudo subir "${file.name}".`);
+        setUploadError(t.admin.articles.editor.uploadFailed(file.name));
       } finally {
         setUploading((n) => n - 1);
       }
@@ -302,7 +303,7 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
     startPreview(async () => setPreview(await previewArticle(body)));
   }
 
-  /** The race chosen in the form's "Carrera" field, as the picker's default. */
+  /** The race chosen in the form's race field, as the picker's default. */
   function linkedRaceId() {
     const field = ref.current?.form?.elements.namedItem("raceId");
     return field instanceof HTMLSelectElement ? field.value : "";
@@ -328,7 +329,7 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <Label htmlFor="body">Contenido</Label>
+      <Label htmlFor="body">{t.admin.articles.editor.content}</Label>
       <div className={tabListClass} role="tablist">
         <button
           type="button"
@@ -337,7 +338,7 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           className={tabItemClass(mode === "write")}
           onClick={() => setMode("write")}
         >
-          Escribir
+          {t.admin.articles.editor.write}
         </button>
         <button
           type="button"
@@ -346,44 +347,44 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           className={tabItemClass(mode === "preview")}
           onClick={showPreview}
         >
-          Vista previa
+          {t.admin.articles.editor.preview}
         </button>
       </div>
 
       <div hidden={mode !== "write"} className="flex flex-col gap-1.5">
-        <div role="toolbar" aria-label="Formato" className="flex flex-wrap items-center gap-0.5 border-b border-border pb-1.5">
-          <ToolButton label="Negrita" onClick={() => edit((t) => wrap(t, "**", "**", "texto"))}>
+        <div role="toolbar" aria-label={t.admin.articles.editor.formatting} className="flex flex-wrap items-center gap-0.5 border-b border-border pb-1.5">
+          <ToolButton label={t.admin.articles.editor.bold} onClick={() => edit((ta) => wrap(ta, "**", "**", t.admin.articles.editor.textPlaceholder))}>
             <Bold />
           </ToolButton>
-          <ToolButton label="Cursiva" onClick={() => edit((t) => wrap(t, "*", "*", "texto"))}>
+          <ToolButton label={t.admin.articles.editor.italic} onClick={() => edit((ta) => wrap(ta, "*", "*", t.admin.articles.editor.textPlaceholder))}>
             <Italic />
           </ToolButton>
-          <ToolButton label="Título de sección" onClick={() => edit((t) => prefixLines(t, () => "## "))}>
+          <ToolButton label={t.admin.articles.editor.heading} onClick={() => edit((ta) => prefixLines(ta, () => "## "))}>
             <Heading2 />
           </ToolButton>
-          <ToolButton label="Lista" onClick={() => edit((t) => prefixLines(t, () => "- "))}>
+          <ToolButton label={t.admin.articles.editor.list} onClick={() => edit((ta) => prefixLines(ta, () => "- "))}>
             <List />
           </ToolButton>
-          <ToolButton label="Lista numerada" onClick={() => edit((t) => prefixLines(t, (i) => `${i + 1}. `))}>
+          <ToolButton label={t.admin.articles.editor.numberedList} onClick={() => edit((ta) => prefixLines(ta, (i) => `${i + 1}. `))}>
             <ListOrdered />
           </ToolButton>
-          <ToolButton label="Cita" onClick={() => edit((t) => prefixLines(t, () => "> "))}>
+          <ToolButton label={t.admin.articles.editor.quote} onClick={() => edit((ta) => prefixLines(ta, () => "> "))}>
             <Quote />
           </ToolButton>
           <ToolButton
-            label="Enlace"
-            onClick={() => edit((t) => {
-              const label = t.value.slice(t.selectionStart, t.selectionEnd) || "texto del enlace";
+            label={t.admin.articles.editor.link}
+            onClick={() => edit((ta) => {
+              const label = ta.value.slice(ta.selectionStart, ta.selectionEnd) || t.admin.articles.editor.linkPlaceholder;
               // Select the URL so it can be pasted over
-              replaceSelection(t, `[${label}](https://)`, label.length + 3, label.length + 11);
+              replaceSelection(ta, `[${label}](https://)`, label.length + 3, label.length + 11);
             })}
           >
             <Link2 />
           </ToolButton>
-          <ToolButton label="Tabla" onClick={() => edit((t) => insertBlock(t, TABLE_TEMPLATE))}>
+          <ToolButton label={t.admin.articles.editor.table} onClick={() => edit((ta) => insertBlock(ta, TABLE_TEMPLATE))}>
             <Table2 />
           </ToolButton>
-          <ToolButton label="Imagen" onClick={() => fileInput.current?.click()}>
+          <ToolButton label={t.admin.articles.editor.image} onClick={() => fileInput.current?.click()}>
             {uploading > 0 ? <Spinner className="size-4" /> : <ImagePlus />}
           </ToolButton>
           {/* No name: picked files are uploaded on their own, not sent with the form */}
@@ -400,13 +401,13 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           />
           <span aria-hidden className="mx-1 h-6 w-px bg-border" />
           <Button variant="ghost" size="sm" onClick={() => setPicker("driver")} disabled={options.drivers.length === 0}>
-            <AtSign /> Piloto
+            <AtSign /> {t.admin.articles.editor.driver}
           </Button>
           <Button variant="ghost" size="sm" onClick={openRacePicker} disabled={options.races.length === 0}>
-            <Flag /> Carrera
+            <Flag /> {t.admin.articles.editor.race}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setPicker("standings")}>
-            <Trophy /> Clasificación
+            <Trophy /> {t.admin.articles.editor.standings}
           </Button>
         </div>
         <MentionTextarea
@@ -417,7 +418,7 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           rows={22}
           aria-invalid={error ? true : undefined}
           defaultValue={state.values?.body ?? defaultValue ?? ""}
-          placeholder={"Escribe aquí. **Negrita**, *cursiva*, ## Títulos, listas con -…\nEscribe @ para mencionar a un piloto. Pega o arrastra imágenes."}
+          placeholder={t.admin.articles.editor.placeholder}
           className="font-mono text-sm leading-6"
           onPaste={(event) => {
             const images = imagesIn(event.clipboardData.files);
@@ -438,7 +439,7 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
         />
         {uploading > 0 && (
           <p className="flex items-center gap-2 text-xs text-fg-muted" role="status">
-            <Spinner className="size-3.5" /> Subiendo {uploading === 1 ? "imagen" : `${uploading} imágenes`}…
+            <Spinner className="size-3.5" /> {t.admin.articles.editor.uploading(uploading)}
           </p>
         )}
         {uploadError && (
@@ -466,8 +467,7 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
         </p>
       ) : (
         <p className="text-xs text-fg-subtle">
-          Markdown. Los bloques <code>{"{{…}}"}</code> muestran datos en directo; el texto tras <code>|</code> es solo una
-          etiqueta para ti.
+          {t.admin.articles.editor.help}
         </p>
       )}
 

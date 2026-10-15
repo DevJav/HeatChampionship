@@ -1,36 +1,37 @@
 import type { Tally } from "@/lib/stats";
 import { formatDecimal, formatPercent } from "@/lib/format";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
+import { t } from "@/i18n";
 
 export type TallyRow = { key: string | number; label: React.ReactNode; tally: Tally };
 
 type TallyTableProps = {
   /** Header of the first column, e.g. "Color" */
   labelHeader: string;
-  /** Header of the usage column, e.g. "Usos" or "Salidas" */
+  /** Header of the usage column, e.g. uses or starts */
   usesHeader?: string;
   rows: TallyRow[];
 };
 
 /** Outcomes per car color, upgrade or grid slot: uses, wins, podiums, win rate, average finish. */
-export function TallyTable({ labelHeader, usesHeader = "Usos", rows }: TallyTableProps) {
+export function TallyTable({ labelHeader, usesHeader = t.stats.uses, rows }: TallyTableProps) {
   return (
     <Table>
       <THead>
         <tr>
           <Th>{labelHeader}</Th>
           <Th align="center">{usesHeader}</Th>
-          <Th align="center" title="Victorias">
-            V
+          <Th align="center" title={t.common.columns.wins}>
+            {t.common.columns.winsShort}
           </Th>
-          <Th align="center" title="Podios">
-            P
+          <Th align="center" title={t.common.columns.podiums}>
+            {t.common.columns.podiumsShort}
           </Th>
-          <Th align="right" title="Porcentaje de victorias">
-            % V
+          <Th align="right" title={t.stats.columns.winRate}>
+            {t.stats.columns.winRateShort}
           </Th>
-          <Th align="right" className="max-sm:hidden" title="Posición media de llegada">
-            Media
+          <Th align="right" className="max-sm:hidden" title={t.stats.columns.average}>
+            {t.stats.columns.averageShort}
           </Th>
         </tr>
       </THead>

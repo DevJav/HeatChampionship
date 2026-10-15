@@ -6,6 +6,7 @@ import { completeProfileSetup } from "@/actions/profile";
 import { Alert, Avatar, ButtonLink, Field, Input, SubmitButton, Textarea } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { needsOutline } from "@/lib/colors";
+import { t } from "@/i18n";
 
 type ProfileSetupFormProps = {
   profile: { name: string; image: string | null; bio: string | null; favoriteColorId: string | null };
@@ -45,9 +46,9 @@ export function ProfileSetupForm({ profile, colors }: ProfileSetupFormProps) {
       <div className="flex flex-col items-center gap-4 sm:flex-row">
         <Avatar name={profile.name} src={preview ?? profile.image} color={color?.hex} size="xl" />
         <Field
-          label="Foto"
+          label={t.profile.photo}
           htmlFor="avatar"
-          hint="Se recorta en cuadrado. Sin foto se muestran tus iniciales."
+          hint={t.profile.photoHint}
           error={errors.avatar}
           className="w-full flex-1"
         >
@@ -68,10 +69,10 @@ export function ProfileSetupForm({ profile, colors }: ProfileSetupFormProps) {
 
       <fieldset className="flex flex-col gap-1.5">
         <legend className="mb-1.5 font-display text-xs font-bold uppercase tracking-wider text-fg-muted">
-          Color favorito
+          {t.profile.favoriteColor}
         </legend>
         <div className="flex flex-wrap gap-2.5">
-          <label title="Sin preferencia" className={cn(swatchClass, "border border-dashed border-border-strong text-fg-subtle")}>
+          <label title={t.profile.noPreference} className={cn(swatchClass, "border border-dashed border-border-strong text-fg-subtle")}>
             <input
               type="radio"
               name="favoriteColorId"
@@ -81,7 +82,7 @@ export function ProfileSetupForm({ profile, colors }: ProfileSetupFormProps) {
               className="sr-only"
             />
             <Ban className="size-4" aria-hidden />
-            <span className="sr-only">Sin preferencia</span>
+            <span className="sr-only">{t.profile.noPreference}</span>
           </label>
           {colors.map((c) => (
             <label key={c.id} title={c.name} className={cn(swatchClass, needsOutline(c.hex) && "border border-border-strong")}
@@ -104,17 +105,18 @@ export function ProfileSetupForm({ profile, colors }: ProfileSetupFormProps) {
           </p>
         ) : (
           <p className="text-xs text-fg-subtle">
-            {color ? `${color.name}. ` : ""}Tiñe tu avatar y tu franja en las gráficas.
+            {color ? `${color.name}. ` : ""}
+            {t.auth.welcome.colorHint}
           </p>
         )}
       </fieldset>
 
-      <Field label="Sobre ti" htmlFor="bio" error={errors.bio}>
+      <Field label={t.profile.bio} htmlFor="bio" error={errors.bio}>
         <Textarea
           id="bio"
           name="bio"
           maxLength={300}
-          placeholder="Estilo de conducción, circuito favorito, rivalidades…"
+          placeholder={t.profile.bioPlaceholder}
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           aria-invalid={!!errors.bio}
@@ -123,10 +125,10 @@ export function ProfileSetupForm({ profile, colors }: ProfileSetupFormProps) {
 
       <div className="mt-2 flex flex-col gap-2">
         <SubmitButton fullWidth size="lg">
-          Guardar y empezar
+          {t.auth.welcome.submit}
         </SubmitButton>
         <ButtonLink href="/" variant="ghost" fullWidth>
-          Ahora no
+          {t.auth.welcome.skip}
         </ButtonLink>
       </div>
     </form>

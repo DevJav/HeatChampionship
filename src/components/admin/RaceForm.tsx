@@ -7,6 +7,7 @@ import { toLocalInput } from "@/lib/dates";
 import { RACE_STATUS } from "@/lib/races";
 import { DateTimeField, FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
 import type { FormAction } from "@/lib/forms";
+import { t } from "@/i18n";
 
 type Option = { id: string; name: string };
 
@@ -28,17 +29,17 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
 
   return (
     <form action={formAction}>
-      <FormLayout state={state} submitLabel={race ? "Guardar cambios" : "Crear carrera"} cancelHref="/admin/carreras">
+      <FormLayout state={state} submitLabel={race ? t.admin.saveChanges : t.admin.racesAdmin.create} cancelHref="/admin/carreras">
         <SelectField
           name="seasonId"
-          label="Temporada"
+          label={t.admin.racesAdmin.season}
           state={state}
           defaultValue={race?.seasonId ?? defaults?.seasonId}
           options={seasons.map((s) => ({ value: s.id, label: s.name }))}
         />
         <TextField
           name="round"
-          label="Ronda"
+          label={t.admin.racesAdmin.round}
           type="number"
           min={1}
           state={state}
@@ -46,43 +47,43 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
         />
         <SelectField
           name="trackId"
-          label="Circuito"
+          label={t.admin.racesAdmin.track}
           state={state}
-          placeholder="Elige un circuito"
+          placeholder={t.admin.racesAdmin.chooseTrack}
           defaultValue={race?.trackId}
-          options={tracks.map((t) => ({
-            value: t.id,
-            label: t.defaultLaps ? `${t.name} (${t.defaultLaps} vueltas)` : t.name,
+          options={tracks.map((track) => ({
+            value: track.id,
+            label: track.defaultLaps ? t.admin.racesAdmin.trackWithLaps(track.name, track.defaultLaps) : track.name,
           }))}
         />
         <TextField
           name="laps"
-          label="Vueltas"
+          label={t.admin.racesAdmin.laps}
           type="number"
           min={1}
           state={state}
-          hint="Vacío = las del circuito"
+          hint={t.admin.racesAdmin.lapsHint}
           defaultValue={race?.laps}
         />
         <DateTimeField
           name="scheduledAt"
-          label="Fecha y hora"
+          label={t.admin.racesAdmin.dateTime}
           state={state}
-          hint={`Hora de ${siteConfig.timeZone.split("/")[1]}`}
+          hint={t.admin.racesAdmin.timeZoneHint(siteConfig.timeZone.split("/").at(-1)!.replaceAll("_", " "))}
           defaultValue={race ? toLocalInput(race.scheduledAt) : undefined}
         />
         <DateTimeField
           name="signupDeadline"
-          label="Cierre de inscripciones"
+          label={t.admin.racesAdmin.signupDeadline}
           clearable
           state={state}
-          hint="Opcional. Sin fecha, se cierran al empezar la carrera."
+          hint={t.admin.racesAdmin.signupDeadlineHint}
           defaultValue={race?.signupDeadline ? toLocalInput(race.signupDeadline) : undefined}
         />
-        <TextField name="location" label="Lugar" state={state} placeholder="Casa de Javier" defaultValue={race?.location} />
+        <TextField name="location" label={t.admin.racesAdmin.location} state={state} placeholder={t.admin.racesAdmin.locationPlaceholder} defaultValue={race?.location} />
         <TextField
           name="maxPlayers"
-          label="Plazas"
+          label={t.admin.racesAdmin.seats}
           type="number"
           min={2}
           max={siteConfig.maxPlayersPerRace}
@@ -91,13 +92,13 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
         />
         <SelectField
           name="status"
-          label="Estado"
+          label={t.admin.status}
           state={state}
           disabled={finished}
           hint={
             finished
-              ? "Finalizada al registrar resultados."
-              : "Borrador: oculta. Abierta: se pueden inscribir hasta el cierre o el inicio de la carrera."
+              ? t.admin.racesAdmin.statusFinishedHint
+              : t.admin.racesAdmin.statusHint
           }
           defaultValue={race?.status ?? "DRAFT"}
           options={(finished ? (["FINISHED"] as RaceStatus[]) : editableStatuses).map((status) => ({
@@ -107,10 +108,10 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
         />
         <TextareaField
           name="notes"
-          label="Notas"
+          label={t.admin.racesAdmin.notes}
           state={state}
           className="md:col-span-2"
-          placeholder="Reglas especiales, qué traer, módulos que se usan…"
+          placeholder={t.admin.racesAdmin.notesPlaceholder}
           defaultValue={race?.notes}
         />
       </FormLayout>

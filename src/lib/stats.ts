@@ -1,5 +1,6 @@
 /** Championship statistics — pure functions, unit-tested in stats.test.ts. */
 
+import { intlLocale, t } from "@/i18n";
 import { summarizePlayer, type PlayerResult, type PlayerSummary } from "./player-stats";
 import { positionsGained } from "./scoring";
 
@@ -191,7 +192,7 @@ export function championshipRecords(races: StatsRace[]) {
       holders: comeback.items.map(({ race, result }) => ({
         userId: result.userId,
         race: raceRef(race),
-        detail: `Salió ${result.startPosition}º, llegó ${result.position}º`,
+        detail: t.achievements.startedFinished(t.common.ordinal(result.startPosition!), t.common.ordinal(result.position)),
       })),
     },
     winFromFurthestBack: furthestBack && {
@@ -288,7 +289,7 @@ export function trackStats(races: StatsRace[]): TrackStats[] {
         lastWinnerId: winners.at(-1) ?? null,
       };
     })
-    .sort((a, b) => b.races - a.races || a.trackName.localeCompare(b.trackName, "es"));
+    .sort((a, b) => b.races - a.races || a.trackName.localeCompare(b.trackName, intlLocale));
 }
 
 /** Outcome tally for anything a result can carry (a car color, an upgrade, a grid slot). */

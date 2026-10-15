@@ -4,10 +4,11 @@ import { ChevronRight, History } from "lucide-react";
 import { ButtonLink, Card, Container, EmptyState, PageHeader, Skeleton } from "@/components/ui";
 import { ActivityByDay } from "@/components/activity/ActivityList";
 import { listActivity } from "@/lib/data/activity";
+import { t } from "@/i18n";
 
 export const metadata: Metadata = {
-  title: "Actividad",
-  description: "Lo último del campeonato: nuevos pilotos, inscripciones, resultados y más.",
+  title: t.activity.title,
+  description: t.activity.description,
 };
 
 const PAGE_SIZE = 50;
@@ -21,8 +22,8 @@ async function ActivityView({ searchParams }: { searchParams: PageProps<"/activi
     return (
       <EmptyState
         icon={<History />}
-        title="Todavía no hay actividad"
-        description="Aquí aparecerán los nuevos pilotos, las inscripciones y los resultados."
+        title={t.activity.empty}
+        description={t.activity.emptyDescription}
       />
     );
   }
@@ -34,7 +35,7 @@ async function ActivityView({ searchParams }: { searchParams: PageProps<"/activi
       </Card>
       {nextCursor && (
         <ButtonLink href={`/actividad?desde=${nextCursor}`} variant="secondary" size="sm" className="self-center">
-          Más antigua <ChevronRight />
+          {t.activity.older} <ChevronRight />
         </ButtonLink>
       )}
     </div>
@@ -44,7 +45,7 @@ async function ActivityView({ searchParams }: { searchParams: PageProps<"/activi
 export default function ActivityPage({ searchParams }: PageProps<"/actividad">) {
   return (
     <Container className="max-w-3xl">
-      <PageHeader title="Actividad" description="Lo último del campeonato: nuevos pilotos, inscripciones, resultados y más." />
+      <PageHeader title={t.activity.title} description={t.activity.description} />
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <ActivityView searchParams={searchParams} />
       </Suspense>

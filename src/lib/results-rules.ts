@@ -1,5 +1,7 @@
 /** Validation for a race's results sheet — pure, unit-tested in results-rules.test.ts. */
 
+import { t } from "@/i18n";
+
 export type ResultRow = {
   userId: string;
   /** Finishing position — everyone finishes in Heat */
@@ -40,17 +42,17 @@ export function validateResults(rows: ResultRow[]): ResultsValidation {
     rowErrors[userId] = { ...rowErrors[userId], [field]: message };
   };
 
-  if (rows.length === 0) return { error: "No hay pilotos en la carrera.", rowErrors };
+  if (rows.length === 0) return { error: t.admin.results.noDriversError, rowErrors };
 
   // Finishing positions: everyone finishes, so unique and within 1..n (hence exactly 1..n)
   const repeatedPositions = duplicates(rows.map((row) => row.position));
   for (const row of rows) {
-    if (row.position < 1 || row.position > rows.length) flag(row.userId, "position", "Posición no válida.");
-    else if (repeatedPositions.has(row.position)) flag(row.userId, "position", "Posición repetida.");
+    if (row.position < 1 || row.position > rows.length) flag(row.userId, "position", t.admin.results.invalidPosition);
+    else if (repeatedPositions.has(row.position)) flag(row.userId, "position", t.admin.results.repeatedPosition);
   }
 
   for (const row of rows) {
-    if (row.spins < 0 || row.spins > MAX_SPINS) flag(row.userId, "spins", "Trompos no válidos.");
+    if (row.spins < 0 || row.spins > MAX_SPINS) flag(row.userId, "spins", t.admin.results.invalidSpins);
   }
 
   // Starting grid: optional, but unique and within the field size
@@ -58,18 +60,18 @@ export function validateResults(rows: ResultRow[]): ResultsValidation {
   const repeatedStarts = duplicates(starters.map((row) => row.startPosition));
   for (const row of starters) {
     if (row.startPosition! < 1 || row.startPosition! > rows.length) {
-      flag(row.userId, "startPosition", "Posición de salida no válida.");
+      flag(row.userId, "startPosition", t.admin.results.invalidStart);
     } else if (repeatedStarts.has(row.startPosition)) {
-      flag(row.userId, "startPosition", "Salida repetida.");
+      flag(row.userId, "startPosition", t.admin.results.repeatedStart);
     }
   }
 
   // Car colors: optional, one car per color
   const repeatedColors = duplicates(rows.filter((row) => row.carColorId).map((row) => row.carColorId));
   for (const row of rows) {
-    if (row.carColorId && repeatedColors.has(row.carColorId)) flag(row.userId, "carColorId", "Color repetido.");
+    if (row.carColorId && repeatedColors.has(row.carColorId)) flag(row.userId, "carColorId", t.admin.results.repeatedColor);
   }
 
-  const error = Object.keys(rowErrors).length > 0 ? "Revisa los campos marcados." : undefined;
+  const error = Object.keys(rowErrors).length > 0 ? t.admin.results.checkFields : undefined;
   return { error, rowErrors };
 }

@@ -7,6 +7,7 @@ import { notifyRaceResults } from "@/lib/notify";
 import { clearRaceResults, saveRaceResults } from "@/lib/results";
 import { MAX_SPINS, validateResults, type ResultsValidation } from "@/lib/results-rules";
 import { requireAdmin } from "@/lib/session";
+import { t } from "@/i18n";
 
 const rowSchema = z.object({
   userId: z.string().min(1),
@@ -32,7 +33,7 @@ const sheetSchema = z.array(rowSchema).max(20);
 export async function saveResults(raceId: string, input: unknown): Promise<ResultsValidation> {
   await requireAdmin();
   const parsed = sheetSchema.safeParse(input);
-  if (!parsed.success) return { error: "Datos no válidos. Recarga la página.", rowErrors: {} };
+  if (!parsed.success) return { error: t.admin.results.invalidData, rowErrors: {} };
 
   const validation = validateResults(parsed.data);
   if (validation.error) return validation;

@@ -1,5 +1,6 @@
 import type { SeasonStandings } from "@/lib/data/standings";
 import { cn } from "@/lib/cn";
+import { t } from "@/i18n";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
@@ -23,25 +24,25 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
       <THead>
         <tr>
           <Th align="center" className="w-20">
-            Pos.
+            {t.common.columns.position}
           </Th>
-          {!compact && <Th className="w-10 px-0" aria-label="Movimiento" />}
-          <Th>Piloto</Th>
-          <Th align="right">Pts</Th>
+          {!compact && <Th className="w-10 px-0" aria-label={t.common.columns.movement} />}
+          <Th>{t.common.columns.driver}</Th>
+          <Th align="right">{t.common.columns.points}</Th>
           <Th align="right" className="max-sm:hidden">
-            Dif.
+            {t.common.columns.gap}
           </Th>
           {!compact && (
             <>
-              <Th align="center" title="Victorias">
-                V
+              <Th align="center" title={t.common.columns.wins}>
+                {t.common.columns.winsShort}
               </Th>
-              <Th align="center" title="Podios">
-                P
+              <Th align="center" title={t.common.columns.podiums}>
+                {t.common.columns.podiumsShort}
               </Th>
               {races.map((race) => (
-                <Th key={race.id} align="center" className="max-lg:hidden" title={`Ronda ${race.round} · ${race.track.name}`}>
-                  R{race.round}
+                <Th key={race.id} align="center" className="max-lg:hidden" title={`${t.common.round(race.round)} · ${race.track.name}`}>
+                  {t.common.roundShort(race.round)}
                 </Th>
               ))}
             </>
@@ -93,9 +94,9 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
                                 "inline-block min-w-8 -skew-x-12 pl-1.5 pr-[calc(0.375rem+0.14em)] font-display text-sm font-bold italic",
                               podiumChipClass(position),
                             )}
-                            title={`${row.pointsByRace[race.id]} pts`}
+                            title={`${row.pointsByRace[race.id]} ${t.common.pts}`}
                           >
-                            {position}º
+                            {t.common.ordinal(position)}
                           </span>
                         )}
                       </Td>

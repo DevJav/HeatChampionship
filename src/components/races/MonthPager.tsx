@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui";
+import { t } from "@/i18n";
 
 export type MonthPage = {
   /** "2026-11" */
@@ -13,7 +14,7 @@ export type MonthPage = {
 
 type MonthPagerProps = {
   months: MonthPage[];
-  /** Month shown first and by "Hoy" */
+  /** Month shown first and by the "today" button */
   current: string;
 };
 
@@ -28,7 +29,7 @@ export function MonthPager({ months, current }: MonthPagerProps) {
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Mes anterior"
+          aria-label={t.races.previousMonth}
           disabled={index === 0}
           onClick={() => setIndex(index - 1)}
         >
@@ -40,7 +41,7 @@ export function MonthPager({ months, current }: MonthPagerProps) {
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Mes siguiente"
+          aria-label={t.races.nextMonth}
           disabled={index === months.length - 1}
           onClick={() => setIndex(index + 1)}
         >
@@ -53,7 +54,7 @@ export function MonthPager({ months, current }: MonthPagerProps) {
           disabled={month.key === current}
           onClick={() => setIndex(months.findIndex((m) => m.key === current))}
         >
-          Hoy
+          {t.common.today}
         </Button>
       </div>
       {months.map((m) => (

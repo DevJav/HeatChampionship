@@ -3,6 +3,7 @@
  * Pure functions, unit-tested in achievements.test.ts.
  */
 
+import { t } from "@/i18n";
 import { positionsGained } from "./scoring";
 import { computeStandings } from "./standings";
 import type { RaceRef, StatsRace } from "./stats";
@@ -49,24 +50,26 @@ const FROM_THE_BACK_MIN_FIELD = 3;
 /** "Incansable" only counts seasons with a few races */
 const IRONMAN_MIN_RACES = 3;
 
+const text = t.achievements.list;
+
 /** Every achievement, in display order. */
 export const ACHIEVEMENTS: AchievementDefinition[] = [
-  { id: "champion", name: "Campeón", description: "Ganó una temporada.", tier: "gold", trophy: true, repeatable: true },
-  { id: "runner-up", name: "Subcampeón", description: "Segundo en una temporada.", tier: "silver", trophy: true, repeatable: true },
-  { id: "third", name: "Tercero", description: "Tercero en una temporada.", tier: "bronze", trophy: true, repeatable: true },
-  { id: "from-the-back", name: "Desde el fondo", description: "Ganó saliendo el último de la parrilla.", tier: "special", repeatable: true },
-  { id: "hat-trick", name: "Hat-trick", description: `${HAT_TRICK_WINS} victorias seguidas.`, tier: "special", repeatable: true },
-  { id: "podium-streak", name: "Fijo en el podio", description: `${PODIUM_STREAK} podios seguidos.`, tier: "special", repeatable: true },
-  { id: "comeback", name: "Remontada", description: `Ganó ${COMEBACK_PLACES} o más posiciones en una carrera.`, tier: "special", repeatable: true },
-  { id: "pole-to-win", name: "De principio a fin", description: "Ganó saliendo primero.", tier: "special", repeatable: true },
-  { id: "globetrotter", name: "Trotamundos", description: `Ganó en ${GLOBETROTTER_TRACKS} circuitos distintos.`, tier: "special" },
-  { id: "ironman", name: "Incansable", description: "Corrió todas las carreras de una temporada.", tier: "special", repeatable: true },
-  { id: "first-win", name: "Primera victoria", description: "Ganó su primera carrera.", tier: "common" },
-  { id: "first-podium", name: "Primer podio", description: "Subió al podio por primera vez.", tier: "common" },
-  { id: "first-race", name: "Debut", description: "Corrió su primera carrera.", tier: "common" },
-  { id: "veteran", name: "Veterano", description: `${VETERAN_STARTS} carreras disputadas.`, tier: "common" },
-  { id: "legend", name: "Leyenda", description: `${LEGEND_STARTS} carreras disputadas.`, tier: "special" },
-  { id: "spin", name: "Trompo", description: "Su primer trompo. Le pasa a cualquiera.", tier: "common" },
+  { id: "champion", ...text["champion"], tier: "gold", trophy: true, repeatable: true },
+  { id: "runner-up", ...text["runner-up"], tier: "silver", trophy: true, repeatable: true },
+  { id: "third", ...text["third"], tier: "bronze", trophy: true, repeatable: true },
+  { id: "from-the-back", ...text["from-the-back"], tier: "special", repeatable: true },
+  { id: "hat-trick", ...text["hat-trick"], description: text["hat-trick"].description(HAT_TRICK_WINS), tier: "special", repeatable: true },
+  { id: "podium-streak", ...text["podium-streak"], description: text["podium-streak"].description(PODIUM_STREAK), tier: "special", repeatable: true },
+  { id: "comeback", ...text["comeback"], description: text["comeback"].description(COMEBACK_PLACES), tier: "special", repeatable: true },
+  { id: "pole-to-win", ...text["pole-to-win"], tier: "special", repeatable: true },
+  { id: "globetrotter", ...text["globetrotter"], description: text["globetrotter"].description(GLOBETROTTER_TRACKS), tier: "special" },
+  { id: "ironman", ...text["ironman"], tier: "special", repeatable: true },
+  { id: "first-win", ...text["first-win"], tier: "common" },
+  { id: "first-podium", ...text["first-podium"], tier: "common" },
+  { id: "first-race", ...text["first-race"], tier: "common" },
+  { id: "veteran", ...text["veteran"], description: text["veteran"].description(VETERAN_STARTS), tier: "common" },
+  { id: "legend", ...text["legend"], description: text["legend"].description(LEGEND_STARTS), tier: "special" },
+  { id: "spin", ...text["spin"], tier: "common" },
 ];
 
 export const ACHIEVEMENT_BY_ID = new Map(ACHIEVEMENTS.map((a) => [a.id, a]));

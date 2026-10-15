@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { t } from "@/i18n";
 
 const { locale, timeZone } = siteConfig;
 
@@ -33,6 +34,13 @@ const percentFormat = new Intl.NumberFormat(locale, { style: "percent", maximumF
 
 /** 0.25 → "25 %" */
 export const formatPercent = (value: number) => percentFormat.format(value);
+
+const listFormat = new Intl.ListFormat(locale, { type: "conjunction" });
+
+/** "Ana", "Ana y Marco", "Ana, Marco y Lucía", "Ana, Marco, Lucía y 2 más" */
+export function formatNames(names: string[], max = 3) {
+  return names.length <= max ? listFormat.format(names) : t.common.namesAndMore(names.slice(0, max), names.length - max);
+}
 
 /** "1 carrera" / "3 carreras" */
 export const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
@@ -76,7 +84,7 @@ const relativeFormat = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
 export function formatRelative(date: Date, now = new Date()) {
   const seconds = Math.round((date.getTime() - now.getTime()) / 1000);
   const abs = Math.abs(seconds);
-  if (abs < 60) return "ahora";
+  if (abs < 60) return t.common.now;
   if (abs < 3600) return relativeFormat.format(Math.round(seconds / 60), "minute");
   if (abs < 86_400) return relativeFormat.format(Math.round(seconds / 3600), "hour");
   if (abs < 7 * 86_400) return relativeFormat.format(Math.round(seconds / 86_400), "day");

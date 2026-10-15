@@ -2,6 +2,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
 import { logRegistration } from "./log-activity";
 import { assignSeats, canWithdraw, SIGNUP_CLOSED_MESSAGES, signupWindow } from "./registration-rules";
+import { t } from "@/i18n";
 
 /** Sign-up database operations. All seat changes go through rebalanceSeats(). */
 
@@ -34,7 +35,7 @@ type JoinOptions = {
 export async function joinRace(raceId: string, userId: string, { force = false }: JoinOptions = {}) {
   return db.$transaction(async (tx) => {
     const race = await tx.race.findUnique({ where: { id: raceId } });
-    if (!race) throw new RegistrationError("La carrera no existe.");
+    if (!race) throw new RegistrationError(t.races.signupPanel.errors.notFound);
     if (!force) {
       const window = signupWindow(race);
       if (!window.open) throw new RegistrationError(SIGNUP_CLOSED_MESSAGES[window.reason]);
@@ -42,7 +43,7 @@ export async function joinRace(raceId: string, userId: string, { force = false }
 
     const existing = await tx.registration.findUnique({ where: { raceId_userId: { raceId, userId } } });
     if (existing && existing.status !== "WITHDRAWN") {
-      throw new RegistrationError("Ya estás inscrito en esta carrera.");
+      throw new RegistrationError(t.races.signupPanel.errors.alreadyIn);
     }
 
     // Re-joining puts you at the back of the queue
@@ -64,9 +65,9 @@ export async function joinRace(raceId: string, userId: string, { force = false }
 export async function leaveRace(raceId: string, userId: string, { force = false }: JoinOptions = {}) {
   await db.$transaction(async (tx) => {
     const race = await tx.race.findUnique({ where: { id: raceId } });
-    if (!race) throw new RegistrationError("La carrera no existe.");
+    if (!race) throw new RegistrationError(t.races.signupPanel.errors.notFound);
     if (!force && !canWithdraw(race)) {
-      throw new RegistrationError("Ya no puedes retirarte. Habla con el organizador.");
+      throw new RegistrationError(t.races.signupPanel.errors.tooLateToLeave);
     }
 
     const existing = await tx.registration.findUnique({ where: { raceId_userId: { raceId, userId } } });

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Button } from "./Button";
+import { t } from "@/i18n";
 
 type ModalProps = {
   open: boolean;
@@ -54,7 +55,7 @@ export function Modal({
             <h2 className="text-xl">{title}</h2>
             {description && <p className="text-sm opacity-70">{description}</p>}
           </div>
-          <Button variant="inverse" size="icon" onClick={onClose} aria-label="Cerrar">
+          <Button variant="inverse" size="icon" onClick={onClose} aria-label={t.forms.close}>
             <X />
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import type { ArticleCategory, ArticleStatus } from "@/generated/prisma/client";
+import { t } from "@/i18n";
 
 /**
  * Articles are Markdown (GitHub flavor: tables, autolinks…) plus two additions:
@@ -12,10 +13,10 @@ import type { ArticleCategory, ArticleStatus } from "@/generated/prisma/client";
 type Tone = "neutral" | "primary" | "accent" | "success" | "warning" | "danger" | "info" | "bar";
 
 export const ARTICLE_CATEGORY: Record<ArticleCategory, { label: string; plural: string; param: string; tone: Tone }> = {
-  PREVIEW: { label: "Previa", plural: "Previas", param: "previas", tone: "accent" },
-  REPORT: { label: "Crónica", plural: "Crónicas", param: "cronicas", tone: "primary" },
-  NEWS: { label: "Novedades", plural: "Novedades", param: "novedades", tone: "info" },
-  RULES: { label: "Reglamento", plural: "Reglamento", param: "reglamento", tone: "bar" },
+  PREVIEW: { ...t.articles.category.PREVIEW, param: "previas", tone: "accent" },
+  REPORT: { ...t.articles.category.REPORT, param: "cronicas", tone: "primary" },
+  NEWS: { ...t.articles.category.NEWS, param: "novedades", tone: "info" },
+  RULES: { ...t.articles.category.RULES, param: "reglamento", tone: "bar" },
 };
 
 export const ARTICLE_CATEGORIES = Object.keys(ARTICLE_CATEGORY) as ArticleCategory[];
@@ -26,8 +27,8 @@ export function categoryFromParam(param: unknown): ArticleCategory | null {
 }
 
 export const ARTICLE_STATUS: Record<ArticleStatus, { label: string; tone: Tone }> = {
-  DRAFT: { label: "Borrador", tone: "neutral" },
-  PUBLISHED: { label: "Publicado", tone: "success" },
+  DRAFT: { label: t.articles.status.DRAFT, tone: "neutral" },
+  PUBLISHED: { label: t.articles.status.PUBLISHED, tone: "success" },
 };
 
 /** Longest comment allowed, in characters */

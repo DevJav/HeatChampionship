@@ -7,6 +7,7 @@ import type { NotificationFeed } from "@/lib/data/notifications";
 import { Button, Card, EmptyState } from "@/components/ui";
 import { readAll, readOne } from "./NotificationBell";
 import { NotificationList } from "./NotificationList";
+import { t } from "@/i18n";
 
 /** The full notifications list, with "mark all as read". */
 export function NotificationsPage({ initial }: { initial: NotificationFeed }) {
@@ -16,8 +17,8 @@ export function NotificationsPage({ initial }: { initial: NotificationFeed }) {
     return (
       <EmptyState
         icon={<Bell />}
-        title="No tienes notificaciones"
-        description="Te avisaremos cuando te mencionen, te respondan o haya resultados de tus carreras."
+        title={t.notifications.emptyTitle}
+        description={t.notifications.emptyDescription}
       />
     );
   }
@@ -34,7 +35,7 @@ export function NotificationsPage({ initial }: { initial: NotificationFeed }) {
             markAllNotificationsRead();
           }}
         >
-          <CheckCheck /> Marcar todas como leídas
+          <CheckCheck /> {t.notifications.markAllRead}
         </Button>
       )}
       <Card>

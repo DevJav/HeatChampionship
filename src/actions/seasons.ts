@@ -7,6 +7,7 @@ import { logSeasonStatusChange } from "@/lib/log-activity";
 import { int, parseForm, text, type FormState } from "@/lib/forms";
 import { recomputeSeasonPoints } from "@/lib/results";
 import { requireAdmin } from "@/lib/session";
+import { t } from "@/i18n";
 
 /** "9, 6, 4, 3, 2, 1" → [9, 6, 4, 3, 2, 1] */
 const pointsTable = z.string().transform((value, ctx) => {
@@ -15,7 +16,7 @@ const pointsTable = z.string().transform((value, ctx) => {
   if (parts.length === 0 || parts.length > 12 || points.some((p) => !Number.isInteger(p) || p < 0 || p > 100)) {
     ctx.addIssue({
       code: "custom",
-      message: "Entre 1 y 12 números enteros separados por comas, p. ej. 9, 6, 4, 3, 2, 1.",
+      message: t.admin.seasons.pointsTableError,
     });
     return z.NEVER;
   }

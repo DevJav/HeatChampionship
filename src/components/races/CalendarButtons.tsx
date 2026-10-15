@@ -1,5 +1,6 @@
 import { CalendarPlus } from "lucide-react";
 import { buttonVariants } from "@/components/ui";
+import { t } from "@/i18n";
 
 type CalendarButtonsProps = {
   /** Path of the race's .ics route */
@@ -15,7 +16,7 @@ export function CalendarButtons({ icsHref, googleHref, variant = "inverse" }: Ca
   return (
     <>
       <a href={icsHref} className={buttonVariants({ variant, size: "sm" })}>
-        <CalendarPlus /> Añadir al calendario
+        <CalendarPlus /> {t.races.share.addToCalendar}
       </a>
       <a href={googleHref} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant, size: "sm" })}>
         Google Calendar

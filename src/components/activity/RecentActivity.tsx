@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { listActivity } from "@/lib/data/activity";
 import { ButtonLink, Card, Section } from "@/components/ui";
 import { ActivityList } from "./ActivityList";
+import { t } from "@/i18n";
 
 /**
  * The latest goings-on in the league, under the news on the home page.
@@ -13,10 +14,10 @@ export async function RecentActivity() {
 
   return (
     <Section
-      title="Actividad"
+      title={t.activity.title}
       actions={
         <ButtonLink href="/actividad" variant="secondary" size="sm">
-          Ver todo <ChevronRight />
+          {t.activity.seeAll} <ChevronRight />
         </ButtonLink>
       }
     >

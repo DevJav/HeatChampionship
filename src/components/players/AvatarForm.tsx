@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { ImagePlus } from "lucide-react";
 import { uploadAvatar } from "@/actions/profile";
 import { Alert, Input, SubmitButton } from "@/components/ui";
+import { t } from "@/i18n";
 
 /** Upload a new profile picture (cropped to a square on the server). */
 export function AvatarForm() {
@@ -18,11 +19,11 @@ export function AvatarForm() {
           name="avatar"
           accept="image/*"
           required
-          aria-label="Foto de perfil"
+          aria-label={t.profile.photoLabel}
           className="h-auto py-1.5 file:mr-3 file:border-0 file:bg-border file:px-3 file:py-1 file:text-sm file:font-semibold sm:flex-1"
         />
         <SubmitButton variant="secondary">
-          <ImagePlus /> Subir foto
+          <ImagePlus /> {t.profile.uploadPhoto}
         </SubmitButton>
       </div>
     </form>

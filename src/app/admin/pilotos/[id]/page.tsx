@@ -8,10 +8,11 @@ import { AdminSuspense } from "@/components/admin/AdminSuspense";
 import { DeleteForm } from "@/components/admin/DeleteForm";
 import { UserNameForm, UserPasswordForm } from "@/components/admin/UserForms";
 import { getAdminUser } from "@/lib/data/users";
-import { formatDate, plural } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Editar piloto · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.users.edit) };
 
 async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]">) {
   const { id } = await params;
@@ -30,21 +31,20 @@ async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]
             <span>
               <CardTitle>{user.name}</CardTitle>
               <CardDescription>
-                @{user.username} · alta el {formatDate(user.createdAt)}
+                @{user.username} · {t.admin.users.joinedOn(formatDate(user.createdAt))}
               </CardDescription>
             </span>
           </span>
-          {isAdmin ? <Badge tone="primary">Admin</Badge> : <Badge tone="bar">Piloto</Badge>}
+          {isAdmin ? <Badge tone="primary">{t.admin.users.admin}</Badge> : <Badge tone="bar">{t.admin.users.driver}</Badge>}
         </CardHeader>
         <CardBody className="flex flex-col gap-2 text-sm text-fg-muted">
           <p>
-            {plural(user._count.results, "carrera con resultado", "carreras con resultado")} ·{" "}
-            {plural(user._count.registrations, "inscripción", "inscripciones")} ·{" "}
-            {plural(user._count.sessions, "sesión abierta", "sesiones abiertas")}
+            {t.admin.users.resultsCount(user._count.results)} · {t.admin.users.registrationsCount(user._count.registrations)} ·{" "}
+            {t.admin.users.sessionsCount(user._count.sessions)}
           </p>
           {user.username && (
             <Link href={`/pilotos/${user.username}`} className="font-semibold text-fg hover:text-primary hover:underline">
-              Ver perfil público
+              {t.admin.users.viewPublic}
             </Link>
           )}
         </CardBody>
@@ -53,7 +53,7 @@ async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Nombre</CardTitle>
+            <CardTitle>{t.admin.users.name}</CardTitle>
           </CardHeader>
           <CardBody>
             <UserNameForm action={renameUser.bind(null, user.id)} name={user.name} />
@@ -63,8 +63,8 @@ async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Contraseña</CardTitle>
-              <CardDescription>Para quien la haya olvidado.</CardDescription>
+              <CardTitle>{t.admin.users.password}</CardTitle>
+              <CardDescription>{t.admin.users.passwordDescription}</CardDescription>
             </div>
           </CardHeader>
           <CardBody>
@@ -75,19 +75,19 @@ async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Rol</CardTitle>
-              <CardDescription>Los administradores gestionan carreras, resultados y pilotos.</CardDescription>
+              <CardTitle>{t.admin.users.role_}</CardTitle>
+              <CardDescription>{t.admin.users.roleDescription}</CardDescription>
             </div>
           </CardHeader>
           <CardBody>
             {isSelf ? (
-              <p className="text-sm text-fg-muted">No puedes quitarte el rol de administrador a ti mismo.</p>
+              <p className="text-sm text-fg-muted">{t.admin.users.cantDemoteSelf}</p>
             ) : (
               <form action={setUserRole.bind(null, user.id)}>
                 <input type="hidden" name="role" value={isAdmin ? "user" : "admin"} />
                 <SubmitButton variant={isAdmin ? "secondary" : "primary"}>
                   {isAdmin ? <ShieldOff /> : <ShieldCheck />}
-                  {isAdmin ? "Quitar administrador" : "Hacer administrador"}
+                  {isAdmin ? t.admin.users.removeAdmin : t.admin.users.makeAdmin}
                 </SubmitButton>
               </form>
             )}
@@ -96,24 +96,21 @@ async function AdminPlayerPageContent({ params }: PageProps<"/admin/pilotos/[id]
 
         <Card>
           <CardHeader>
-            <CardTitle>Eliminar cuenta</CardTitle>
+            <CardTitle>{t.admin.users.deleteAccount}</CardTitle>
           </CardHeader>
           <CardBody className="flex flex-col items-start gap-3 text-sm text-fg-muted">
             {isSelf ? (
-              <p>No puedes eliminar tu propia cuenta.</p>
+              <p>{t.admin.users.cantDeleteSelf}</p>
             ) : user._count.results > 0 ? (
-              <p>
-                Tiene resultados en {plural(user._count.results, "carrera", "carreras")}: eliminarle cambiaría clasificaciones pasadas, así que no
-                se puede.
-              </p>
+              <p>{t.admin.users.hasResults(t.common.races(user._count.results))}</p>
             ) : (
               <>
-                <p>Borra la cuenta y sus inscripciones. No tiene resultados, así que las clasificaciones no cambian.</p>
+                <p>{t.admin.users.deleteDescription}</p>
                 <DeleteForm
                   action={deleteUser.bind(null, user.id)}
-                  title={`¿Eliminar a ${user.name}?`}
-                  description="No se puede deshacer."
-                  label="Eliminar cuenta"
+                  title={t.admin.users.deleteTitle(user.name)}
+                  description={t.admin.users.cantUndo}
+                  label={t.admin.users.deleteAccount}
                 />
               </>
             )}

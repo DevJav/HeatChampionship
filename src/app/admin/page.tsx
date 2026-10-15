@@ -6,8 +6,9 @@ import { Badge, Card, CardBody, CardDescription, CardHeader, CardTitle, SubmitBu
 import { getSettings } from "@/lib/data/settings";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Administración" };
+export const metadata: Metadata = { title: t.admin.title };
 
 async function RegistrationSettings() {
   const { registrationOpen } = await getSettings();
@@ -16,24 +17,24 @@ async function RegistrationSettings() {
     <Card>
       <CardHeader>
         <div>
-          <CardTitle>Registro de pilotos</CardTitle>
-          <CardDescription>Controla si se pueden crear cuentas nuevas.</CardDescription>
+          <CardTitle>{t.admin.registration.title}</CardTitle>
+          <CardDescription>{t.admin.registration.description}</CardDescription>
         </div>
         <Badge tone={registrationOpen ? "success" : "danger"}>
-          {registrationOpen ? "Abierto" : "Cerrado"}
+          {registrationOpen ? t.admin.registration.open : t.admin.registration.closed}
         </Badge>
       </CardHeader>
       <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-fg-muted">
           {registrationOpen
-            ? "Cualquiera con el enlace puede registrarse. Ciérralo cuando estén todos tus amigos."
-            : "Nadie puede registrarse. Ábrelo para que se unan nuevos pilotos."}
+            ? t.admin.registration.openHint
+            : t.admin.registration.closedHint}
         </p>
         <form action={updateRegistrationOpen}>
           <input type="hidden" name="open" value={String(!registrationOpen)} />
           <SubmitButton variant={registrationOpen ? "secondary" : "primary"}>
             {registrationOpen ? <Lock /> : <LockOpen />}
-            {registrationOpen ? "Cerrar registro" : "Abrir registro"}
+            {registrationOpen ? t.admin.registration.close : t.admin.registration.reopen}
           </SubmitButton>
         </form>
       </CardBody>
@@ -48,9 +49,9 @@ async function AdminPageContent() {
     <div className="flex flex-col gap-10">
       <RegistrationSettings />
       <p className="text-sm text-fg-muted">
-        Para cambiar contraseñas, nombres o roles de los pilotos, ve a la pestaña{" "}
+        {t.admin.driversHint}{" "}
         <Link href="/admin/pilotos" className="font-semibold text-fg hover:text-primary hover:underline">
-          Pilotos
+          {t.admin.tabs.drivers}
         </Link>
         .
       </p>

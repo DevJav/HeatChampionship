@@ -7,8 +7,9 @@ import { ProfileSetupForm } from "@/components/players/ProfileSetupForm";
 import { listCarColors } from "@/lib/data/catalog";
 import { getEditableProfile } from "@/lib/data/players";
 import { requireUser } from "@/lib/session";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Bienvenida" };
+export const metadata: Metadata = { title: t.auth.welcome.title };
 
 async function ProfileSetup() {
   const user = await requireUser("/bienvenida");
@@ -23,13 +24,13 @@ async function ProfileSetup() {
 export default function WelcomePage() {
   return (
     <AuthCard
-      title="Ya estás en la parrilla"
-      description="Dale un toque a tu perfil para que el resto de pilotos te reconozca. Todo es opcional."
+      title={t.auth.welcome.heading}
+      description={t.auth.welcome.description}
       footer={
         <>
-          Puedes cambiarlo cuando quieras en{" "}
+          {t.auth.welcome.changeLater}{" "}
           <Link href="/perfil" className="font-semibold text-primary hover:underline">
-            Mi perfil
+            {t.profile.title}
           </Link>
         </>
       }

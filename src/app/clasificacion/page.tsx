@@ -20,8 +20,9 @@ import { StandingsTable } from "@/components/standings/StandingsTable";
 import { getCurrentSeason, listSeasons } from "@/lib/data/catalog";
 import { getSeasonStandings } from "@/lib/data/standings";
 import { cn } from "@/lib/cn";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Clasificación" };
+export const metadata: Metadata = { title: t.standings.title };
 
 async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasificacion">["searchParams"] }) {
   const { temporada } = await searchParams;
@@ -31,8 +32,8 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
   if (!season) {
     return (
       <>
-        <PageHeader title="Clasificación" />
-        <EmptyState icon={<Trophy />} title="Todavía no hay temporadas" />
+        <PageHeader title={t.standings.title} />
+        <EmptyState icon={<Trophy />} title={t.standings.noSeasons} />
       </>
     );
   }
@@ -48,8 +49,8 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
     <div className="flex flex-col gap-8">
       <PageHeader
         eyebrow={season.name}
-        title="Clasificación"
-        description="Puntos por carrera, desempate por número de victorias, segundos puestos…"
+        title={t.standings.title}
+        description={t.standings.description}
         className="pb-0"
       />
       <SeasonPicker seasons={seasons} selectedId={season.id} basePath="/clasificacion" />
@@ -57,8 +58,8 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
       {rows.length === 0 ? (
         <EmptyState
           icon={<Flag />}
-          title="Aún no hay resultados"
-          description="La clasificación aparecerá cuando termine la primera carrera de la temporada."
+          title={t.standings.noResults}
+          description={t.standings.noResultsDescription}
         />
       ) : (
         <>
@@ -68,25 +69,25 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
           <div className={cn("grid grid-cols-2 gap-4", !finished && "lg:grid-cols-3")}>
             {!finished && (
               <StatCard
-                label="Líder"
+                label={t.standings.leader}
                 value={leader?.name ?? "—"}
-                hint={`${rows[0].points} pts${rows[1] ? ` · +${rows[0].points - rows[1].points} sobre el 2º` : ""}`}
+                hint={`${rows[0].points} ${t.common.pts}${rows[1] ? ` · ${t.standings.leadOverSecond(rows[0].points - rows[1].points)}` : ""}`}
                 icon={<Crown />}
               />
             )}
             <StatCard
-              label="Carreras disputadas"
+              label={t.standings.racesRun}
               value={`${races.length}/${Math.max(scheduledRaces, races.length)}`}
               icon={<Flag />}
             />
             <StatCard
-              label="Más victorias"
+              label={t.standings.mostWins}
               value={topWins}
               hint={
                 topWins === 0
                   ? undefined
                   : winLeaders.length > 3
-                    ? `${winLeaders.slice(0, 3).join(", ")} y ${winLeaders.length - 3} más`
+                    ? t.common.namesAndMore(winLeaders.slice(0, 3), winLeaders.length - 3)
                     : winLeaders.join(", ")
               }
               icon={<Trophy />}
@@ -96,7 +97,7 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
 
           <Card>
             <CardHeader>
-              <CardTitle>Pilotos</CardTitle>
+              <CardTitle>{t.standings.drivers}</CardTitle>
             </CardHeader>
             <StandingsTable standings={standings} />
           </Card>
@@ -105,8 +106,8 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
             <Card>
               <CardHeader>
                 <div>
-                  <CardTitle>Evolución</CardTitle>
-                  <CardDescription>Puntos acumulados tras cada ronda. Pasa el ratón para ver a todos.</CardDescription>
+                  <CardTitle>{t.standings.progression}</CardTitle>
+                  <CardDescription>{t.standings.progressionDescription}</CardDescription>
                 </div>
               </CardHeader>
               <CardBody>

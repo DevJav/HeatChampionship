@@ -3,13 +3,16 @@ import { ACHIEVEMENT_BY_ID } from "@/lib/achievements";
 import { cn } from "@/lib/cn";
 import { tierClass } from "./AchievementBadge";
 import { AchievementIcon } from "./AchievementIcon";
+import { t } from "@/i18n";
+
+const SEASON_PREFIX = new RegExp(`^${t.achievements.seasonPrefix}\\s+`, "i");
 
 /** Season trophies as compact chips: "🏆 Campeón 2025/26". */
 export function TrophyChips({ unlocks, className }: { unlocks: Unlock[]; className?: string }) {
   const trophies = unlocks.filter((u) => ACHIEVEMENT_BY_ID.get(u.achievementId)?.trophy);
   if (trophies.length === 0) return null;
   return (
-    <ul className={cn("flex flex-wrap gap-2", className)} aria-label="Trofeos de temporada">
+    <ul className={cn("flex flex-wrap gap-2", className)} aria-label={t.achievements.seasonTrophies}>
       {[...trophies].reverse().map((unlock) => {
         const achievement = ACHIEVEMENT_BY_ID.get(unlock.achievementId)!;
         return (
@@ -21,7 +24,7 @@ export function TrophyChips({ unlocks, className }: { unlocks: Unlock[]; classNa
             )}
           >
             <AchievementIcon id={achievement.id} className="size-3.5" />
-            {achievement.name} · {unlock.season?.name.replace(/^Temporada\s+/i, "")}
+            {achievement.name} · {unlock.season?.name.replace(SEASON_PREFIX, "")}
           </li>
         );
       })}

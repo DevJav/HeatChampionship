@@ -4,6 +4,7 @@ import { formatShortDate } from "@/lib/format";
 import { EmptyState } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { PositionBadge } from "@/components/domain/PositionBadge";
+import { t } from "@/i18n";
 
 type EntryListProps = {
   entrants: Entrant[];
@@ -18,7 +19,7 @@ export function EntryList({ entrants, maxPlayers, rowAction }: EntryListProps) {
   const waitlist = entrants.filter((e) => e.status === "WAITLIST");
 
   if (entrants.length === 0) {
-    return <EmptyState icon={<Users />} title="Aún no hay inscritos" className="py-8" />;
+    return <EmptyState icon={<Users />} title={t.races.entries.empty} className="py-8" />;
   }
 
   return (
@@ -41,7 +42,7 @@ export function EntryList({ entrants, maxPlayers, rowAction }: EntryListProps) {
                   {rowAction?.(entrant)}
                 </>
               ) : (
-                <span className="flex-1 text-sm text-fg-subtle italic">Plaza libre</span>
+                <span className="flex-1 text-sm text-fg-subtle italic">{t.races.entries.openSeat}</span>
               )}
             </li>
           );
@@ -51,19 +52,19 @@ export function EntryList({ entrants, maxPlayers, rowAction }: EntryListProps) {
       {waitlist.length > 0 && (
         <div className="flex flex-col gap-2">
           <h4 className="flex items-center gap-2 text-lg">
-            <Clock className="size-4" /> Lista de espera
+            <Clock className="size-4" /> {t.races.entries.waitlist}
           </h4>
           <ol className="flex flex-col gap-1">
             {waitlist.map((entrant, i) => (
               <li key={entrant.id} className="flex items-center gap-3 bg-surface-2/60 py-1.5 pr-2 pl-3">
-                <span className="w-8 text-center font-display font-bold text-fg-subtle italic italic-center tabular-nums">{i + 1}º</span>
+                <span className="w-8 text-center font-display font-bold text-fg-subtle italic italic-center tabular-nums">{t.common.ordinal(i + 1)}</span>
                 <DriverName
                     name={entrant.user.name}
                     username={entrant.user.username}
                     color={entrant.user.favoriteColor?.hex}
                     className="flex-1"
                   />
-                <span className="text-xs text-fg-subtle">desde {formatShortDate(entrant.queuedAt)}</span>
+                <span className="text-xs text-fg-subtle">{t.races.entries.since(formatShortDate(entrant.queuedAt))}</span>
                 {rowAction?.(entrant)}
               </li>
             ))}

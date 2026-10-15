@@ -9,8 +9,9 @@ import { formatShortDate } from "@/lib/format";
 import { raceTitle } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Noticias · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.articles.title) };
 
 async function AdminArticlesPageContent() {
   await requireAdmin("/admin/noticias");
@@ -18,29 +19,29 @@ async function AdminArticlesPageContent() {
 
   return (
     <Section
-      title="Noticias"
+      title={t.admin.articles.title}
       actions={
         <ButtonLink href="/admin/noticias/nueva" size="sm">
-          <Plus /> Nuevo artículo
+          <Plus /> {t.admin.articles.new}
         </ButtonLink>
       }
     >
       {articles.length === 0 ? (
         <EmptyState
           icon={<Newspaper />}
-          title="Aún no hay artículos"
-          description="Escribe previas, crónicas, novedades o el reglamento del campeonato."
+          title={t.admin.articles.empty}
+          description={t.admin.articles.emptyDescription}
         />
       ) : (
         <Card>
           <Table>
             <THead>
               <tr>
-                <Th>Título</Th>
-                <Th>Categoría</Th>
-                <Th className="max-md:hidden">Carrera</Th>
-                <Th className="max-sm:hidden">Publicado</Th>
-                <Th align="right">Estado</Th>
+                <Th>{t.admin.articles.articleTitle}</Th>
+                <Th>{t.admin.articles.category}</Th>
+                <Th className="max-md:hidden">{t.admin.articles.race}</Th>
+                <Th className="max-sm:hidden">{t.admin.articles.published}</Th>
+                <Th align="right">{t.admin.status}</Th>
               </tr>
             </THead>
             <TBody>
@@ -50,7 +51,7 @@ async function AdminArticlesPageContent() {
                   <Tr key={article.id}>
                     <Td>
                       <span className="flex items-center gap-2">
-                        {article.pinned && <Pin className="size-3.5 shrink-0 text-primary" aria-label="Destacado" />}
+                        {article.pinned && <Pin className="size-3.5 shrink-0 text-primary" aria-label={t.admin.articles.pinned} />}
                         <Link href={`/admin/noticias/${article.id}`} className="font-semibold hover:text-primary hover:underline">
                           {article.title}
                         </Link>

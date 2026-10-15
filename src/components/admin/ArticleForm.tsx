@@ -9,6 +9,7 @@ import type { FormAction, FormState } from "@/lib/forms";
 import { Field, Input } from "@/components/ui";
 import { raceTitle } from "@/lib/races";
 import { ArticleBodyEditor } from "./ArticleBodyEditor";
+import { t } from "@/i18n";
 
 const categoryOptions = ARTICLE_CATEGORIES.map((value) => ({ value, label: ARTICLE_CATEGORY[value].label }));
 const statusOptions = (["DRAFT", "PUBLISHED"] as const).map((value) => ({ value, label: ARTICLE_STATUS[value].label }));
@@ -26,9 +27,9 @@ function CoverField({ state, current }: { state: FormState; current: string | nu
 
   return (
     <Field
-      label="Imagen de cabecera"
+      label={t.admin.articles.cover}
       htmlFor="cover"
-      hint="Opcional. Sale en la cabecera y en las tarjetas; sin imagen se usa la bandera de la carrera."
+      hint={t.admin.articles.coverHint}
       error={error}
       className="md:col-span-2"
     >
@@ -45,7 +46,7 @@ function CoverField({ state, current }: { state: FormState; current: string | nu
         onChange={(e) => pick(e.target.files?.[0])}
         className="h-auto py-1.5 file:mr-3 file:border-0 file:bg-border file:px-3 file:py-1 file:text-sm file:font-semibold"
       />
-      {current && !picked && <CheckboxField name="removeCover" label="Quitar la imagen" state={state} />}
+      {current && !picked && <CheckboxField name="removeCover" label={t.admin.articles.removeCover} state={state} />}
     </Field>
   );
 }
@@ -62,19 +63,19 @@ export function ArticleForm({ action, article, options }: ArticleFormProps) {
 
   return (
     <form action={formAction}>
-      <FormLayout state={state} submitLabel={article ? "Guardar" : "Crear artículo"} cancelHref="/admin/noticias">
+      <FormLayout state={state} submitLabel={article ? t.forms.save : t.admin.articles.create} cancelHref="/admin/noticias">
         <TextField
           name="title"
-          label="Título"
+          label={t.admin.articles.articleTitle}
           state={state}
           className="md:col-span-2"
-          placeholder="Previa: todo listo para Italia"
+          placeholder={t.admin.articles.titlePlaceholder}
           defaultValue={article?.title}
         />
         <TextareaField
           name="excerpt"
-          label="Entradilla"
-          hint="Resumen corto para las listas y al compartir el enlace. Si lo dejas vacío se usa el principio del texto."
+          label={t.admin.articles.excerpt}
+          hint={t.admin.articles.excerptHint}
           rows={2}
           state={state}
           className="md:col-span-2"
@@ -82,33 +83,33 @@ export function ArticleForm({ action, article, options }: ArticleFormProps) {
         />
         <SelectField
           name="category"
-          label="Categoría"
+          label={t.admin.articles.category}
           state={state}
           options={categoryOptions}
           defaultValue={article?.category ?? "NEWS"}
         />
         <SelectField
           name="raceId"
-          label="Carrera"
-          hint="El artículo aparecerá en la página de esa carrera."
+          label={t.admin.articles.race}
+          hint={t.admin.articles.raceHint}
           state={state}
           options={raceOptions}
-          placeholder="Ninguna"
+          placeholder={t.admin.articles.noRace}
           defaultValue={article?.raceId ?? ""}
         />
         <CoverField state={state} current={article?.coverImage} />
         <ArticleBodyEditor state={state} defaultValue={article?.body} options={options} className="md:col-span-2" />
         <SelectField
           name="status"
-          label="Estado"
-          hint="Los borradores solo los ven los administradores."
+          label={t.admin.status}
+          hint={t.admin.articles.statusHint}
           state={state}
           options={statusOptions}
           defaultValue={article?.status ?? "DRAFT"}
         />
         <CheckboxField
           name="pinned"
-          label="Destacar en la portada de noticias"
+          label={t.admin.articles.pinLabel}
           state={state}
           className="self-center"
           defaultChecked={article?.pinned ?? false}

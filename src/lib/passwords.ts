@@ -1,9 +1,7 @@
 import { randomInt } from "node:crypto";
+import { t } from "@/i18n";
 
-const WORDS = [
-  "curva", "rebufo", "calor", "marcha", "recta", "boxes", "motor", "turbo",
-  "chicane", "meta", "podio", "vuelta", "parrilla", "garaje", "frenada", "bandera",
-];
+const WORDS = t.admin.users.passwordWords;
 
 /**
  * A temporary password that's easy to read out or send by message,

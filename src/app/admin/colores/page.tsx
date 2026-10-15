@@ -6,8 +6,9 @@ import { CarColorChip } from "@/components/domain/CarColorChip";
 import { listCarColors } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Colores · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.colors.title) };
 
 async function AdminColorsPageContent() {
   await requireAdmin("/admin/colores");
@@ -15,10 +16,10 @@ async function AdminColorsPageContent() {
 
   return (
     <Section
-      title="Colores de coche"
+      title={t.admin.colors.heading}
       actions={
         <ButtonLink href="/admin/colores/nuevo" size="sm">
-          <Plus /> Nuevo color
+          <Plus /> {t.admin.colors.new}
         </ButtonLink>
       }
     >
@@ -26,10 +27,10 @@ async function AdminColorsPageContent() {
         <Table>
           <THead>
             <tr>
-              <Th>Color</Th>
-              <Th align="center">Orden</Th>
-              <Th align="center">Usos</Th>
-              <Th align="right">Estado</Th>
+              <Th>{t.admin.colors.color}</Th>
+              <Th align="center">{t.admin.colors.order}</Th>
+              <Th align="center">{t.admin.uses}</Th>
+              <Th align="right">{t.admin.status}</Th>
             </tr>
           </THead>
           <TBody>
@@ -42,7 +43,7 @@ async function AdminColorsPageContent() {
                 </Td>
                 <Td align="center">{color.sortOrder}</Td>
                 <Td align="center">{color._count.results}</Td>
-                <Td align="right">{color.active ? <Badge tone="success">Activo</Badge> : <Badge>Inactivo</Badge>}</Td>
+                <Td align="right">{color.active ? <Badge tone="success">{t.admin.activeM}</Badge> : <Badge>{t.admin.inactiveM}</Badge>}</Td>
               </Tr>
             ))}
           </TBody>

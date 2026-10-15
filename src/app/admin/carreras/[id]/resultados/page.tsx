@@ -9,8 +9,9 @@ import { getResultsEditorData } from "@/lib/data/results";
 import { raceTitle } from "@/lib/races";
 import { parsePointsTable } from "@/lib/scoring";
 import { requireAdmin } from "@/lib/session";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Resultados · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.results.title) };
 
 async function ResultsPageContent({ params }: PageProps<"/admin/carreras/[id]/resultados">) {
   const { id } = await params;
@@ -38,32 +39,32 @@ async function ResultsPageContent({ params }: PageProps<"/admin/carreras/[id]/re
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-3xl">Resultados · {raceTitle(race)}</h2>
+        <h2 className="text-3xl">{t.admin.results.heading(raceTitle(race))}</h2>
         <ButtonLink href={`/admin/carreras/${race.id}`} variant="ghost" size="sm">
-          <ArrowLeft /> Volver a la carrera
+          <ArrowLeft /> {t.admin.results.backToRace}
         </ButtonLink>
       </div>
 
       {finished && (
         <Alert tone="info">
-          Esta carrera ya tiene resultados. Al guardar se sustituyen y se recalculan los puntos.
+          {t.admin.results.alreadyFinished}
         </Alert>
       )}
 
       {players.length === 0 ? (
         <EmptyState
           icon={<Users />}
-          title="No hay pilotos con plaza"
-          description="Inscribe a los pilotos que corrieron desde la página de la carrera."
-          action={<ButtonLink href={`/admin/carreras/${race.id}`}>Ir a inscritos</ButtonLink>}
+          title={t.admin.results.noDrivers}
+          description={t.admin.results.noDriversDescription}
+          action={<ButtonLink href={`/admin/carreras/${race.id}`}>{t.admin.results.goToEntrants}</ButtonLink>}
         />
       ) : (
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Hoja de resultados</CardTitle>
+              <CardTitle>{t.admin.results.sheet}</CardTitle>
               <CardDescription>
-                Puntos de la temporada: {pointsTable.join(" · ")}. ¿Falta alguien? Inscríbelo en la carrera.
+                {t.admin.results.sheetDescription(pointsTable.join(" · "))}
               </CardDescription>
             </div>
           </CardHeader>
@@ -83,20 +84,20 @@ async function ResultsPageContent({ params }: PageProps<"/admin/carreras/[id]/re
       {finished && (
         <Card>
           <CardHeader>
-            <CardTitle>Anular resultados</CardTitle>
+            <CardTitle>{t.admin.results.clear}</CardTitle>
           </CardHeader>
           <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-fg-muted">
-              Borra los resultados y los puntos. La carrera vuelve a «Inscripción cerrada».
+              {t.admin.results.clearDescription}
             </p>
             <form action={clearResults.bind(null, race.id)}>
               <ConfirmButton
-                title="¿Anular los resultados?"
-                description="Se borrarán las posiciones y puntos de esta carrera. Las fotos se conservan."
-                confirmLabel="Anular"
+                title={t.admin.results.clearTitle}
+                description={t.admin.results.clearConfirmDescription}
+                confirmLabel={t.admin.results.clearConfirm}
                 size="sm"
               >
-                <RotateCcw /> Anular resultados
+                <RotateCcw /> {t.admin.results.clear}
               </ConfirmButton>
             </form>
           </CardBody>

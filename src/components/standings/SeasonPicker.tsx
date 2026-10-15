@@ -1,4 +1,5 @@
 import { ButtonLink } from "@/components/ui";
+import { t } from "@/i18n";
 
 type SeasonPickerProps = {
   seasons: { id: string; name: string }[];
@@ -18,7 +19,7 @@ export function SeasonPicker({ seasons, selectedId, basePath, allSeasonsLabel }:
     ...seasons.map((season) => ({ ...season, href: `${basePath}?temporada=${season.id}` })),
   ];
   return (
-    <nav aria-label="Temporadas" className="flex flex-wrap gap-2">
+    <nav aria-label={t.common.seasons} className="flex flex-wrap gap-2">
       {options.map((option) => (
         <ButtonLink
           key={option.id ?? "all"}

@@ -1,6 +1,7 @@
 import * as Flags from "country-flag-icons/react/3x2";
 import { cn } from "@/lib/cn";
 import { countryName } from "@/lib/countries";
+import { t } from "@/i18n";
 
 // Server components only: this pulls in every flag, so keep it out of client bundles.
 
@@ -16,7 +17,7 @@ export function CountryFlag({ code, className }: { code: string | null | undefin
   const Flag = FLAGS[flagKey(code)];
   if (!Flag) return null;
   const name = countryName(code);
-  return <Flag role="img" aria-label={name ? `Bandera de ${name}` : undefined} className={className} />;
+  return <Flag role="img" aria-label={name ? t.layout.flagOf(name) : undefined} className={className} />;
 }
 
 /**

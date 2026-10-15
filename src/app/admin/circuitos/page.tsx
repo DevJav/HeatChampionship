@@ -6,8 +6,9 @@ import { listTracks } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
 import { CountryFlag } from "@/components/domain/CountryFlag";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Circuitos · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.tracks.title) };
 
 async function AdminTracksPageContent() {
   await requireAdmin("/admin/circuitos");
@@ -15,10 +16,10 @@ async function AdminTracksPageContent() {
 
   return (
     <Section
-      title="Circuitos"
+      title={t.admin.tracks.title}
       actions={
         <ButtonLink href="/admin/circuitos/nuevo" size="sm">
-          <Plus /> Nuevo circuito
+          <Plus /> {t.admin.tracks.new}
         </ButtonLink>
       }
     >
@@ -26,11 +27,11 @@ async function AdminTracksPageContent() {
         <Table>
           <THead>
             <tr>
-              <Th>Circuito</Th>
-              <Th>Juego</Th>
-              <Th align="center">Vueltas</Th>
-              <Th align="center">Carreras</Th>
-              <Th align="right">Estado</Th>
+              <Th>{t.admin.tracks.track}</Th>
+              <Th>{t.admin.game}</Th>
+              <Th align="center">{t.admin.tracks.laps}</Th>
+              <Th align="center">{t.admin.races}</Th>
+              <Th align="right">{t.admin.status}</Th>
             </tr>
           </THead>
           <TBody>
@@ -41,7 +42,7 @@ async function AdminTracksPageContent() {
                     {track.countryCode ? (
                       <CountryFlag code={track.countryCode} className="h-4 w-6 shrink-0 ring-1 ring-border" />
                     ) : (
-                      <span title="Sin país" className="h-4 w-6 shrink-0 border border-dashed border-border-strong" />
+                      <span title={t.admin.noCountry} className="h-4 w-6 shrink-0 border border-dashed border-border-strong" />
                     )}
                     <Link href={`/admin/circuitos/${track.id}`} className="font-semibold hover:text-primary hover:underline">
                       {track.name}
@@ -51,7 +52,7 @@ async function AdminTracksPageContent() {
                 <Td className="text-fg-muted">{track.expansion ?? "—"}</Td>
                 <Td align="center">{track.defaultLaps ?? <span className="text-fg-subtle">—</span>}</Td>
                 <Td align="center">{track._count.races}</Td>
-                <Td align="right">{track.active ? <Badge tone="success">Activo</Badge> : <Badge>Inactivo</Badge>}</Td>
+                <Td align="right">{track.active ? <Badge tone="success">{t.admin.activeM}</Badge> : <Badge>{t.admin.inactiveM}</Badge>}</Td>
               </Tr>
             ))}
           </TBody>

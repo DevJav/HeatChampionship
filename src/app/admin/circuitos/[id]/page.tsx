@@ -7,8 +7,9 @@ import { TrackForm } from "@/components/admin/TrackForm";
 import { getTrack } from "@/lib/data/catalog";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Editar circuito · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.tracks.edit) };
 
 async function EditTrackPageContent({ params }: PageProps<"/admin/circuitos/[id]">) {
   const { id } = await params;
@@ -20,7 +21,7 @@ async function EditTrackPageContent({ params }: PageProps<"/admin/circuitos/[id]
     <EditCard
       title={track.name}
       actions={
-        track._count.races === 0 && <DeleteForm action={deleteTrack.bind(null, id)} title="¿Eliminar el circuito?" />
+        track._count.races === 0 && <DeleteForm action={deleteTrack.bind(null, id)} title={t.admin.tracks.deleteTitle} />
       }
     >
       <TrackForm action={updateTrack.bind(null, id)} track={track} />

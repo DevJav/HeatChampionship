@@ -7,6 +7,7 @@ import { fetchMyNotifications, markAllNotificationsRead, markNotificationRead } 
 import type { NotificationFeed, NotificationItem } from "@/lib/data/notifications";
 import { Button } from "@/components/ui";
 import { NotificationList } from "./NotificationList";
+import { t } from "@/i18n";
 
 const POLL_MS = 60_000;
 
@@ -89,7 +90,7 @@ export function NotificationBell({ initial }: { initial: NotificationFeed }) {
   }
 
   const { unread, items } = feed;
-  const label = unread > 0 ? `Notificaciones (${unread} sin leer)` : "Notificaciones";
+  const label = unread > 0 ? t.notifications.unreadLabel(unread) : t.notifications.title;
 
   return (
     <div ref={root} className="relative">
@@ -118,17 +119,17 @@ export function NotificationBell({ initial }: { initial: NotificationFeed }) {
         >
           <div className="surface-panel clip-chamfer">
             <div className="flex items-center justify-between gap-3 border-l-4 border-primary surface-bar px-4 py-2.5">
-              <h2 className="text-lg">Notificaciones</h2>
+              <h2 className="text-lg">{t.notifications.title}</h2>
               {unread > 0 && (
                 <Button variant="inverse" size="sm" onClick={readEverything} className="h-7 px-2 text-xs">
-                  <CheckCheck /> Marcar leídas
+                  <CheckCheck /> {t.notifications.markRead}
                 </Button>
               )}
             </div>
             {items.length > 0 ? (
               <NotificationList items={items} onOpen={openItem} className="max-h-[min(28rem,70vh)] overflow-y-auto" />
             ) : (
-              <p className="px-4 py-8 text-center text-sm text-fg-muted">No tienes notificaciones.</p>
+              <p className="px-4 py-8 text-center text-sm text-fg-muted">{t.notifications.none}</p>
             )}
             <div className="border-t border-border bg-surface-2/50 px-4 py-2 text-center">
               <Link
@@ -136,7 +137,7 @@ export function NotificationBell({ initial }: { initial: NotificationFeed }) {
                 onClick={() => setOpen(false)}
                 className="text-sm font-semibold text-primary hover:underline"
               >
-                Ver todas
+                {t.notifications.seeAll}
               </Link>
             </div>
           </div>

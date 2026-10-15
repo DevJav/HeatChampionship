@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Titillium_Web } from "next/font/google";
 import { Suspense } from "react";
 import { siteConfig } from "@/config/site";
+import { locale } from "@/i18n";
 import { siteUrl } from "@/lib/site-url";
 import { MeHighlight } from "@/components/domain/MeHighlight";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -38,7 +39,7 @@ export const viewport: Viewport = { themeColor: "#111214" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${titillium.variable} ${codeFont.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">

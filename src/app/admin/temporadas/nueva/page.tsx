@@ -4,13 +4,14 @@ import { EditCard } from "@/components/admin/EditCard";
 import { SeasonForm } from "@/components/admin/SeasonForm";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
+import { t } from "@/i18n";
 
-export const metadata: Metadata = { title: "Nueva temporada · Admin" };
+export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.seasons.new) };
 
 async function NewSeasonPageContent() {
   await requireAdmin("/admin/temporadas/nueva");
   return (
-    <EditCard title="Nueva temporada">
+    <EditCard title={t.admin.seasons.new}>
       <SeasonForm action={createSeason} />
     </EditCard>
   );

@@ -6,6 +6,7 @@ import { PositionBadge } from "@/components/domain/PositionBadge";
 import { podiumRowClass } from "@/components/domain/podium";
 import { PositionsGained } from "@/components/domain/PositionsGained";
 import { SpinCount } from "@/components/domain/SpinCount";
+import { t } from "@/i18n";
 
 /** Timing-tower style classification of a race. The stripe by each name shows the car color. */
 export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
@@ -18,17 +19,17 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
       <THead>
         <tr>
           <Th align="center" className="w-20">
-            Pos.
+            {t.common.columns.position}
           </Th>
-          <Th>Piloto</Th>
-          {showGrid && <Th align="center">Salida</Th>}
-          {showUpgrades && <Th className="max-md:hidden">Mejoras</Th>}
+          <Th>{t.common.columns.driver}</Th>
+          {showGrid && <Th align="center">{t.common.columns.start}</Th>}
+          {showUpgrades && <Th className="max-md:hidden">{t.common.columns.upgrades}</Th>}
           {showSpins && (
-            <Th align="center" title="Trompos">
-              Tromp.
+            <Th align="center" title={t.common.columns.spins}>
+              {t.common.columns.spinsShort}
             </Th>
           )}
-          <Th align="right">Pts</Th>
+          <Th align="right">{t.common.columns.points}</Th>
         </tr>
       </THead>
       <TBody>
@@ -47,7 +48,7 @@ export function ResultsTable({ results }: { results: RaceResultDetail[] }) {
             </Td>
             {showGrid && (
               <Td align="center" className="whitespace-nowrap">
-                <span className="text-fg-muted">{result.startPosition ?? "—"}º</span>{" "}
+                <span className="text-fg-muted">{result.startPosition == null ? "—" : t.common.ordinal(result.startPosition)}</span>{" "}
                 <PositionsGained value={positionsGained(result.startPosition, result.position)} />
               </Td>
             )}

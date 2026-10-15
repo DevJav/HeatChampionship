@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { listLatestArticles } from "@/lib/data/articles";
 import { ButtonLink, Section } from "@/components/ui";
 import { ArticleCard } from "./ArticleCard";
+import { t } from "@/i18n";
 
 /**
  * The three newest articles: a column on wide screens, a row of cards on tablets.
@@ -13,10 +14,10 @@ export async function LatestNews() {
 
   return (
     <Section
-      title="Noticias"
+      title={t.articles.title}
       actions={
         <ButtonLink href="/noticias" variant="secondary" size="sm">
-          Ver todas <ChevronRight />
+          {t.articles.seeAll} <ChevronRight />
         </ButtonLink>
       }
     >

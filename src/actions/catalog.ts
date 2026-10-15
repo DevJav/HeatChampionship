@@ -17,6 +17,7 @@ import {
 } from "@/lib/forms";
 import { requireAdmin } from "@/lib/session";
 import { slugify } from "@/lib/slug";
+import { t } from "@/i18n";
 
 function duplicate(formData: FormData, field: string, message: string): FormState {
   return { fieldErrors: { [field]: message }, values: formValues(formData) };
@@ -28,7 +29,7 @@ function duplicate(formData: FormData, field: string, message: string): FormStat
 
 const trackSchema = z.object({
   name: text(60),
-  countryCode: optionalText(10).refine((code) => code == null || countryName(code) != null, "País no válido."),
+  countryCode: optionalText(10).refine((code) => code == null || countryName(code) != null, t.admin.tracks.invalidCountry),
   expansion: optionalText(60),
   defaultLaps: optionalInt(1, 10),
   description: optionalText(500),
@@ -42,7 +43,7 @@ export async function createTrack(_prev: FormState, formData: FormData): Promise
   try {
     await db.track.create({ data: { ...parsed.data, slug: slugify(parsed.data.name) } });
   } catch (error) {
-    if (isUniqueViolation(error)) return duplicate(formData, "name", "Ya existe un circuito con ese nombre.");
+    if (isUniqueViolation(error)) return duplicate(formData, "name", t.admin.tracks.duplicate);
     throw error;
   }
   redirect("/admin/circuitos");
@@ -55,7 +56,7 @@ export async function updateTrack(trackId: string, _prev: FormState, formData: F
   try {
     await db.track.update({ where: { id: trackId }, data: { ...parsed.data, slug: slugify(parsed.data.name) } });
   } catch (error) {
-    if (isUniqueViolation(error)) return duplicate(formData, "name", "Ya existe un circuito con ese nombre.");
+    if (isUniqueViolation(error)) return duplicate(formData, "name", t.admin.tracks.duplicate);
     throw error;
   }
   redirect("/admin/circuitos");
@@ -87,7 +88,7 @@ export async function createUpgrade(_prev: FormState, formData: FormData): Promi
   try {
     await db.upgrade.create({ data: parsed.data });
   } catch (error) {
-    if (isUniqueViolation(error)) return duplicate(formData, "name", "Ya existe una mejora con ese nombre.");
+    if (isUniqueViolation(error)) return duplicate(formData, "name", t.admin.upgrades.duplicate);
     throw error;
   }
   redirect("/admin/mejoras");
@@ -100,7 +101,7 @@ export async function updateUpgrade(upgradeId: string, _prev: FormState, formDat
   try {
     await db.upgrade.update({ where: { id: upgradeId }, data: parsed.data });
   } catch (error) {
-    if (isUniqueViolation(error)) return duplicate(formData, "name", "Ya existe una mejora con ese nombre.");
+    if (isUniqueViolation(error)) return duplicate(formData, "name", t.admin.upgrades.duplicate);
     throw error;
   }
   redirect("/admin/mejoras");
@@ -119,7 +120,7 @@ export async function deleteUpgrade(upgradeId: string) {
 
 const carColorSchema = z.object({
   name: text(30),
-  hex: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Color no válido."),
+  hex: z.string().regex(/^#[0-9a-fA-F]{6}$/, t.forms.invalidColor),
   sortOrder: int(0, 999),
   active: checkbox(),
 });
@@ -131,7 +132,7 @@ export async function createCarColor(_prev: FormState, formData: FormData): Prom
   try {
     await db.carColor.create({ data: parsed.data });
   } catch (error) {
-    if (isUniqueViolation(error)) return duplicate(formData, "name", "Ya existe un color con ese nombre.");
+    if (isUniqueViolation(error)) return duplicate(formData, "name", t.admin.colors.duplicate);
     throw error;
   }
   redirect("/admin/colores");
@@ -144,7 +145,7 @@ export async function updateCarColor(colorId: string, _prev: FormState, formData
   try {
     await db.carColor.update({ where: { id: colorId }, data: parsed.data });
   } catch (error) {
-    if (isUniqueViolation(error)) return duplicate(formData, "name", "Ya existe un color con ese nombre.");
+    if (isUniqueViolation(error)) return duplicate(formData, "name", t.admin.colors.duplicate);
     throw error;
   }
   redirect("/admin/colores");

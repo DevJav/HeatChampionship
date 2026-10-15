@@ -4,6 +4,7 @@ import { Avatar, Card } from "@/components/ui";
 import type { Unlock } from "@/lib/achievements";
 import { TrophyChips } from "@/components/achievements/TrophyChips";
 import { FormStrip } from "./FormStrip";
+import { t } from "@/i18n";
 
 type PlayerCardProps = {
   player: {
@@ -21,10 +22,10 @@ type PlayerCardProps = {
 export function PlayerCard({ player, results, unlocks = [] }: PlayerCardProps) {
   const summary = summarizePlayer(results, 3);
   const stats = [
-    { label: "Carreras", value: summary.starts },
-    { label: "Victorias", value: summary.wins },
-    { label: "Podios", value: summary.podiums },
-    { label: "Puntos", value: summary.points },
+    { label: t.drivers.races, value: summary.starts },
+    { label: t.drivers.wins, value: summary.wins },
+    { label: t.drivers.podiums, value: summary.podiums },
+    { label: t.drivers.points, value: summary.points },
   ];
 
   return (
@@ -49,7 +50,7 @@ export function PlayerCard({ player, results, unlocks = [] }: PlayerCardProps) {
           ))}
         </dl>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Forma</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">{t.drivers.form}</span>
           <FormStrip form={summary.form} />
         </div>
       </Link>

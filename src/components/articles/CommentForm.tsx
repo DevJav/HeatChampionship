@@ -6,6 +6,7 @@ import { COMMENT_MAX, type MentionCandidate } from "@/lib/articles";
 import type { FormAction } from "@/lib/forms";
 import { Alert, Button, SubmitButton } from "@/components/ui";
 import { MentionTextarea } from "@/components/forms/MentionTextarea";
+import { t } from "@/i18n";
 
 type CommentFormProps = {
   action: FormAction;
@@ -48,9 +49,9 @@ export function CommentForm({ action, drivers, parentId, initialText, autoFocus,
         rows={parentId ? 2 : 3}
         required
         maxLength={COMMENT_MAX}
-        aria-label={parentId ? "Respuesta" : "Comentario"}
+        aria-label={parentId ? t.articles.commentList.replyLabel : t.articles.commentList.commentLabel}
         aria-invalid={error ? true : undefined}
-        placeholder={parentId ? "Escribe tu respuesta…" : "Escribe un comentario… Escribe @ para mencionar a alguien."}
+        placeholder={parentId ? t.articles.commentList.replyPlaceholder : t.articles.commentList.commentPlaceholder}
         defaultValue={state.values?.body ?? initialText}
       />
       <div className="flex items-center justify-between gap-3">
@@ -59,16 +60,16 @@ export function CommentForm({ action, drivers, parentId, initialText, autoFocus,
             {error}
           </p>
         ) : (
-          <p className="text-xs text-fg-subtle">Admite **negrita**, *cursiva* y enlaces.</p>
+          <p className="text-xs text-fg-subtle">{t.articles.commentList.formattingHint}</p>
         )}
         <div className="flex shrink-0 gap-1">
           {onCancel && (
             <Button variant="ghost" size="sm" onClick={onCancel}>
-              Cancelar
+              {t.articles.commentList.cancel}
             </Button>
           )}
           <SubmitButton size="sm">
-            <Send /> {parentId ? "Responder" : "Comentar"}
+            <Send /> {parentId ? t.articles.commentList.reply : t.articles.commentList.comment}
           </SubmitButton>
         </div>
       </div>

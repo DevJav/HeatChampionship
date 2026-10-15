@@ -3,6 +3,7 @@ import type { ChampionshipRecord } from "@/lib/stats";
 import type { StatsDriver } from "@/lib/data/stats";
 import { Badge, Card } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
+import { t } from "@/i18n";
 
 const MAX_HOLDERS = 3;
 
@@ -49,7 +50,7 @@ export function RecordCard({ label, icon, record, drivers, format = String, capt
                     race ? (
                       <>
                         <Link href={`/carreras/${race.id}`} className="hover:text-primary hover:underline">
-                          {race.trackName} · R{race.round}
+                          {race.trackName} · {t.common.roundShort(race.round)}
                           {showSeason && ` · ${race.seasonName}`}
                         </Link>
                         {holder.detail && ` · ${holder.detail}`}
@@ -59,11 +60,11 @@ export function RecordCard({ label, icon, record, drivers, format = String, capt
                     )
                   }
                 />
-                {holder.ongoing && <Badge tone="success">En curso</Badge>}
+                {holder.ongoing && <Badge tone="success">{t.stats.ongoing}</Badge>}
               </li>
             );
           })}
-          {extra > 0 && <li className="text-xs text-fg-muted">y {extra} más</li>}
+          {extra > 0 && <li className="text-xs text-fg-muted">{t.stats.andMore(extra)}</li>}
         </ul>
       )}
     </Card>

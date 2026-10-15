@@ -6,6 +6,7 @@ import { formatDayKey, formatMonth, monthOf, monthRange, monthWeeks, WEEKDAYS } 
 import { CountryFlag } from "@/components/domain/CountryFlag";
 import { MonthPager } from "./MonthPager";
 import { RaceRow } from "./RaceRow";
+import { t } from "@/i18n";
 
 type RaceCalendarProps = {
   races: RaceListItem[];
@@ -91,7 +92,7 @@ function MonthView({ month, byDay, today }: MonthViewProps) {
           ))}
         </ol>
       ) : (
-        <p className="text-center text-sm text-fg-muted">No hay carreras este mes.</p>
+        <p className="text-center text-sm text-fg-muted">{t.races.noRacesThisMonth}</p>
       )}
     </div>
   );
@@ -105,7 +106,7 @@ function CalendarRace({ race }: { race: RaceListItem }) {
   return (
     <Link
       href={`/carreras/${race.id}`}
-      title={`Ronda ${race.round} · ${race.track.name} · ${formatDayKey(day)} ${time}`}
+      title={`${t.common.round(race.round)} · ${race.track.name} · ${formatDayKey(day)} ${time}`}
       className={cn(
         "flex min-w-0 items-center gap-1.5 px-1.5 py-1 text-xs font-bold transition-[filter] hover:brightness-110 focus-inset max-sm:justify-center",
         finished ? "surface-bar text-bar-fg" : "bg-primary text-primary-fg gloss",

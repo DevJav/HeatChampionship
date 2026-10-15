@@ -1,0 +1,127 @@
+# A tour of the site
+
+[← Back to the README](../README.md)
+
+The screenshots come from the English demo league (see [Try it with demo data](../README.md#try-it-with-demo-data)), logged in as the demo driver Maya. The logged-in driver's name is highlighted in red wherever it appears.
+
+- [Home](#home)
+- [Races](#races)
+- [Before a race](#before-a-race)
+- [After a race](#after-a-race)
+- [Standings](#standings)
+- [Statistics](#statistics)
+- [Drivers](#drivers)
+- [Driver profiles](#driver-profiles)
+- [News](#news)
+- [Articles and comments](#articles-and-comments)
+- [Activity and notifications](#activity-and-notifications)
+- [Admin panel](#admin-panel)
+
+## Home
+
+![Home page](screenshots/home.png)
+
+The front page answers "what's next?" at a glance:
+- a bar with the current season, how many rounds have been raced and who's leading;
+- the **next race**, with an LED countdown to the start, the seats taken and your own sign-up button;
+- the top five of the **standings**;
+- the podium of the **last race**;
+- the latest **news** and **activity** down the side.
+
+## Races
+
+<p>
+  <img src="screenshots/races-calendar.png" alt="Race calendar" width="72%">
+  <img src="screenshots/mobile-races.png" alt="Race list on a phone" width="25%">
+</p>
+
+Every race of every season, as a **list** (upcoming first, then past races grouped by season, each with its podium) or as a **month calendar**. The whole site works on phones too, as the race list on the right shows.
+
+## Before a race
+
+![Upcoming race page](screenshots/race-upcoming.png)
+
+Each race has its own page, with the track's country flag in the banner. Before the race it's all about signing up:
+- **The grid** shows who has a seat, plus the **waitlist**. Seats go in sign-up order. When the race is full, new players join the waitlist, and if someone withdraws the first person waiting moves up automatically.
+- **Sign-up** shows how many seats are left and the deadline, with a button to join or withdraw. Players can withdraw until the race starts; signing up again puts you at the back of the queue.
+- **Sharing:** a WhatsApp message (with the date, place and seats left), a copy-link button, a calendar invite with a reminder 2 hours before, and a Google Calendar link. Shared links show a preview image with the track, flag and sign-up status.
+- **At this track:** the track's history in the championship. It shows how many races were held there, who has won it most, how often the driver starting first wins, the biggest comeback, each entrant's record there and the latest podiums.
+
+## After a race
+
+![Finished race page](screenshots/race-results.png)
+
+Once the organiser enters the results, the page switches to the **podium** and the **full results**: finishing and starting position (with places gained or lost), the upgrade cards each driver used, spins and notes. It also lists the **achievements unlocked** in that race, and the race's drivers can upload **photos** of the final board.
+
+## Standings
+
+![Standings](screenshots/standings.png)
+
+The championship table: points, gap to the leader, wins, podiums and each round's result. Ties are broken by countback (most wins, then most second places, and so on), and arrows show who moved up or down since the previous race. Once a season has two or more races, a chart shows how the points built up round by round. Past seasons are one click away.
+
+## Statistics
+
+![Statistics](screenshots/stats.png)
+
+Numbers for the whole championship or a single season:
+- the **roll of honour**, with the top three of every finished season;
+- **records**: most wins, podiums and points, win and podium streaks, best average finish, biggest comeback, win from furthest back, most spins. Streaks count consecutive races a driver took part in, so missing a month doesn't break one;
+- a table comparing every driver;
+- a **head-to-head** grid: how often each driver finished ahead of each other;
+- the **win rate by starting position**;
+- per-track winners, and results by car colour and by upgrade card.
+
+## Drivers
+
+![Drivers](screenshots/drivers.png)
+
+Every driver in the championship, most points first. Each card shows their season trophies, career numbers and recent form.
+
+## Driver profiles
+
+![Driver profile](screenshots/profile.png)
+
+A driver's own page: career stats, **achievements**, recent form, best track and full race history. Players edit their own name, photo, bio, favourite car colour and password from "My profile".
+
+Achievements are worked out from the results, so nothing is entered by hand. When a season finishes, its top three get the **Champion**, **Runner-up** and **Third** trophies. Badges cover things like winning from last on the grid, gaining 4 or more places, three wins in a row, five podiums in a row, winning at three different tracks or racing every race of a season. Badges not earned yet are listed under "Still to earn". The definitions and thresholds are in [`src/lib/achievements.ts`](../src/lib/achievements.ts).
+
+## News
+
+![News](screenshots/news.png)
+
+Articles from the organiser, filtered by category: **previews**, **race reports**, **news** and **rules**. An article can be pinned to the top. When it belongs to a race, it uses that race's flag as its banner (unless it has its own cover image) and is also linked from the race page.
+
+## Articles and comments
+
+![Race report article](screenshots/article.png)
+
+Articles are written in Markdown, and two things make them more than plain text:
+- **Mentions:** `@username` links to the driver's profile (with their car colour) and notifies them.
+- **Live blocks:** a race card (countdown and sign-up before the race, podium after), a results table, a podium, the standings after a race, the current standings or a driver card. They always show current data, so a preview written before the race shows the podium once it's over. The editor inserts them from the toolbar; in the text they look like `{{podio:<race id> | Round 1 · Italy}}`.
+
+Logged-in players can **comment**, reply and mention each other.
+
+## Activity and notifications
+
+![Activity feed](screenshots/activity.png)
+
+The **activity feed** follows the life of the league: new drivers, races announced, sign-up opening, sign-ups and withdrawals, results, photos, and seasons starting and finishing. The latest entries also appear on the home page.
+
+The **bell** in the header is personal: it tells you when someone mentions you, replies to your comment, or the results of a race you drove in are published.
+
+## Admin panel
+
+![Entering results in the admin panel](screenshots/admin-results.png)
+
+The organiser runs everything from **`/admin`** (shield icon in the header):
+
+| Section | |
+|---|---|
+| **Overview** | Open or close registration for new players. |
+| **Drivers** | Rename players, reset forgotten passwords (it can generate an easy one to read out), give or remove the admin role. |
+| **Races** | Create a race with its season, track, date, place, seats and optional sign-up deadline. *Draft* hides it, *Sign-up open* lets players join, *Sign-up closed* stops new sign-ups. You can also add or remove drivers yourself, even when sign-up is closed. |
+| **News** | Write articles with a toolbar, drag-and-drop images and a live preview. |
+| **Seasons** | Seasons and their points table. Only one season can be in progress at a time. Changing the points table re-scores that season's finished races. |
+| **Tracks / Upgrades / Colours** | The catalogues: tracks (with country flag and default laps), upgrade cards and car colours. Anything already used can be deactivated but not deleted. |
+
+**Entering results** (screenshot above): after the race, open it in admin and click **Results**. For each driver pick the finishing position (everyone finishes in Heat), starting position, car, upgrade cards and number of spins, plus an optional note. Points are previewed live from the season's table. Saving awards the points, marks the race finished and notifies the drivers. You can edit or void the results later.

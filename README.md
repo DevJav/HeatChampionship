@@ -51,3 +51,6 @@ The demo database has two seasons of results, an open race with a waitlist, arti
 
 Built with Next.js 16, React 19, Tailwind CSS 4, TypeScript, Prisma 7 + SQLite and Better Auth.
 
+## License
+
+[MIT](LICENSE). Heat: Pedal to the Metal is a trademark of its publisher; this project only tracks your own games of it.

@@ -38,6 +38,15 @@ model User {
   favoriteColorId String?
   favoriteColor   CarColor? @relation(fields: [favoriteColorId], references: [id], onDelete: SetNull)
 
+  // Optional emails (see src/lib/email). `email` above is a placeholder, so the real address lives here.
+  contactEmail    String?
+  /// Comma-separated email topics the driver wants, e.g. "races,news" (see src/lib/email/topics.ts)
+  emailTopics     String    @default("")
+  /// Secret for the unsubscribe link in every email, so it works without logging in
+  emailToken      String?   @unique
+  /// When they answered the "add your email?" banner (added it or said not now); it isn't shown again
+  emailPromptDismissedAt DateTime?
+
   sessions      Session[]
   accounts      Account[]
   registrations Registration[]
@@ -438,4 +447,16 @@ model Activity {
 
   @@index([createdAt])
   @@index([raceId, type])
+}
+
+// ---------------------------------------------------------------------------
+// Emails — one row per email sent to subscribers, so re-saving never sends twice
+// ---------------------------------------------------------------------------
+
+model EmailBroadcast {
+  id         String   @id @default(cuid())
+  /// What it was about, e.g. "race-open:<raceId>" or "article:<articleId>"
+  key        String   @unique
+  recipients Int      @default(0)
+  sentAt     DateTime @default(now())
 }

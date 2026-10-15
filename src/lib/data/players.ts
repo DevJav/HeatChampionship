@@ -71,7 +71,16 @@ export async function getEditableProfile(userId: string) {
   await connection();
   return db.user.findUniqueOrThrow({
     where: { id: userId },
-    select: { id: true, name: true, username: true, image: true, bio: true, favoriteColorId: true },
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      image: true,
+      bio: true,
+      favoriteColorId: true,
+      contactEmail: true,
+      emailTopics: true,
+    },
   });
 }
 

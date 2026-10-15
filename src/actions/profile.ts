@@ -4,9 +4,12 @@ import { APIError } from "better-auth/api";
 import { refresh } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { auth, PASSWORD_MIN } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { newEmailToken, sendWelcome } from "@/lib/email/send";
+import { EMAIL_TOPICS, serializeTopics } from "@/lib/email/topics";
 import { formValues, optionalText, parseForm, type FormState } from "@/lib/forms";
 import { requireUser, type CurrentUser } from "@/lib/session";
 import { deleteStoredFile, storeAvatar, storedPathFromUrl, UploadError } from "@/lib/uploads";
@@ -59,6 +62,44 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   await db.user.update({ where: { id: user.id }, data: parsed.data });
   refresh();
   return { message: t.profile.saved };
+}
+
+const emailSchema = z.object({
+  contactEmail: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.union([z.literal(""), z.email(t.email.invalidAddress).max(254)]))
+    .transform((value) => value || null),
+});
+
+/** The optional email address and which topics to get emails about. Empty address = no emails. */
+export async function updateEmailPreferences(_prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser("/perfil");
+  const parsed = parseForm(emailSchema, formData);
+  if (!parsed.ok) return parsed.state;
+
+  const { contactEmail } = parsed.data;
+  const topics = contactEmail ? EMAIL_TOPICS.filter((topic) => formData.get(`topic-${topic}`) === "on") : [];
+  const current = await db.user.findUniqueOrThrow({
+    where: { id: user.id },
+    select: { contactEmail: true, emailToken: true },
+  });
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      contactEmail,
+      emailTopics: serializeTopics(topics),
+      // A new address gets a new unsubscribe link
+      emailToken: contactEmail === current.contactEmail && current.emailToken ? current.emailToken : newEmailToken(),
+    },
+  });
+  // Confirm a new address works (and is theirs)
+  if (contactEmail && contactEmail !== current.contactEmail && topics.length > 0) after(() => sendWelcome(user.id));
+
+  refresh();
+  if (!contactEmail) return { message: current.contactEmail ? t.email.removed : t.email.saved };
+  return { message: topics.length > 0 ? t.email.saved : t.email.savedNoTopics };
 }
 
 export async function uploadAvatar(_prev: FormState, formData: FormData): Promise<FormState> {

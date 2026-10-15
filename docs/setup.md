@@ -26,10 +26,21 @@ Copy `.env.example` to `.env` and fill it in:
 | `DATABASE_URL` | SQLite file, `file:./data/heat.db` by default. |
 | `UPLOAD_DIR` | Where photos are stored, `./data/uploads` by default. |
 | `SITE_URL` | Optional. Address used in shared links if it differs from `BETTER_AUTH_URL`. |
+| `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_REPLY_TO` | Optional. Turn on [emails](#emails) to drivers. |
 
 `APP_LOCALE` and `APP_TIME_ZONE` are read when the site is built, so rebuild (or restart `npm run dev`) after changing them.
 
 The championship name, menu and maximum seats per race are in [`src/config/site.ts`](../src/config/site.ts).
+
+### Emails
+
+Drivers can add an email address in their profile and choose what to hear about: new races (when sign-ups open), results, and news. It's optional for them and off for the whole site until you set it up:
+
+1. Create a free account at [Resend](https://resend.com), verify your domain, and create an API key.
+2. Set `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `Heat Championship <heat@yourdomain.com>`), and optionally `EMAIL_REPLY_TO`.
+3. Restart the site. The profile page now shows an "Emails" card.
+
+Each email goes out once: when a race's sign-ups first open, when a race's results are first saved, and when an article is first published. Later edits send nothing. Every email has an unsubscribe link that works without logging in. The topics are listed in [`src/lib/email/topics.ts`](../src/lib/email/topics.ts).
 
 ## 2. Create the database and start
 

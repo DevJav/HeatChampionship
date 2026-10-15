@@ -5,6 +5,7 @@ import { siteConfig } from "@/config/site";
 import { locale } from "@/i18n";
 import { siteUrl } from "@/lib/site-url";
 import { MeHighlight } from "@/components/domain/MeHighlight";
+import { EmailPrompt } from "@/components/layout/EmailPrompt";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import "./globals.css";
@@ -44,6 +45,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <SiteHeader />
+        <Suspense>
+          <EmailPrompt />
+        </Suspense>
         <main className="flex-1 py-8 sm:py-10">{children}</main>
         <SiteFooter />
         <Suspense>

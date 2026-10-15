@@ -2,11 +2,13 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { siteConfig } from "@/config/site";
 import { fromLocalInput } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/db-errors";
+import { announceSignupsOpen } from "@/lib/email/announce";
 import { logRaceStatusChange } from "@/lib/log-activity";
 import { formValues, int, optionalInt, optionalText, parseForm, text, type FormState } from "@/lib/forms";
 import { joinRace, leaveRace, rebalanceSeats, RegistrationError } from "@/lib/registrations";
@@ -103,6 +105,7 @@ export async function createRace(_prev: FormState, formData: FormData): Promise<
     throw error;
   }
 
+  if (parsed.data.status === "OPEN") after(() => announceSignupsOpen(raceId));
   redirect(`/admin/carreras/${raceId}`);
 }
 
@@ -112,6 +115,7 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
   if (!parsed.ok) return parsed.state;
 
   const { status, ...data } = parsed.data;
+  let opened = false;
   try {
     await db.$transaction(async (tx) => {
       const current = await tx.race.findUniqueOrThrow({ where: { id: raceId }, select: { status: true } });
@@ -119,6 +123,7 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
       const nextStatus = current.status === "FINISHED" ? "FINISHED" : (status ?? current.status);
       await tx.race.update({ where: { id: raceId }, data: { ...data, status: nextStatus } });
       await logRaceStatusChange(tx, raceId, current.status, nextStatus);
+      opened = current.status !== "OPEN" && nextStatus === "OPEN";
       // Seats may have changed
       await rebalanceSeats(tx, raceId);
       // A finished race moved to another season takes that season's points table
@@ -131,6 +136,7 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
     throw error;
   }
 
+  if (opened) after(() => announceSignupsOpen(raceId));
   redirect("/admin/carreras");
 }
 

@@ -16,10 +16,12 @@ import {
   SubmitButton,
 } from "@/components/ui";
 import { AvatarForm } from "@/components/players/AvatarForm";
+import { EmailPreferencesForm } from "@/components/players/EmailPreferencesForm";
 import { PasswordForm } from "@/components/players/PasswordForm";
 import { ProfileForm } from "@/components/players/ProfileForm";
 import { listCarColors } from "@/lib/data/catalog";
 import { getEditableProfile } from "@/lib/data/players";
+import { emailEnabled } from "@/lib/email/send";
 import { requireUser } from "@/lib/session";
 import { t } from "@/i18n";
 
@@ -69,6 +71,20 @@ async function ProfileSettings() {
           </div>
         </CardBody>
       </Card>
+
+      {emailEnabled() && (
+        <Card id="correo" className="scroll-mt-24">
+          <CardHeader>
+            <div>
+              <CardTitle>{t.email.title}</CardTitle>
+              <CardDescription>{t.email.hint}</CardDescription>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <EmailPreferencesForm profile={profile} />
+          </CardBody>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

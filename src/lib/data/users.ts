@@ -1,6 +1,16 @@
 import { connection } from "next/server";
 import { db } from "../db";
 
+/** Whether to show the one-time "add your email?" banner to this driver. */
+export async function shouldPromptForEmail(userId: string) {
+  await connection();
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { contactEmail: true, emailPromptDismissedAt: true },
+  });
+  return !!user && !user.contactEmail && !user.emailPromptDismissedAt;
+}
+
 export async function listUsers() {
   await connection();
   return db.user.findMany({

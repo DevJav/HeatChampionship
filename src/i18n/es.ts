@@ -595,6 +595,60 @@ export const es = {
     parentGone: "El comentario al que respondes ya no existe.",
   },
 
+  email: {
+    /** Profile card */
+    title: "Correos",
+    hint: "Opcional. Te escribimos solo sobre lo que marques, y nadie más ve tu dirección.",
+    address: "Tu correo",
+    addressHint: "Déjalo vacío para no recibir ninguno.",
+    addressPlaceholder: "tu@correo.com",
+    invalidAddress: "Escribe un correo válido.",
+    whatToReceive: "Quiero recibir",
+    saved: "Preferencias guardadas.",
+    savedNoTopics: "Guardado. Marca algún tema para empezar a recibir correos.",
+    removed: "Correo borrado. No te enviaremos nada más.",
+    topics: {
+      races: "Nuevas carreras, cuando se abren las inscripciones",
+      results: "Resultados de cada carrera",
+      news: "Noticias y artículos",
+    },
+    /** Short topic names, for the email footer */
+    topicNames: { races: "carreras", results: "resultados", news: "noticias" },
+    /** Email content */
+    footer: (topics: string) => `Recibes este correo porque te apuntaste a: ${topics}.`,
+    managePreferences: "Cambiar preferencias",
+    unsubscribe: "Darme de baja",
+    welcomeSubject: "Te has apuntado a los correos de Heat Championship",
+    welcomeHeading: "¡Correo apuntado!",
+    welcomeBody: (topics: string) => `A partir de ahora te avisaremos de: ${topics}.`,
+    welcomeChange: "Puedes cambiarlo cuando quieras desde tu perfil.",
+    goToProfile: "Ir a mi perfil",
+    signupsOpenSubject: (race: string) => `Inscripciones abiertas: ${race}`,
+    signupsOpenWhen: (season: string, when: string, where: string | null) =>
+      `${season}. Se corre el ${when}${where ? ` en ${where}` : ""}.`,
+    signupsOpenSeats: (seats: number, deadline: string | null) =>
+      `Hay ${seats} plazas${deadline ? `; las inscripciones cierran el ${deadline}` : ""}. ¡Que no te la quiten!`,
+    signUp: "Apuntarme",
+    resultsSubject: (race: string) => `Resultados: ${race}`,
+    resultsWinner: (winner: string) => `Victoria de ${winner}.`,
+    resultsPodium: (names: string) => `Completan el podio ${names}.`,
+    seeResults: "Ver resultados",
+    readArticle: "Leer artículo",
+    /** Unsubscribe page */
+    unsubscribeTitle: "Darse de baja",
+    unsubscribeDescription: (address: string) => `Dejaremos de enviar correos a ${address}.`,
+    unsubscribeConfirm: "Sí, darme de baja",
+    unsubscribedTitle: "Te has dado de baja",
+    unsubscribedDescription: "No te enviaremos más correos. Puedes volver a apuntarte desde tu perfil.",
+    badLinkTitle: "Enlace caducado",
+    badLinkDescription: "Este enlace ya no sirve. Puedes cambiar tus correos desde tu perfil.",
+    /** One-time banner for drivers without an address */
+    promptTitle: "¿Te avisamos por correo?",
+    promptBody: "Si quieres, añade tu correo para enterarte de nuevas carreras, resultados y noticias. Es opcional y lo puedes cambiar cuando quieras.",
+    promptAdd: "Añadir mi correo",
+    promptDismiss: "Ahora no",
+  },
+
   activity: {
     title: "Actividad",
     description: "Lo último del campeonato: nuevos pilotos, inscripciones, resultados y más.",

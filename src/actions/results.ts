@@ -2,7 +2,10 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
+import { db } from "@/lib/db";
+import { announceResults } from "@/lib/email/announce";
 import { notifyRaceResults } from "@/lib/notify";
 import { clearRaceResults, saveRaceResults } from "@/lib/results";
 import { MAX_SPINS, validateResults, type ResultsValidation } from "@/lib/results-rules";
@@ -38,8 +41,11 @@ export async function saveResults(raceId: string, input: unknown): Promise<Resul
   const validation = validateResults(parsed.data);
   if (validation.error) return validation;
 
+  // Corrections to a finished race aren't news
+  const wasFinished = (await db.race.findUnique({ where: { id: raceId }, select: { status: true } }))?.status === "FINISHED";
   await saveRaceResults(raceId, parsed.data);
   await notifyRaceResults(raceId);
+  if (!wasFinished) after(() => announceResults(raceId));
   redirect(`/carreras/${raceId}`);
 }
 

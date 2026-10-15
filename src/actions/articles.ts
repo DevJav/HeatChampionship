@@ -2,8 +2,10 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { announceArticle } from "@/lib/email/announce";
 import { checkbox, formValues, optionalText, parseForm, text, type FormState } from "@/lib/forms";
 import { requireAdmin } from "@/lib/session";
 import { notifyArticleMentions } from "@/lib/notify";
@@ -64,6 +66,7 @@ export async function createArticle(_prev: FormState, formData: FormData): Promi
     },
   });
   await notifyArticleMentions(article.id, admin.id);
+  if (article.publishedAt) after(() => announceArticle(article.id));
   redirect(`/admin/noticias/${article.id}`);
 }
 
@@ -94,6 +97,8 @@ export async function updateArticle(articleId: string, _prev: FormState, formDat
   if (current.coverImage && current.coverImage !== coverImage) await deleteStoredFile(current.coverImage);
   // Publishing, or adding someone to a published article, tells them
   await notifyArticleMentions(articleId, admin.id);
+  // Only the first publish is emailed, not later edits
+  if (!current.publishedAt && publishedAt) after(() => announceArticle(articleId));
 
   refresh();
   // Don't echo "remove": the box would stay ticked next to a newly uploaded cover

@@ -84,8 +84,8 @@ export async function storeAvatar(userId: string, file: File) {
   return storedPath;
 }
 
-/** Store an article's banner image as WebP (max 2000px wide). Returns the path relative to UPLOAD_DIR. */
-export async function storeArticleCover(file: File) {
+/** Store an article image (banner or inline) as WebP, max 2000px. Returns the path relative to UPLOAD_DIR. */
+export async function storeArticleImage(file: File) {
   if (!file.type.startsWith("image/")) throw new UploadError("El archivo no es una imagen.");
   if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("La imagen pesa más de 15 MB.");
 

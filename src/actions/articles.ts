@@ -8,7 +8,7 @@ import { checkbox, formValues, optionalText, parseForm, text, type FormState } f
 import { requireAdmin } from "@/lib/session";
 import { notifyArticleMentions } from "@/lib/notify";
 import { slugify } from "@/lib/slug";
-import { deleteStoredFile, storeArticleCover, UploadError } from "@/lib/uploads";
+import { deleteStoredFile, storeArticleImage, UploadError } from "@/lib/uploads";
 
 const articleSchema = z.object({
   title: text(140),
@@ -37,7 +37,7 @@ async function uploadCover(formData: FormData): Promise<CoverUpload> {
   const file = formData.get("cover");
   if (!(file instanceof File) || file.size === 0) return { ok: true, path: null };
   try {
-    return { ok: true, path: await storeArticleCover(file) };
+    return { ok: true, path: await storeArticleImage(file) };
   } catch (error) {
     if (error instanceof UploadError) {
       return { ok: false, state: { fieldErrors: { cover: error.message }, values: formValues(formData) } };
@@ -109,4 +109,20 @@ export async function deleteArticle(articleId: string) {
   const article = await db.article.delete({ where: { id: articleId } });
   if (article.coverImage) await deleteStoredFile(article.coverImage);
   redirect("/admin/noticias");
+}
+
+/**
+ * An image dropped, pasted or picked in the article editor. Uploaded right
+ * away so it can be previewed; returns its URL for the Markdown.
+ */
+export async function uploadArticleImage(formData: FormData): Promise<{ url: string } | { error: string }> {
+  await requireAdmin();
+  const file = formData.get("image");
+  if (!(file instanceof File) || file.size === 0) return { error: "Elige una imagen." };
+  try {
+    return { url: `/media/${await storeArticleImage(file)}` };
+  } catch (error) {
+    if (error instanceof UploadError) return { error: error.message };
+    throw error;
+  }
 }

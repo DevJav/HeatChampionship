@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Markdown, { type Components } from "react-markdown";
+import Markdown, { defaultUrlTransform, type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { MentionedDriver } from "@/lib/data/articles";
 import { cn } from "@/lib/cn";
@@ -42,6 +42,20 @@ function withoutNode<P extends { node?: unknown }>(props: P): Omit<P, "node"> {
 const cellAlign = (align: string | undefined) =>
   align === "left" || align === "center" || align === "right" ? align : undefined;
 
+/** An image on its own line: full width at most, never cropped, caption from its alt text, click for full size. */
+function ArticleFigure({ src, alt }: { src: string; alt: string }) {
+  return (
+    <figure className="flex flex-col items-center gap-2">
+      <a href={src} target="_blank" rel="noopener noreferrer" className="max-w-full" title="Ver a tamaño completo">
+        {/* Any URL the admin pastes, so next/image's allowlist doesn't apply */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={alt} loading="lazy" className="max-h-[40rem] w-auto max-w-full clip-chamfer" />
+      </a>
+      {alt && <figcaption className="text-center text-sm text-fg-muted italic">{alt}</figcaption>}
+    </figure>
+  );
+}
+
 function components(drivers: ReadonlyMap<string, MentionedDriver>): Components {
   return {
     h1: (props) => <h2 className="mt-4 text-3xl" {...withoutNode(props)} />,
@@ -53,7 +67,16 @@ function components(drivers: ReadonlyMap<string, MentionedDriver>): Components {
     ),
     h3: (props) => <h3 className="mt-2 text-2xl" {...withoutNode(props)} />,
     h4: (props) => <h4 className="text-xl" {...withoutNode(props)} />,
-    p: (props) => <p className="leading-7" {...withoutNode(props)} />,
+    p: ({ node, ...props }) => {
+      // A paragraph holding just an image (how the editor inserts them) becomes a captioned figure
+      const content = node?.children.filter((child) => child.type !== "text" || child.value.trim() !== "") ?? [];
+      const [only] = content;
+      if (content.length === 1 && only.type === "element" && only.tagName === "img") {
+        const src = defaultUrlTransform(String(only.properties.src ?? ""));
+        return <ArticleFigure src={src} alt={String(only.properties.alt ?? "")} />;
+      }
+      return <p className="leading-7" {...props} />;
+    },
     a: ({ node, href = "", children, ...props }) => {
       const mention = node?.properties?.dataMention;
       const driver = typeof mention === "string" ? drivers.get(mention) : undefined;
@@ -89,10 +112,11 @@ function components(drivers: ReadonlyMap<string, MentionedDriver>): Components {
       />
     ),
     hr: () => <ChequeredStrip className="my-2 text-fg/15" />,
+    // Images in the middle of a sentence; ones on their own line are figures (see p)
     img: ({ alt, ...props }) => (
       // Any URL the admin pastes, so next/image's allowlist doesn't apply
       // eslint-disable-next-line @next/next/no-img-element
-      <img alt={alt ?? ""} loading="lazy" className="max-h-[32rem] w-full object-cover clip-chamfer" {...withoutNode(props)} />
+      <img alt={alt ?? ""} loading="lazy" className="inline-block h-auto max-w-full align-middle" {...withoutNode(props)} />
     ),
     code: (props) => <code className="rounded-sm bg-surface-2 px-1.5 py-0.5 font-mono text-[0.9em]" {...withoutNode(props)} />,
     pre: (props) => (

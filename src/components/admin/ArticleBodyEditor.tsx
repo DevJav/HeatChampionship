@@ -7,6 +7,7 @@ import {
   Bold,
   Flag,
   Heading2,
+  ImagePlus,
   Italic,
   Link2,
   List,
@@ -16,6 +17,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { previewArticle } from "@/actions/article-preview";
+import { uploadArticleImage } from "@/actions/articles";
 import { replaceSelection } from "@/components/forms/textareaEdit";
 import { embedSnippet, type EmbedKind } from "@/lib/articles";
 import type { ArticleEditorOptions } from "@/lib/data/articles";
@@ -46,7 +48,7 @@ function prefixLines(textarea: HTMLTextAreaElement, prefix: (index: number) => s
   replaceSelection(textarea, lines.map((line, i) => prefix(i) + line).join("\n"));
 }
 
-/** Insert on its own paragraph (embeds and tables need a line to themselves). */
+/** Insert on its own paragraph (embeds, tables, images). Returns where the block starts. */
 function insertBlock(textarea: HTMLTextAreaElement, block: string) {
   const { selectionStart, selectionEnd, value } = textarea;
   const before = value.slice(0, selectionStart);
@@ -54,7 +56,17 @@ function insertBlock(textarea: HTMLTextAreaElement, block: string) {
   const lead = before === "" || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
   const trail = after.startsWith("\n\n") ? "" : after.startsWith("\n") ? "\n" : "\n\n";
   replaceSelection(textarea, lead + block + trail);
+  return selectionStart + lead.length;
 }
+
+/** An uploaded image on its own line, with the cursor in its (optional) caption: ![|](url) */
+function insertImage(textarea: HTMLTextAreaElement, url: string) {
+  const start = insertBlock(textarea, `![](${url})`);
+  textarea.setSelectionRange(start + 2, start + 2);
+}
+
+/** Image files from a paste, drop or file picker. */
+const imagesIn = (files: FileList | null | undefined) => Array.from(files ?? []).filter((f) => f.type.startsWith("image/"));
 
 const TABLE_TEMPLATE = "| Piloto | Puntos |\n| --- | ---: |\n| Nombre | 0 |";
 
@@ -254,11 +266,34 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
   const [loading, startPreview] = useTransition();
   const [picker, setPicker] = useState<Picker | null>(null);
   const [pickerRaceId, setPickerRaceId] = useState("");
+  const [uploading, setUploading] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const error = state.fieldErrors?.body;
 
   /** Run an edit on the textarea (always mounted, hidden while previewing). */
   function edit(fn: (textarea: HTMLTextAreaElement) => void) {
     if (ref.current) fn(ref.current);
+  }
+
+  /** Upload images one by one, each inserted where the cursor is when it's ready. */
+  async function uploadImages(files: File[]) {
+    if (files.length === 0) return;
+    setUploadError(null);
+    setUploading((n) => n + files.length);
+    for (const file of files) {
+      const data = new FormData();
+      data.append("image", file);
+      try {
+        const result = await uploadArticleImage(data);
+        if ("error" in result) setUploadError(result.error);
+        else edit((t) => insertImage(t, result.url));
+      } catch {
+        setUploadError(`No se pudo subir "${file.name}".`);
+      } finally {
+        setUploading((n) => n - 1);
+      }
+    }
   }
 
   function showPreview() {
@@ -348,6 +383,21 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           <ToolButton label="Tabla" onClick={() => edit((t) => insertBlock(t, TABLE_TEMPLATE))}>
             <Table2 />
           </ToolButton>
+          <ToolButton label="Imagen" onClick={() => fileInput.current?.click()}>
+            {uploading > 0 ? <Spinner className="size-4" /> : <ImagePlus />}
+          </ToolButton>
+          {/* No name: picked files are uploaded on their own, not sent with the form */}
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={(event) => {
+              uploadImages(imagesIn(event.target.files));
+              event.target.value = "";
+            }}
+          />
           <span aria-hidden className="mx-1 h-6 w-px bg-border" />
           <Button variant="ghost" size="sm" onClick={() => setPicker("driver")} disabled={options.drivers.length === 0}>
             <AtSign /> Piloto
@@ -367,9 +417,35 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           rows={22}
           aria-invalid={error ? true : undefined}
           defaultValue={state.values?.body ?? defaultValue ?? ""}
-          placeholder={"Escribe aquí. **Negrita**, *cursiva*, ## Títulos, listas con -…\nEscribe @ para mencionar a un piloto."}
+          placeholder={"Escribe aquí. **Negrita**, *cursiva*, ## Títulos, listas con -…\nEscribe @ para mencionar a un piloto. Pega o arrastra imágenes."}
           className="font-mono text-sm leading-6"
+          onPaste={(event) => {
+            const images = imagesIn(event.clipboardData.files);
+            if (images.length === 0) return;
+            event.preventDefault();
+            uploadImages(images);
+          }}
+          onDragOver={(event) => {
+            // Allow dropping files (text drags keep the browser's behavior)
+            if (event.dataTransfer.types.includes("Files")) event.preventDefault();
+          }}
+          onDrop={(event) => {
+            const images = imagesIn(event.dataTransfer.files);
+            if (images.length === 0) return;
+            event.preventDefault();
+            uploadImages(images);
+          }}
         />
+        {uploading > 0 && (
+          <p className="flex items-center gap-2 text-xs text-fg-muted" role="status">
+            <Spinner className="size-3.5" /> Subiendo {uploading === 1 ? "imagen" : `${uploading} imágenes`}…
+          </p>
+        )}
+        {uploadError && (
+          <p className="text-xs text-danger" role="alert">
+            {uploadError}
+          </p>
+        )}
       </div>
 
       {mode === "preview" && (

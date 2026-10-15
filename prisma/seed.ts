@@ -4,44 +4,21 @@
  *
  *   npm run db:seed          catalogs + season + admin
  *   npm run db:seed:demo     …plus demo players (local testing only)
+ *
+ * Names come from seed-content.ts, in the language set by APP_LOCALE.
  */
 import "dotenv/config";
 import { db } from "../src/lib/db";
 import { createUserWithPassword } from "../src/lib/users";
+import { seedContent } from "./seed-content";
 
 const DEFAULT_POINTS = [9, 6, 4, 3, 2, 1];
 
-const tracks = [
-  { slug: "usa", name: "Estados Unidos", countryCode: "US", expansion: "Juego base" },
-  { slug: "italia", name: "Italia", countryCode: "IT", expansion: "Juego base" },
-  { slug: "francia", name: "Francia", countryCode: "FR", expansion: "Juego base" },
-  { slug: "gran-bretana", name: "Gran Bretaña", countryCode: "GB", expansion: "Juego base" },
-];
+const { tracks, carColors, upgrades, currentSeason } = seedContent;
 
-const carColors = [
-  { name: "Rojo", hex: "#d10500" },
-  { name: "Azul", hex: "#1d4ed8" },
-  { name: "Verde", hex: "#15803d" },
-  { name: "Amarillo", hex: "#facc15" },
-  { name: "Negro", hex: "#1c1917" },
-  { name: "Blanco", hex: "#f5f5f4" },
-  { name: "Naranja", hex: "#ea580c" },
-  { name: "Morado", hex: "#7e22ce" },
-];
-
-// Upgrade cards are added from the admin (names depend on your edition).
-const upgrades: { name: string; description?: string; expansion?: string }[] = [];
-
-const demoPlayers = [
-  { username: "ana", name: "Ana" },
-  { username: "marco", name: "Marco" },
-  { username: "lucia", name: "Lucía" },
-  { username: "pablo", name: "Pablo" },
-  { username: "sara", name: "Sara" },
-  { username: "diego", name: "Diego" },
-  { username: "elena", name: "Elena" },
-];
-const DEMO_PASSWORD = "carreras";
+// The sample seed adds the last demo driver later, for a full grid plus waitlist
+const demoPlayers = seedContent.drivers.slice(0, -1).map(({ username, name }) => ({ username, name }));
+const DEMO_PASSWORD = seedContent.demoPassword;
 
 async function seedCatalogs() {
   await db.appSettings.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } });
@@ -65,9 +42,9 @@ async function seedCatalogs() {
 async function seedSeason() {
   if ((await db.season.count()) > 0) return;
   await db.season.create({
-    data: { name: "Temporada 2026/27", year: 2026, status: "ACTIVE", pointsTable: DEFAULT_POINTS },
+    data: { name: currentSeason, year: 2026, status: "ACTIVE", pointsTable: DEFAULT_POINTS },
   });
-  console.log("✓ Temporada 2026/27 creada");
+  console.log(`✓ ${currentSeason} creada`);
 }
 
 async function seedAdmin() {

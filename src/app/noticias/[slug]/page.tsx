@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: PageProps<"/noticias/[slug]">
 }
 
 function ArticleHero({ article, admin }: { article: ArticleListItem; admin: boolean }) {
-  const url = absoluteUrl(`/noticias/${article.slug}`);
+  // WhatsApp caches previews by link, so a link per edit picks up a new cover or title
+  const url = absoluteUrl(`/noticias/${article.slug}?v=${article.updatedAt.getTime().toString(36)}`);
 
   return (
     <header className="relative overflow-hidden border-l-4 border-primary surface-bar clip-chamfer">

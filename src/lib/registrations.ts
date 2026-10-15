@@ -1,5 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { logRegistration } from "./log-activity";
 import { assignSeats, canWithdraw, SIGNUP_CLOSED_MESSAGES, signupWindow } from "./registration-rules";
 
 /** Sign-up database operations. All seat changes go through rebalanceSeats(). */
@@ -53,6 +54,7 @@ export async function joinRace(raceId: string, userId: string, { force = false }
       : await tx.registration.create({ data: { raceId, userId, status: "WAITLIST" } });
 
     await rebalanceSeats(tx, raceId);
+    await logRegistration(tx, "RACE_SIGNUP", raceId, userId);
     const { status } = await tx.registration.findUniqueOrThrow({ where: { id: registration.id } });
     return status;
   });
@@ -72,5 +74,6 @@ export async function leaveRace(raceId: string, userId: string, { force = false 
 
     await tx.registration.update({ where: { id: existing.id }, data: { status: "WITHDRAWN" } });
     await rebalanceSeats(tx, raceId);
+    await logRegistration(tx, "RACE_WITHDRAWAL", raceId, userId);
   });
 }

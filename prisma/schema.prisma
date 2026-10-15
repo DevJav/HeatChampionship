@@ -48,6 +48,7 @@ model User {
   notifications Notification[]   @relation("NotificationsReceived")
   /// Notifications caused by this user (their mention, reply…)
   notified      Notification[]   @relation("NotificationsCaused")
+  activity      Activity[]
 
   @@map("user")
 }
@@ -171,7 +172,8 @@ model Season {
   pointsTable Json
   createdAt   DateTime     @default(now())
 
-  races Race[]
+  races    Race[]
+  activity Activity[]
 }
 
 enum RaceStatus {
@@ -210,6 +212,7 @@ model Race {
   photos        RacePhoto[]
   articles      Article[]
   notifications Notification[]
+  activity      Activity[]
 
   @@unique([seasonId, round])
   @@index([scheduledAt])
@@ -394,4 +397,45 @@ model Notification {
   race    Race?           @relation(fields: [raceId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Activity — the league's public feed (home page and /actividad)
+// ---------------------------------------------------------------------------
+
+enum ActivityType {
+  /// A new driver signed up to the site
+  PLAYER_JOINED
+  /// A race appeared on the calendar (published without sign-ups yet)
+  RACE_ANNOUNCED
+  /// Sign-ups opened for a race
+  SIGNUPS_OPENED
+  /// A driver signed up for a race (seat or waitlist)
+  RACE_SIGNUP
+  /// A driver withdrew from a race
+  RACE_WITHDRAWAL
+  /// A race's results were published
+  RESULTS_PUBLISHED
+  /// A driver added photos to a race
+  PHOTOS_ADDED
+  SEASON_STARTED
+  SEASON_FINISHED
+}
+
+/** One line in the feed. The text is built when shown, from the linked driver, race or season (see src/lib/activity.ts). */
+model Activity {
+  id        String       @id @default(cuid())
+  type      ActivityType
+  /// The driver it's about, if any
+  actorId   String?
+  raceId    String?
+  seasonId  String?
+  createdAt DateTime     @default(now())
+
+  actor  User?   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  race   Race?   @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  season Season? @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([raceId, type])
 }

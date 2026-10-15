@@ -1,5 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { logResultsPublished, unlogResultsPublished } from "./log-activity";
 import type { ResultRow } from "./results-rules";
 import { parsePointsTable, scoreRace } from "./scoring";
 
@@ -33,6 +34,7 @@ export async function saveRaceResults(raceId: string, rows: ResultRow[]) {
       });
     }
     await tx.race.update({ where: { id: raceId }, data: { status: "FINISHED", finalizedAt: new Date() } });
+    await logResultsPublished(tx, raceId);
   });
 }
 
@@ -41,6 +43,7 @@ export async function clearRaceResults(raceId: string) {
   await db.$transaction(async (tx) => {
     await tx.raceResult.deleteMany({ where: { raceId } });
     await tx.race.update({ where: { id: raceId }, data: { status: "CLOSED", finalizedAt: null } });
+    await unlogResultsPublished(tx, raceId);
   });
 }
 

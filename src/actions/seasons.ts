@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { logSeasonStatusChange } from "@/lib/log-activity";
 import { int, parseForm, text, type FormState } from "@/lib/forms";
 import { recomputeSeasonPoints } from "@/lib/results";
 import { requireAdmin } from "@/lib/session";
@@ -37,16 +38,23 @@ type SeasonData = z.output<typeof seasonSchema>;
 async function saveSeason(data: SeasonData, seasonId?: string) {
   await db.$transaction(async (tx) => {
     if (data.status === "ACTIVE") {
-      await tx.season.updateMany({
+      const finishing = await tx.season.findMany({
         where: { status: "ACTIVE", ...(seasonId ? { id: { not: seasonId } } : {}) },
-        data: { status: "FINISHED" },
+        select: { id: true },
       });
+      for (const other of finishing) {
+        await tx.season.update({ where: { id: other.id }, data: { status: "FINISHED" } });
+        await logSeasonStatusChange(tx, other.id, "ACTIVE", "FINISHED");
+      }
     }
     if (seasonId) {
+      const current = await tx.season.findUniqueOrThrow({ where: { id: seasonId }, select: { status: true } });
       await tx.season.update({ where: { id: seasonId }, data });
       await recomputeSeasonPoints(tx, seasonId);
+      await logSeasonStatusChange(tx, seasonId, current.status, data.status);
     } else {
-      await tx.season.create({ data });
+      const season = await tx.season.create({ data });
+      await logSeasonStatusChange(tx, season.id, null, data.status);
     }
   });
 }

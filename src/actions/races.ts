@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { fromLocalInput } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/db-errors";
+import { logRaceStatusChange } from "@/lib/log-activity";
 import { formValues, int, optionalInt, optionalText, parseForm, text, type FormState } from "@/lib/forms";
 import { joinRace, leaveRace, rebalanceSeats, RegistrationError } from "@/lib/registrations";
 import { recomputeSeasonPoints } from "@/lib/results";
@@ -89,8 +90,11 @@ export async function createRace(_prev: FormState, formData: FormData): Promise<
 
   let raceId: string;
   try {
-    const race = await db.race.create({ data: { ...parsed.data, status: parsed.data.status ?? "DRAFT" } });
-    raceId = race.id;
+    raceId = await db.$transaction(async (tx) => {
+      const race = await tx.race.create({ data: { ...parsed.data, status: parsed.data.status ?? "DRAFT" } });
+      await logRaceStatusChange(tx, race.id, null, race.status);
+      return race.id;
+    });
   } catch (error) {
     if (isUniqueViolation(error)) {
       return { fieldErrors: { round: DUPLICATE_ROUND }, values: formValues(formData) };
@@ -113,6 +117,7 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
       // Finished races keep their status; results are handled separately
       const nextStatus = current.status === "FINISHED" ? "FINISHED" : (status ?? current.status);
       await tx.race.update({ where: { id: raceId }, data: { ...data, status: nextStatus } });
+      await logRaceStatusChange(tx, raceId, current.status, nextStatus);
       // Seats may have changed
       await rebalanceSeats(tx, raceId);
       // A finished race moved to another season takes that season's points table

@@ -103,7 +103,7 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
 
 function PhotosCard({ race, driverIds }: { race: RaceDetail; driverIds: string[] }) {
   return (
-    <Card>
+    <Card id="fotos" className="scroll-mt-24">
       <CardHeader>
         <CardTitle>Fotos</CardTitle>
       </CardHeader>

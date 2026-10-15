@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { db } from "@/lib/db";
 import type { FormState } from "@/lib/forms";
+import { logPhotosAdded } from "@/lib/log-activity";
 import { getCurrentUser, isAdmin, requireUser } from "@/lib/session";
 import { deleteStoredPhoto, MAX_FILES_PER_UPLOAD, storeRacePhoto, UploadError } from "@/lib/uploads";
 
@@ -25,19 +26,23 @@ export async function uploadRacePhotos(raceId: string, _prev: FormState, formDat
   if (files.length > MAX_FILES_PER_UPLOAD) return { error: `Máximo ${MAX_FILES_PER_UPLOAD} fotos a la vez.` };
   const caption = String(formData.get("caption") ?? "").trim().slice(0, 200) || null;
 
+  let added = 0;
   try {
     for (const file of files) {
       const path = await storeRacePhoto(raceId, file);
       await db.racePhoto.create({ data: { raceId, path, caption, uploadedById: user.id } });
+      added++;
     }
   } catch (error) {
     if (error instanceof UploadError) {
+      if (added > 0) await logPhotosAdded(raceId, user.id);
       refresh();
       return { error: error.message };
     }
     throw error;
   }
 
+  await logPhotosAdded(raceId, user.id);
   refresh();
   return {};
 }

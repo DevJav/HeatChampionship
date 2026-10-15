@@ -5,6 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 import { admin, username } from "better-auth/plugins";
 import { db } from "./db";
 import { getSettings } from "./data/settings";
+import { logPlayerJoined } from "./log-activity";
 
 import { PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
 
@@ -35,6 +36,15 @@ export const auth = betterAuth({
     // Must be last: lets server actions set auth cookies
     nextCookies(),
   ],
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await logPlayerJoined(user.id);
+        },
+      },
+    },
+  },
   hooks: {
     // Enforced here (not only in the form) because the auth API is public
     before: createAuthMiddleware(async (ctx) => {

@@ -683,6 +683,20 @@ export const es = {
       `Termina ${season}${champion ? `: el título es para ${champion}` : ""}`,
   },
 
+  radio: {
+    title: "Radio del equipo",
+    empty: "Nadie ha dicho nada por la radio todavía.",
+    yours: "Tu mensaje por radio",
+    placeholder: "«No me entraban las cartas…»",
+    send: "Enviar",
+    saved: "Mensaje enviado.",
+    cleared: "Mensaje borrado.",
+    errors: {
+      notDriver: "Solo los pilotos de esta carrera pueden hablar por la radio.",
+      tooLong: (max: number) => `Máximo ${max} caracteres.`,
+    },
+  },
+
   wrapped: {
     link: "Resumen de temporada",
     title: (name: string) => `La temporada de ${name}`,

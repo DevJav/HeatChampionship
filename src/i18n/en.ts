@@ -668,6 +668,20 @@ export const en: Dictionary = {
     seasonFinished: (season, champion) => `${season} is over${champion ? `: ${champion} takes the title` : ""}`,
   },
 
+  radio: {
+    title: "Team radio",
+    empty: "Nobody has said anything on the radio yet.",
+    yours: "Your radio message",
+    placeholder: "\"The cards just didn't come…\"",
+    send: "Send",
+    saved: "Message sent.",
+    cleared: "Message cleared.",
+    errors: {
+      notDriver: "Only this race's drivers can talk on the radio.",
+      tooLong: (max) => `${max} characters at most.`,
+    },
+  },
+
   wrapped: {
     link: "Season in review",
     title: (name) => `${name}'s season`,

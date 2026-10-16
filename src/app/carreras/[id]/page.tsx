@@ -21,6 +21,7 @@ import { RaceArticles } from "@/components/articles/RaceArticles";
 import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
 import { DriverOfTheDayCard } from "@/components/dotd/DriverOfTheDayCard";
 import { RacePredictions } from "@/components/predictions/RacePredictions";
+import { TeamRadio } from "@/components/radio/TeamRadio";
 import { RaceChancesCard } from "@/components/chances/RaceChancesCard";
 import { getAchievements } from "@/lib/data/achievements";
 import { EntryList } from "@/components/races/EntryList";
@@ -159,6 +160,9 @@ async function FinishedRace({ race, results }: { race: RaceDetail; results: Race
         </CardHeader>
         <ResultsTable results={results} />
       </Card>
+      <Suspense>
+        <TeamRadio raceId={race.id} results={results} />
+      </Suspense>
       <Suspense>
         <DriverOfTheDayCard race={race} results={results} />
       </Suspense>

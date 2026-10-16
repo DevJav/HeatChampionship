@@ -1,5 +1,5 @@
 /**
- * Driver of the Day votes and podium predictions for finished sample races.
+ * Driver of the Day votes, podium predictions and team radio lines for finished sample races.
  * Used by seed-sample.ts after the races exist, with its own random stream so
  * the races and results it generates stay exactly as before.
  *
@@ -48,7 +48,12 @@ function shuffle<T>(items: T[], random: () => number) {
  * may predict. Pass `announce: false` to leave closed votes for the site to
  * announce (with notifications) on the next page load.
  */
-export async function addVotesAndPredictions(raceIds: string[], league: string[], random: () => number, { announce = true, now = new Date() } = {}) {
+export async function addVotesAndPredictions(
+  raceIds: string[],
+  league: string[],
+  random: () => number,
+  { announce = true, now = new Date(), radioLines = [] as string[] } = {},
+) {
   let votes = 0;
   let predictions = 0;
   for (const raceId of raceIds) {
@@ -68,6 +73,11 @@ export async function addVotesAndPredictions(raceIds: string[], league: string[]
       await db.driverOfTheDayVote.create({ data: { raceId, voterId: voter.userId, driverId: choice.userId } });
       cast.push({ driverId: choice.userId });
       votes++;
+    }
+
+    // A couple of drivers say something on the radio
+    for (const driver of shuffle(results, random).slice(0, radioLines.length ? 2 : 0)) {
+      await db.raceResult.updateMany({ where: { raceId, userId: driver.userId }, data: { radio: radioLines[Math.floor(random() * radioLines.length)] } });
     }
 
     // A handful of people call the podium from the top five finishers

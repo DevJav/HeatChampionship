@@ -279,7 +279,7 @@ async function main() {
   await backfillActivity({ all, past, current, openRaceId: open.id, queued });
 
   const finished = await db.race.findMany({ where: { seasonId: { in: [past.id, current.id] }, status: "FINISHED" }, orderBy: { scheduledAt: "asc" }, select: { id: true } });
-  const extras = await addVotesAndPredictions(finished.map((r) => r.id), all.map((d) => d.id), mulberry32(7));
+  const extras = await addVotesAndPredictions(finished.map((r) => r.id), all.map((d) => d.id), mulberry32(7), { radioLines: seedContent.radioLines });
   console.log(`✓ ${extras.votes} votos al piloto del día y ${extras.predictions} pronósticos`);
   await seedArticles({ all, past, current, lastPastRaceId: lastPastRace!.id, roundOneId: roundOne.id, openRaceId: open.id, interested });
 }

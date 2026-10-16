@@ -273,6 +273,8 @@ model RaceResult {
   /// Snapshot of points awarded when the race was finalized
   points        Int      @default(0)
   notes         String?
+  /// The driver's own "team radio" line about the race (see src/actions/radio.ts)
+  radio         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

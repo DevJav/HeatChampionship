@@ -813,6 +813,8 @@ export const en: Dictionary = {
     rivalrySwaps: (n) => `Swapped places ${n} times`,
     rivalryClose: (n) => `side by side for ${n} ${n === 1 ? "round" : "rounds"}`,
     moment: (name, from, to, round) => `${name} went from ${from} to ${to} in round ${round}`,
+    dossier: "Report data",
+    dossierTitle: "Download everything needed to write the race report (or the preview) as Markdown",
     recordRace: "Log race",
     record: "Log",
     replay: "Replay",

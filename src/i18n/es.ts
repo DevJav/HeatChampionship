@@ -829,6 +829,8 @@ export const es = {
     rivalryClose: (n: number) => `${n} ${n === 1 ? "ronda" : "rondas"} codo con codo`,
     moment: (name: string, from: string, to: string, round: number) => `${name} pasó de ${from} a ${to} en la ronda ${round}`,
     recordRace: "Anotar carrera",
+    dossier: "Datos para crónica",
+    dossierTitle: "Descarga en Markdown todo lo necesario para escribir la crónica (o la previa)",
     record: "Anotar",
     replay: "Repetición",
     round: (n: number) => `Ronda ${n}`,

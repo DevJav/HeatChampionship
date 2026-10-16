@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Flag, NotebookPen, Pencil } from "lucide-react";
+import { FileText, Flag, NotebookPen, Pencil } from "lucide-react";
 import {
   Alert,
   Badge,
   ButtonLink,
+  buttonVariants,
   Card,
   CardBody,
   CardHeader,
@@ -105,6 +106,9 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
             <ButtonLink href={`/admin/carreras/${race.id}/resultados`} variant="inverse" size="sm">
               <Flag /> {race.status === "FINISHED" ? t.races.editResults : t.races.results}
             </ButtonLink>
+            <a href={`/carreras/${race.id}/cronica.md`} title={t.raceLog.dossierTitle} className={buttonVariants({ variant: "inverse", size: "sm" })}>
+              <FileText /> {t.raceLog.dossier}
+            </a>
           </div>
         )}
       </div>

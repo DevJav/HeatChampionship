@@ -219,6 +219,8 @@ export type Duel = {
   /** Races the row driver finished ahead */
   ahead: number;
   behind: number;
+  /** Times they swapped places during races logged round by round */
+  swaps: number;
 };
 
 /** duels.get(a)?.get(b) = how `a` fared against `b` in races they shared. */
@@ -227,7 +229,7 @@ export function headToHead(races: StatsRace[]) {
   const duel = (a: string, b: string) => {
     const row = duels.get(a) ?? new Map<string, Duel>();
     duels.set(a, row);
-    const entry = row.get(b) ?? { meetings: 0, ahead: 0, behind: 0 };
+    const entry = row.get(b) ?? { meetings: 0, ahead: 0, behind: 0, swaps: 0 };
     row.set(b, entry);
     return entry;
   };
@@ -240,6 +242,12 @@ export function headToHead(races: StatsRace[]) {
         if (a.position < b.position) entry.ahead += 1;
         else entry.behind += 1;
       }
+    }
+    for (const { a, b, swaps } of race.highlights?.duels ?? []) {
+      // Both directions, only for pairs that are in the results
+      if (!swaps || !duels.get(a)?.has(b)) continue;
+      duel(a, b).swaps += swaps;
+      duel(b, a).swaps += swaps;
     }
   }
   return duels;

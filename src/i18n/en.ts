@@ -426,6 +426,7 @@ export const en: Dictionary = {
       mostlyAhead: "Mostly ahead",
       racesTogether: (n) => (n === 1 ? "race together" : "races together"),
       ahead: (name) => `${name} ahead:`,
+      swaps: "Place swaps in logged races:",
       neverMet: "They haven't raced each other yet.",
     },
   },
@@ -663,6 +664,9 @@ export const en: Dictionary = {
 
   raceLog: {
     momentTitle: "Moment of the race",
+    rivalryTitle: "Rivalry of the race",
+    rivalrySwaps: (n) => `Swapped places ${n} times`,
+    rivalryClose: (n) => `side by side for ${n} ${n === 1 ? "round" : "rounds"}`,
     moment: (name, from, to, round) => `${name} went from ${from} to ${to} in round ${round}`,
     recordRace: "Log race",
     record: "Log",

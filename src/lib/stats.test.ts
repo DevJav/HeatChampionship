@@ -148,18 +148,28 @@ describe("headToHead", () => {
       race([r("ana", 2), r("leo", 3)]),
       race([r("ana", 3), r("eva", 1)]),
     ]);
-    expect(duels.get("ana")?.get("leo")).toEqual({ meetings: 3, ahead: 2, behind: 1 });
-    expect(duels.get("leo")?.get("ana")).toEqual({ meetings: 3, ahead: 1, behind: 2 });
-    expect(duels.get("eva")?.get("ana")).toEqual({ meetings: 1, ahead: 1, behind: 0 });
+    expect(duels.get("ana")?.get("leo")).toEqual({ meetings: 3, ahead: 2, behind: 1, swaps: 0 });
+    expect(duels.get("leo")?.get("ana")).toEqual({ meetings: 3, ahead: 1, behind: 2, swaps: 0 });
+    expect(duels.get("eva")?.get("ana")).toEqual({ meetings: 1, ahead: 1, behind: 0, swaps: 0 });
     expect(duels.get("eva")?.get("leo")).toBeUndefined();
+  });
+
+  it("adds up place swaps from logged races, both ways", () => {
+    const logged = (results: StatsResult[], swaps: number): StatsRace => ({
+      ...race(results),
+      highlights: { winner: null, wireToWire: false, lastGasp: false, slipstreams: {}, duels: [{ a: "leo", b: "ana", swaps, close: 0 }] },
+    });
+    const duels = headToHead([logged([r("ana", 1), r("leo", 2)], 3), logged([r("ana", 2), r("leo", 1)], 2), race([r("ana", 1), r("leo", 2)])]);
+    expect(duels.get("ana")?.get("leo")?.swaps).toBe(5);
+    expect(duels.get("leo")?.get("ana")?.swaps).toBe(5);
   });
 });
 
 describe("duelStep", () => {
   it("bands the share of races finished ahead symmetrically", () => {
-    const step = (ahead: number, behind: number) => duelStep({ meetings: ahead + behind, ahead, behind });
+    const step = (ahead: number, behind: number) => duelStep({ meetings: ahead + behind, ahead, behind, swaps: 0 });
     expect([step(5, 5), step(6, 5), step(6, 4), step(8, 2), step(9, 1), step(0, 4), step(4, 5)]).toEqual([0, 0, 1, 2, 3, -3, -1]);
-    expect(duelStep({ meetings: 0, ahead: 0, behind: 0 })).toBe(0);
+    expect(duelStep({ meetings: 0, ahead: 0, behind: 0, swaps: 0 })).toBe(0);
   });
 });
 

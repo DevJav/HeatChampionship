@@ -1,9 +1,9 @@
 import { Download } from "lucide-react";
 import { ButtonLink, Section } from "@/components/ui";
 import { LoggedRaceReplay } from "@/components/race-log/LoggedRaceReplay";
-import { MomentOfTheRace } from "@/components/race-log/MomentOfTheRace";
+import { MomentOfTheRace, RivalryOfTheRace } from "@/components/race-log/RaceHighlights";
 import { getRaceLog } from "@/lib/data/race-logs";
-import { momentOfTheRace } from "@/lib/race-log/highlights";
+import { momentOfTheRace, pairDuels, rivalryOfTheRace } from "@/lib/race-log/highlights";
 import { carLabels } from "@/lib/race-log/log";
 import { trackDrawing } from "@/lib/race-log/tracks";
 import { t } from "@/i18n";
@@ -17,7 +17,10 @@ export async function RaceLogSection({ raceId }: { raceId: string }) {
   const cars = log.cars.map((c) => ({ id: c.userId, name: names[c.userId] ?? "?", label: labels[c.userId] ?? "?", color: c.color }));
   const layout = trackDrawing(log.track, log.laps)?.layout;
   const moment = layout && momentOfTheRace(layout, log.rounds);
-  const star = moment && cars.find((c) => c.id === moment.userId);
+  const rivalry = layout && rivalryOfTheRace(pairDuels(layout, log.rounds));
+  const car = (id: string) => cars.find((c) => c.id === id);
+  const star = moment && car(moment.userId);
+  const rivals = rivalry && { a: car(rivalry.a), b: car(rivalry.b) };
 
   return (
     <Section
@@ -34,7 +37,12 @@ export async function RaceLogSection({ raceId }: { raceId: string }) {
       }
     >
       <div className="flex flex-col gap-4">
-        {moment && star && <MomentOfTheRace moment={moment} name={star.name} color={star.color} />}
+        {(star || rivals) && (
+          <div className="grid gap-4 md:grid-cols-2">
+            {moment && star && <MomentOfTheRace moment={moment} car={star} />}
+            {rivalry && rivals?.a && rivals.b && <RivalryOfTheRace rivalry={rivalry} a={rivals.a} b={rivals.b} />}
+          </div>
+        )}
         <LoggedRaceReplay track={log.track} laps={log.laps} cars={cars} rounds={log.rounds} />
       </div>
     </Section>

@@ -134,6 +134,7 @@ describe("computeUnlocks — race log feats", () => {
     wireToWire: false,
     lastGasp: false,
     slipstreams: {},
+    duels: [],
     ...extra,
   });
 

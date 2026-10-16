@@ -181,6 +181,11 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
               <li>
                 {t.stats.matrix.ahead(colDriver.name)} <span className="font-bold text-fg tabular-nums">{duel.behind}</span>
               </li>
+              {duel.swaps > 0 && (
+                <li>
+                  {t.stats.matrix.swaps} <span className="font-bold text-fg tabular-nums">{duel.swaps}</span>
+                </li>
+              )}
             </ul>
           ) : (
             <p className="text-fg-muted">{t.stats.matrix.neverMet}</p>

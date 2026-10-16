@@ -433,6 +433,7 @@ export const es = {
       racesTogether: (n: number): string => (n === 1 ? "carrera juntos" : "carreras juntos"),
       ahead: (name: string) => `${name} por delante:`,
       neverMet: "Aún no han coincidido en una carrera.",
+      swaps: "Cambios de posición en carreras anotadas:",
     },
   },
 
@@ -678,6 +679,9 @@ export const es = {
 
   raceLog: {
     momentTitle: "Momento de la carrera",
+    rivalryTitle: "Rivalidad de la carrera",
+    rivalrySwaps: (n: number) => `Se cambiaron de posición ${n} veces`,
+    rivalryClose: (n: number) => `${n} ${n === 1 ? "ronda" : "rondas"} codo con codo`,
     moment: (name: string, from: string, to: string, round: number) => `${name} pasó de ${from} a ${to} en la ronda ${round}`,
     recordRace: "Anotar carrera",
     record: "Anotar",

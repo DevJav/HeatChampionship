@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { momentOfTheRace, raceHighlights } from "./highlights";
+import { momentOfTheRace, pairDuels, raceHighlights, rivalryOfTheRace } from "./highlights";
 import type { LoggedRound, Positions } from "./rounds";
 import { usaLayout as usa } from "./usa";
 
@@ -22,7 +22,7 @@ const grid = round({ a: -1, b: -1, c: -2 });
 describe("raceHighlights", () => {
   it("is empty until every car has finished", () => {
     const h = raceHighlights(usa, [grid, round({ a: 10, b: 8, c: 5 }, { b: { slipstream: true } })]);
-    expect(h).toEqual({ winner: null, wireToWire: false, lastGasp: false, slipstreams: { b: 1 } });
+    expect(h).toMatchObject({ winner: null, wireToWire: false, lastGasp: false, slipstreams: { b: 1 } });
   });
 
   it("spots a wire-to-wire win", () => {
@@ -49,5 +49,26 @@ describe("momentOfTheRace", () => {
 
   it("ignores single-place swaps", () => {
     expect(momentOfTheRace(usa, [grid, round({ a: 8, b: 10, c: 2 })])).toBeNull();
+  });
+});
+
+describe("pairDuels", () => {
+  const rounds = [
+    grid,
+    round({ a: 10, b: 11, c: 2 }), // b passes a, close
+    round({ a: 20, b: 19, c: 9 }), // a passes b, close
+    round({ a: 28, b: 30, c: 15 }), // b passes a
+    round({ a: 40, b: 41, c: 39 }), // c closes up on a
+  ];
+
+  it("counts swaps and close rounds per pair", () => {
+    const duels = pairDuels(usa, rounds);
+    expect(duels.find((d) => d.a === "a" && d.b === "b")).toEqual({ a: "a", b: "b", swaps: 3, close: 3 });
+    expect(duels.find((d) => d.a === "a" && d.b === "c")).toEqual({ a: "a", b: "c", swaps: 0, close: 1 });
+  });
+
+  it("names the rivalry of the race only with enough swaps", () => {
+    expect(rivalryOfTheRace(pairDuels(usa, rounds))).toMatchObject({ a: "a", b: "b", swaps: 3 });
+    expect(rivalryOfTheRace(pairDuels(usa, rounds.slice(0, 2)))).toBeNull();
   });
 });

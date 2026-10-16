@@ -25,6 +25,8 @@ export type StatsRace = {
   results: StatsResult[];
   /** Story beats from the round-by-round log, when the race was logged on a traced track */
   highlights?: RaceHighlights | null;
+  /** Driver of the Day winners, once voting has closed */
+  driverOfTheDay?: string[];
 };
 
 /** Where a single-race record happened. */

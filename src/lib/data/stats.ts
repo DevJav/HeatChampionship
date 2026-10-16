@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import type { StatsRace } from "../stats";
 import { db } from "../db";
+import { tallyVotes, votingPhase } from "../driver-of-the-day";
 import { raceHighlights } from "../race-log/highlights";
 import { storedLog } from "../race-log/tracks";
 import { driverSelect } from "./standings";
@@ -34,11 +35,16 @@ export async function getStatsData({ seasonId, trackId }: { seasonId?: string | 
         },
       },
       log: { select: { data: true } },
+      status: true,
+      finalizedAt: true,
+      dotdVotes: { select: { driverId: true } },
     },
   });
-  const statsRaces: StatsRace[] = races.map(({ log, ...race }) => ({
+  const now = new Date();
+  const statsRaces: StatsRace[] = races.map(({ log, status, finalizedAt, dotdVotes, ...race }) => ({
     ...race,
     highlights: log && highlightsOf(log.data),
+    driverOfTheDay: votingPhase({ status, finalizedAt }, now) === "closed" ? tallyVotes(dotdVotes).winners : [],
     results: race.results.map((result) => ({ ...result, upgrades: result.upgrades.map((u) => u.upgrade) })),
   }));
 

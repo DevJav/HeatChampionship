@@ -343,6 +343,7 @@ export const es = {
       "last-gasp": { name: "Al último suspiro", description: "Ganó adelantando al líder en la última ronda." },
       "spun-podium": { name: "Trompo y podio", description: "Subió al podio después de hacer un trompo." },
       "slipstream-king": { name: "Rey del rebufo", description: "Más rebufos de la temporada en las carreras anotadas." },
+      "driver-of-the-day": { name: "Piloto del día", description: "Elegido piloto del día por sus rivales." },
       globetrotter: { name: "Trotamundos", description: (n: number) => `Ganó en ${n} circuitos distintos.` },
       ironman: { name: "Incansable", description: "Corrió todas las carreras de una temporada." },
       "first-win": { name: "Primera victoria", description: "Ganó su primera carrera." },
@@ -675,6 +676,26 @@ export const es = {
     seasonStarted: (season: string) => `Arranca ${season}`,
     seasonFinished: (season: string, champion: string | null) =>
       `Termina ${season}${champion ? `: el título es para ${champion}` : ""}`,
+  },
+
+  dotd: {
+    title: "Piloto del día",
+    intro: "Los pilotos de la carrera votan a quién merece el premio. Nadie puede votarse a sí mismo.",
+    closesOn: (date: string) => `Votación abierta hasta el ${date}.`,
+    turnout: (voted: number, total: number) => `Han votado ${voted} de ${total} pilotos.`,
+    vote: "Votar",
+    changeVote: "Cambiar voto",
+    yourVote: (name: string) => `Tu voto: ${name}.`,
+    onlyDrivers: "Solo votan los pilotos de esta carrera. El resultado se verá al cerrar la votación.",
+    logInToVote: "Entra para votar si corriste esta carrera.",
+    winner: (votes: number) => (votes === 1 ? "1 voto" : `${votes} votos`),
+    noVotes: "Nadie votó en esta carrera.",
+    errors: {
+      closed: "La votación no está abierta.",
+      onlyDrivers: "Solo pueden votar los pilotos de esta carrera.",
+      notYourself: "No puedes votarte a ti mismo.",
+      notInRace: "Ese piloto no corrió esta carrera.",
+    },
   },
 
   raceLog: {

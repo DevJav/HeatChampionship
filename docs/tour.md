@@ -52,7 +52,7 @@ Each race has its own page, with the track's country flag in the banner. Before 
 
 ![Finished race page](screenshots/race-results.png)
 
-Once the organiser enters the results, the page switches to the **podium** and the **full results**: finishing and starting position (with places gained or lost), the upgrade cards each driver used, spins and notes. It also lists the **achievements unlocked** in that race, and the race's drivers can upload **photos** of the final board.
+Once the organiser enters the results, the page switches to the **podium** and the **full results**: finishing and starting position (with places gained or lost), the upgrade cards each driver used, spins and notes. For a week after the results, the race's drivers vote for the **Driver of the Day** (not themselves); the tally stays hidden until voting closes, and the winner gets a badge. It also lists the **achievements unlocked** in that race, and the race's drivers can upload **photos** of the final board.
 
 ## Logging a race round by round
 

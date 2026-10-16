@@ -19,6 +19,7 @@ import { FlagBackdrop } from "@/components/domain/CountryFlag";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { RaceArticles } from "@/components/articles/RaceArticles";
 import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
+import { DriverOfTheDayCard } from "@/components/dotd/DriverOfTheDayCard";
 import { getAchievements } from "@/lib/data/achievements";
 import { EntryList } from "@/components/races/EntryList";
 import { Podium } from "@/components/races/Podium";
@@ -156,6 +157,9 @@ async function FinishedRace({ race, results }: { race: RaceDetail; results: Race
         </CardHeader>
         <ResultsTable results={results} />
       </Card>
+      <Suspense>
+        <DriverOfTheDayCard race={race} results={results} />
+      </Suspense>
       {raceUnlocks.length > 0 && (
         <Card>
           <CardHeader>

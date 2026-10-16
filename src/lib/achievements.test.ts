@@ -163,3 +163,12 @@ describe("computeUnlocks — race log feats", () => {
     expect(kings.sort()).toEqual(["ana", "leo"]);
   });
 });
+
+describe("computeUnlocks — Driver of the Day", () => {
+  it("awards every winner of a closed vote", () => {
+    const voted = { ...race([r("ana", 1), r("leo", 2), r("eva", 3)]), driverOfTheDay: ["leo", "eva"] };
+    expect(ids("leo", [voted])).toContain("driver-of-the-day");
+    expect(ids("eva", [voted])).toContain("driver-of-the-day");
+    expect(ids("ana", [voted])).not.toContain("driver-of-the-day");
+  });
+});

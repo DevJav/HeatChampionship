@@ -58,6 +58,8 @@ model User {
   /// Notifications caused by this user (their mention, reply…)
   notified      Notification[]   @relation("NotificationsCaused")
   activity      Activity[]
+  dotdVotesCast     DriverOfTheDayVote[] @relation("DotdVotesCast")
+  dotdVotesReceived DriverOfTheDayVote[] @relation("DotdVotesReceived")
 
   @@map("user")
 }
@@ -220,6 +222,7 @@ model Race {
   results       RaceResult[]
   photos        RacePhoto[]
   log           RaceLog?
+  dotdVotes     DriverOfTheDayVote[]
   articles      Article[]
   notifications Notification[]
   activity      Activity[]
@@ -294,6 +297,21 @@ model RaceLog {
   updatedAt DateTime @updatedAt
 
   race Race @relation(fields: [raceId], references: [id], onDelete: Cascade)
+}
+
+/// One driver's Driver of the Day vote in a race (see src/lib/driver-of-the-day.ts). They can change it while voting is open.
+model DriverOfTheDayVote {
+  raceId    String
+  voterId   String
+  driverId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  race   Race @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  voter  User @relation("DotdVotesCast", fields: [voterId], references: [id], onDelete: Cascade)
+  driver User @relation("DotdVotesReceived", fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@id([raceId, voterId])
 }
 
 model RacePhoto {

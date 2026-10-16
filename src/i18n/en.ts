@@ -338,6 +338,7 @@ export const en: Dictionary = {
       "last-gasp": { name: "Last gasp", description: "Won by passing the leader in the final round." },
       "spun-podium": { name: "Spin and podium", description: "Reached the podium after spinning out." },
       "slipstream-king": { name: "Slipstream king", description: "Most slipstreams of the season in logged races." },
+      "driver-of-the-day": { name: "Driver of the Day", description: "Voted Driver of the Day by their rivals." },
       globetrotter: { name: "Globetrotter", description: (n) => `Won at ${n} different tracks.` },
       ironman: { name: "Ironman", description: "Raced every race of a season." },
       "first-win": { name: "First win", description: "Won their first race." },
@@ -660,6 +661,26 @@ export const en: Dictionary = {
     photos: (race) => `uploaded photos of ${race}`,
     seasonStarted: (season) => `${season} is under way`,
     seasonFinished: (season, champion) => `${season} is over${champion ? `: ${champion} takes the title` : ""}`,
+  },
+
+  dotd: {
+    title: "Driver of the Day",
+    intro: "The race's drivers vote for who deserves it. Nobody can vote for themselves.",
+    closesOn: (date) => `Voting open until ${date}.`,
+    turnout: (voted, total) => `${voted} of ${total} drivers have voted.`,
+    vote: "Vote",
+    changeVote: "Change vote",
+    yourVote: (name) => `Your vote: ${name}.`,
+    onlyDrivers: "Only this race's drivers vote. The result shows when voting closes.",
+    logInToVote: "Log in to vote if you raced in this one.",
+    winner: (votes) => (votes === 1 ? "1 vote" : `${votes} votes`),
+    noVotes: "Nobody voted in this race.",
+    errors: {
+      closed: "Voting isn't open.",
+      onlyDrivers: "Only this race's drivers can vote.",
+      notYourself: "You can't vote for yourself.",
+      notInRace: "That driver didn't race in this one.",
+    },
   },
 
   raceLog: {

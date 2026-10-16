@@ -24,6 +24,7 @@ export type AchievementId =
   | "last-gasp"
   | "spun-podium"
   | "slipstream-king"
+  | "driver-of-the-day"
   | "hat-trick"
   | "podium-streak"
   | "globetrotter"
@@ -69,6 +70,7 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
   { id: "wire-to-wire", ...text["wire-to-wire"], tier: "special", repeatable: true },
   { id: "last-gasp", ...text["last-gasp"], tier: "special", repeatable: true },
   { id: "spun-podium", ...text["spun-podium"], tier: "special", repeatable: true },
+  { id: "driver-of-the-day", ...text["driver-of-the-day"], tier: "special", repeatable: true },
   { id: "globetrotter", ...text["globetrotter"], description: text["globetrotter"].description(GLOBETROTTER_TRACKS), tier: "special" },
   { id: "ironman", ...text["ironman"], tier: "special", repeatable: true },
   { id: "slipstream-king", ...text["slipstream-king"], tier: "special", repeatable: true },
@@ -161,6 +163,8 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
         if (c.podiumStreak === PODIUM_STREAK) add("podium-streak", userId);
         if (result.spins > 0) add("spun-podium", userId);
       }
+
+      if (race.driverOfTheDay?.includes(userId)) add("driver-of-the-day", userId);
 
       const gained = positionsGained(startPosition, position);
       if (gained != null && gained >= COMEBACK_PLACES) add("comeback", userId);

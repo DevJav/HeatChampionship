@@ -20,6 +20,7 @@ import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { RaceArticles } from "@/components/articles/RaceArticles";
 import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
 import { DriverOfTheDayCard } from "@/components/dotd/DriverOfTheDayCard";
+import { RacePredictions } from "@/components/predictions/RacePredictions";
 import { getAchievements } from "@/lib/data/achievements";
 import { EntryList } from "@/components/races/EntryList";
 import { Podium } from "@/components/races/Podium";
@@ -160,6 +161,9 @@ async function FinishedRace({ race, results }: { race: RaceDetail; results: Race
       <Suspense>
         <DriverOfTheDayCard race={race} results={results} />
       </Suspense>
+      <Suspense>
+        <RacePredictions race={race} results={results} />
+      </Suspense>
       {raceUnlocks.length > 0 && (
         <Card>
           <CardHeader>
@@ -201,6 +205,9 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
               <RaceSignupPanel race={race} />
             </CardBody>
           </Card>
+          <Suspense>
+            <RacePredictions race={race} />
+          </Suspense>
           {race.notes && <NotesCard notes={race.notes} />}
         </div>
       </div>

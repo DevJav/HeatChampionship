@@ -60,6 +60,10 @@ model User {
   activity      Activity[]
   dotdVotesCast     DriverOfTheDayVote[] @relation("DotdVotesCast")
   dotdVotesReceived DriverOfTheDayVote[] @relation("DotdVotesReceived")
+  predictions       Prediction[]         @relation("PredictionsMade")
+  pickedFirst       Prediction[]         @relation("PickedFirst")
+  pickedSecond      Prediction[]         @relation("PickedSecond")
+  pickedThird       Prediction[]         @relation("PickedThird")
 
   @@map("user")
 }
@@ -223,6 +227,7 @@ model Race {
   photos        RacePhoto[]
   log           RaceLog?
   dotdVotes     DriverOfTheDayVote[]
+  predictions   Prediction[]
   articles      Article[]
   notifications Notification[]
   activity      Activity[]
@@ -312,6 +317,25 @@ model DriverOfTheDayVote {
   driver User @relation("DotdVotesReceived", fields: [driverId], references: [id], onDelete: Cascade)
 
   @@id([raceId, voterId])
+}
+
+/// Someone's podium prediction for a race (see src/lib/predictions.ts). Editable until the race starts.
+model Prediction {
+  raceId    String
+  userId    String
+  firstId   String
+  secondId  String
+  thirdId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  race   Race @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  user   User @relation("PredictionsMade", fields: [userId], references: [id], onDelete: Cascade)
+  first  User @relation("PickedFirst", fields: [firstId], references: [id], onDelete: Cascade)
+  second User @relation("PickedSecond", fields: [secondId], references: [id], onDelete: Cascade)
+  third  User @relation("PickedThird", fields: [thirdId], references: [id], onDelete: Cascade)
+
+  @@id([raceId, userId])
 }
 
 model RacePhoto {

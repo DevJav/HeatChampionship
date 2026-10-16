@@ -3,6 +3,7 @@
 import { intlLocale, t } from "@/i18n";
 import { summarizePlayer, type PlayerResult, type PlayerSummary } from "./player-stats";
 import { positionsGained } from "./scoring";
+import type { Picks } from "./predictions";
 import type { RaceHighlights } from "./race-log/highlights";
 
 export type StatsResult = {
@@ -27,6 +28,8 @@ export type StatsRace = {
   highlights?: RaceHighlights | null;
   /** Driver of the Day winners, once voting has closed */
   driverOfTheDay?: string[];
+  /** Podium predictions made for the race */
+  predictions?: { userId: string; picks: Picks }[];
 };
 
 /** Where a single-race record happened. */

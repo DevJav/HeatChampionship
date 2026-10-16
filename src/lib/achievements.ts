@@ -4,6 +4,7 @@
  */
 
 import { t } from "@/i18n";
+import { oracleTable, podiumOf, scorePicks } from "./predictions";
 import { positionsGained } from "./scoring";
 import { computeStandings } from "./standings";
 import type { RaceRef, StatsRace } from "./stats";
@@ -25,6 +26,8 @@ export type AchievementId =
   | "spun-podium"
   | "slipstream-king"
   | "driver-of-the-day"
+  | "perfect-call"
+  | "oracle"
   | "hat-trick"
   | "podium-streak"
   | "globetrotter"
@@ -71,6 +74,8 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
   { id: "last-gasp", ...text["last-gasp"], tier: "special", repeatable: true },
   { id: "spun-podium", ...text["spun-podium"], tier: "special", repeatable: true },
   { id: "driver-of-the-day", ...text["driver-of-the-day"], tier: "special", repeatable: true },
+  { id: "perfect-call", ...text["perfect-call"], tier: "special", repeatable: true },
+  { id: "oracle", ...text["oracle"], tier: "special", repeatable: true },
   { id: "globetrotter", ...text["globetrotter"], description: text["globetrotter"].description(GLOBETROTTER_TRACKS), tier: "special" },
   { id: "ironman", ...text["ironman"], tier: "special", repeatable: true },
   { id: "slipstream-king", ...text["slipstream-king"], tier: "special", repeatable: true },
@@ -169,6 +174,12 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
       const gained = positionsGained(startPosition, position);
       if (gained != null && gained >= COMEBACK_PLACES) add("comeback", userId);
     }
+
+    // Predictors need not have raced
+    const podium = podiumOf(race.results);
+    for (const { userId, picks } of race.predictions ?? []) {
+      if (scorePicks(picks, podium).perfect) add("perfect-call", userId);
+    }
   }
 
   // --- Finished seasons: final top three and full attendance
@@ -184,6 +195,11 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
       if (seasonRaces.length >= IRONMAN_MIN_RACES && row.starts === seasonRaces.length) {
         unlocks.push({ achievementId: "ironman", userId: row.userId, date, season: ref });
       }
+    }
+
+    // Best predictor of the season; ties share it
+    for (const row of oracleTable(seasonRaces.map((race) => ({ results: race.results, predictions: race.predictions ?? [] })))) {
+      if (row.rank === 1 && row.points > 0) unlocks.push({ achievementId: "oracle", userId: row.userId, date, season: ref });
     }
 
     // Most slipstreams over the season's logged races; ties share it

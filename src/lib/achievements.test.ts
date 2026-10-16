@@ -172,3 +172,16 @@ describe("computeUnlocks — Driver of the Day", () => {
     expect(ids("ana", [voted])).not.toContain("driver-of-the-day");
   });
 });
+
+describe("computeUnlocks — predictions", () => {
+  it("rewards an exact podium call and the season's best predictor", () => {
+    const results = [r("ana", 1), r("leo", 2), r("eva", 3)];
+    const races = [
+      { ...race(results, { season: "s7" }), predictions: [{ userId: "zoe", picks: ["ana", "leo", "eva"] as [string, string, string] }, { userId: "max", picks: ["leo", "ana", "eva"] as [string, string, string] }] },
+    ];
+    const unlocks = computeUnlocks(races, [{ id: "s7", name: "s7", finished: true }]);
+    const of = (id: string) => unlocks.filter((u) => u.achievementId === id).map((u) => u.userId);
+    expect(of("perfect-call")).toEqual(["zoe"]);
+    expect(of("oracle")).toEqual(["zoe"]);
+  });
+});

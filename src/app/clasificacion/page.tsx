@@ -17,6 +17,8 @@ import { SeasonPodium } from "@/components/achievements/SeasonPodium";
 import { SeasonPicker } from "@/components/standings/SeasonPicker";
 import { StandingsChart } from "@/components/standings/StandingsChart";
 import { StandingsTable } from "@/components/standings/StandingsTable";
+import { OracleTable } from "@/components/predictions/OracleTable";
+import { getSeasonOracle } from "@/lib/data/predictions";
 import { getCurrentSeason, listSeasons } from "@/lib/data/catalog";
 import { getSeasonStandings } from "@/lib/data/standings";
 import { cn } from "@/lib/cn";
@@ -38,7 +40,7 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
     );
   }
 
-  const standings = await getSeasonStandings(season.id);
+  const [standings, oracle] = await Promise.all([getSeasonStandings(season.id), getSeasonOracle(season.id)]);
   const finished = season.status === "FINISHED";
   const { rows, races, drivers, scheduledRaces } = standings;
   const leader = rows[0] ? drivers.get(rows[0].userId) : null;
@@ -113,6 +115,18 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
               <CardBody>
                 <StandingsChart standings={standings} />
               </CardBody>
+            </Card>
+          )}
+
+          {oracle.rows.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div>
+                  <CardTitle>{t.predictions.oracle}</CardTitle>
+                  <CardDescription>{t.predictions.oracleDescription}</CardDescription>
+                </div>
+              </CardHeader>
+              <OracleTable rows={oracle.rows} users={oracle.users} />
             </Card>
           )}
         </>

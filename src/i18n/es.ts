@@ -344,6 +344,8 @@ export const es = {
       "spun-podium": { name: "Trompo y podio", description: "Subió al podio después de hacer un trompo." },
       "slipstream-king": { name: "Rey del rebufo", description: "Más rebufos de la temporada en las carreras anotadas." },
       "driver-of-the-day": { name: "Piloto del día", description: "Elegido piloto del día por sus rivales." },
+      "perfect-call": { name: "Clarividente", description: "Acertó el podio exacto en un pronóstico." },
+      oracle: { name: "Oráculo", description: "Mejor pronosticador de una temporada." },
       globetrotter: { name: "Trotamundos", description: (n: number) => `Ganó en ${n} circuitos distintos.` },
       ironman: { name: "Incansable", description: "Corrió todas las carreras de una temporada." },
       "first-win": { name: "Primera victoria", description: "Ganó su primera carrera." },
@@ -676,6 +678,34 @@ export const es = {
     seasonStarted: (season: string) => `Arranca ${season}`,
     seasonFinished: (season: string, champion: string | null) =>
       `Termina ${season}${champion ? `: el título es para ${champion}` : ""}`,
+  },
+
+  predictions: {
+    title: "Pronóstico del podio",
+    intro: "Elige quién acaba 1º, 2º y 3º. 3 puntos por cada puesto exacto y 1 por acertar un piloto del podio en otro puesto. Nadie ve los pronósticos hasta la salida.",
+    places: ["1º", "2º", "3º"] as [string, string, string],
+    choose: "Elige piloto",
+    save: "Guardar pronóstico",
+    update: "Cambiar pronóstico",
+    saved: "Pronóstico guardado.",
+    count: (n: number) => (n === 1 ? "1 pronóstico hasta ahora." : `${n} pronósticos hasta ahora.`),
+    needDrivers: "Se podrá pronosticar cuando haya al menos 3 pilotos confirmados.",
+    logIn: "Entra para hacer tu pronóstico.",
+    none: "Nadie hizo pronóstico para esta carrera.",
+    predictor: "Quién",
+    picks: "Pronóstico",
+    points: "Pts",
+    perfect: "¡Podio exacto!",
+    oracle: "Oráculo",
+    oracleDescription: "Quién acierta más podios esta temporada.",
+    exact: "Exactos",
+    made: "Pronósticos",
+    errors: {
+      closed: "Los pronósticos de esta carrera están cerrados.",
+      pickThree: "Elige un piloto para cada puesto.",
+      different: "Elige tres pilotos distintos.",
+      notEntered: "Solo puedes elegir pilotos confirmados en la carrera.",
+    },
   },
 
   dotd: {

@@ -92,7 +92,7 @@ Every driver in the championship, most points first. Each card shows their seaso
 
 ![Driver profile](screenshots/profile.png)
 
-A driver's own page: career stats, **achievements**, recent form, best track and full race history. Players edit their own name, photo, bio, favourite car colour and password from "My profile".
+A driver's own page: career stats, **achievements**, recent form, best track and full race history. Players edit their own name, photo, bio, favourite car colour and password from "My profile". Each driver also has a **season in review** page, Wrapped style: their numbers, best day, biggest comeback, nemesis and favourite victim, favourite car and track, spins, slipstreams, Driver of the Day awards, prediction points and the badges earned that season.
 
 Achievements are worked out from the results, so nothing is entered by hand. When a season finishes, its top three get the **Champion**, **Runner-up** and **Third** trophies. Badges cover things like winning from last on the grid, gaining 4 or more places, three wins in a row, five podiums in a row, winning at three different tracks, racing every race of a season or reaching the podium after a spin. Races logged round by round add a few more: leading every round, winning by passing the leader in the final round, and the season's most slipstreams. Badges not earned yet are listed under "Still to earn". The definitions and thresholds are in [`src/lib/achievements.ts`](../src/lib/achievements.ts).
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Award, Flag, Gauge, MapPin, Pencil, Trophy, TrendingUp, Medal } from "lucide-react";
+import { Award, Flag, Gauge, MapPin, Pencil, Sparkles, Trophy, TrendingUp, Medal } from "lucide-react";
 import {
   Avatar,
   Badge,
@@ -76,6 +76,11 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
                 <span className="flex items-center gap-2">
                   {t.drivers.favoriteCar} <CarColorChip name={player.favoriteColor.name} hex={player.favoriteColor.hex} />
                 </span>
+              )}
+              {summary.starts > 0 && (
+                <ButtonLink href={`/pilotos/${player.username}/resumen`} variant="inverse" size="sm">
+                  <Sparkles /> {t.wrapped.link}
+                </ButtonLink>
               )}
               {isMe && (
                 <ButtonLink href="/perfil" variant="inverse" size="sm">

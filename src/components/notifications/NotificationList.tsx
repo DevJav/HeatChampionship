@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AtSign, Flag, MessageSquare, Reply } from "lucide-react";
+import { AtSign, Flag, MessageSquare, Reply, Sparkles } from "lucide-react";
 import type { NotificationItem } from "@/lib/data/notifications";
 import { cn } from "@/lib/cn";
 import { formatRelative } from "@/lib/format";
@@ -13,6 +13,7 @@ const TYPE_ICON = {
   COMMENT_MENTION: MessageSquare,
   COMMENT_REPLY: Reply,
   RACE_RESULTS: Flag,
+  DRIVER_OF_THE_DAY: Sparkles,
 } satisfies Record<NotificationItem["type"], unknown>;
 
 type NotificationListProps = {

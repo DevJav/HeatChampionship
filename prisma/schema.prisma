@@ -217,6 +217,8 @@ model Race {
   status         RaceStatus @default(DRAFT)
   notes          String?
   finalizedAt    DateTime?
+  /// When the Driver of the Day result was announced (or the closed vote was checked), so it happens once
+  dotdAnnouncedAt DateTime?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
@@ -437,6 +439,8 @@ enum NotificationType {
   COMMENT_REPLY
   /// A race you drove has results
   RACE_RESULTS
+  /// The Driver of the Day vote of a race you drove has closed; the actor is the winner
+  DRIVER_OF_THE_DAY
 }
 
 /// The text is built when shown, from the linked article, comment or race
@@ -483,6 +487,8 @@ enum ActivityType {
   PHOTOS_ADDED
   SEASON_STARTED
   SEASON_FINISHED
+  /// A driver was voted Driver of the Day (the actor)
+  DRIVER_OF_THE_DAY
 }
 
 /** One line in the feed. The text is built when shown, from the linked driver, race or season (see src/lib/activity.ts). */

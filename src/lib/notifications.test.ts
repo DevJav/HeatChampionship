@@ -12,6 +12,12 @@ const base: NotificationRecord = {
 };
 
 describe("describeNotification", () => {
+  it("names the Driver of the Day, or congratulates the winner", () => {
+    const dotd: NotificationRecord = { ...base, type: "DRIVER_OF_THE_DAY", article: null, race: { id: "r1", round: 3, track: { name: "Italia" }, results: [] } };
+    expect(describeNotification(dotd)).toEqual({ message: "Javier es el piloto del día de Ronda 3 · Italia", href: "/carreras/r1" });
+    expect(describeNotification({ ...dotd, aboutYou: true }).message).toBe("¡Eres el piloto del día de Ronda 3 · Italia!");
+  });
+
   it("links mentions to the article", () => {
     expect(describeNotification(base)).toEqual({
       message: "Javier te ha mencionado en «Previa Italia»",

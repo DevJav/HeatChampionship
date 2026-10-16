@@ -43,6 +43,8 @@ export function describeActivity(a: ActivityRecord): { subject: string | null; t
     case "RESULTS_PUBLISHED": {
       return { subject: null, text: t.activity.results(race, a.race?.winner ?? null), href: raceHref };
     }
+    case "DRIVER_OF_THE_DAY":
+      return { subject, text: t.activity.driverOfTheDay(race), href: raceHref };
     case "PHOTOS_ADDED":
       return { subject, text: t.activity.photos(race), href: `${raceHref}#fotos` };
     case "SEASON_STARTED":

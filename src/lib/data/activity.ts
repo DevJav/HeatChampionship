@@ -1,7 +1,8 @@
-import { connection } from "next/server";
+import { after, connection } from "next/server";
 import type { ActivityType } from "@/generated/prisma/client";
 import { describeActivity } from "../activity";
 import { db } from "../db";
+import { announceDriverOfTheDay } from "../dotd-announce";
 import { computeStandings } from "../standings";
 
 /** What the feed shows for each entry. */
@@ -41,13 +42,14 @@ async function championsOf(seasonIds: string[]) {
  * The league's latest activity, newest first. Entries about draft races are
  * hidden. Pass the last id seen as `after` for the next page.
  */
-export async function listActivity({ limit = 10, after }: { limit?: number; after?: string } = {}) {
+export async function listActivity({ limit = 10, after: cursor }: { limit?: number; after?: string } = {}) {
   await connection();
+  after(() => announceDriverOfTheDay());
   const rows = await db.activity.findMany({
     where: { OR: [{ raceId: null }, { race: { status: { not: "DRAFT" } } }] },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: limit + 1,
-    ...(after && { cursor: { id: after }, skip: 1 }),
+    ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     select: {
       id: true,
       type: true,

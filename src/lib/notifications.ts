@@ -9,6 +9,8 @@ export type NotificationRecord = {
   article: { slug: string; title: string } | null;
   commentId: string | null;
   race: { id: string; round: number; track: { name: string }; results: { position: number; points: number }[] } | null;
+  /** The recipient caused it themselves (they won the Driver of the Day vote) */
+  aboutYou?: boolean;
 };
 
 /** Sentence and link for a notification. Built when shown, so edited results or titles stay current. */
@@ -25,6 +27,11 @@ export function describeNotification(n: NotificationRecord): { message: string; 
       return { message: t.notifications.commentMention(who, title), href: commentHref };
     case "COMMENT_REPLY":
       return { message: t.notifications.commentReply(who, title), href: commentHref };
+    case "DRIVER_OF_THE_DAY": {
+      const race = n.race ? raceTitle(n.race) : "";
+      const href = n.race ? `/carreras/${n.race.id}` : "/carreras";
+      return { message: n.aboutYou ? t.notifications.dotdYou(race) : t.notifications.dotd(who, race), href };
+    }
     case "RACE_RESULTS": {
       if (!n.race) return { message: t.notifications.resultsGeneric, href: "/carreras" };
       const result = n.race.results[0];

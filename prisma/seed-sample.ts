@@ -25,6 +25,7 @@ import { raceTitle } from "../src/lib/races";
 import { slugify } from "../src/lib/slug";
 import { createUserWithPassword } from "../src/lib/users";
 import type { ActivityType } from "../src/generated/prisma/client";
+import { addVotesAndPredictions, mulberry32 } from "./sample-extras";
 import { seedContent, type ShowcaseContext } from "./seed-content";
 
 const { pastSeason: PAST_SEASON, currentSeason: CURRENT_SEASON, locations, raceNotes, resultNotes } = seedContent;
@@ -46,15 +47,6 @@ const drivers: { username: string; name: string; skill: number; color?: string }
 // Reproducible randomness
 // ---------------------------------------------------------------------------
 
-function mulberry32(seed: number) {
-  return () => {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 const random = mulberry32(2026);
 const pick = <T>(items: T[]) => items[Math.floor(random() * items.length)];
 
@@ -285,6 +277,10 @@ async function main() {
   console.log(`✓ ${CURRENT_SEASON}: ronda 1 finalizada, ronda ${nextRound} abierta, ronda ${nextRound + 1} en borrador`);
 
   await backfillActivity({ all, past, current, openRaceId: open.id, queued });
+
+  const finished = await db.race.findMany({ where: { seasonId: { in: [past.id, current.id] }, status: "FINISHED" }, orderBy: { scheduledAt: "asc" }, select: { id: true } });
+  const extras = await addVotesAndPredictions(finished.map((r) => r.id), all.map((d) => d.id), mulberry32(7));
+  console.log(`✓ ${extras.votes} votos al piloto del día y ${extras.predictions} pronósticos`);
   await seedArticles({ all, past, current, lastPastRaceId: lastPastRace!.id, roundOneId: roundOne.id, openRaceId: open.id, interested });
 }
 

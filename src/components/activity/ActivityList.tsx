@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarPlus, Camera, ClipboardPen, Flag, Rocket, Trophy, UserCheck, UserMinus, UserPlus } from "lucide-react";
+import { CalendarPlus, Camera, ClipboardPen, Flag, Rocket, Sparkles, Trophy, UserCheck, UserMinus, UserPlus } from "lucide-react";
 import type { ActivityItem } from "@/lib/data/activity";
 import { cn } from "@/lib/cn";
 import { dateParts, formatDate, formatRelative } from "@/lib/format";
@@ -14,6 +14,7 @@ const TYPE_ICON = {
   RACE_WITHDRAWAL: UserMinus,
   RESULTS_PUBLISHED: Flag,
   PHOTOS_ADDED: Camera,
+  DRIVER_OF_THE_DAY: Sparkles,
   SEASON_STARTED: Rocket,
   SEASON_FINISHED: Trophy,
 } satisfies Record<ActivityItem["type"], unknown>;

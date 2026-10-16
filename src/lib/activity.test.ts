@@ -12,6 +12,14 @@ describe("describeActivity", () => {
     expect(describeActivity({ ...base, type: "PHOTOS_ADDED" }).href).toBe("/carreras/r1#fotos");
   });
 
+  it("announces the Driver of the Day", () => {
+    expect(describeActivity({ ...base, type: "DRIVER_OF_THE_DAY" })).toEqual({
+      subject: "Ana",
+      text: "es el piloto del día de Ronda 3 · Italia",
+      href: "/carreras/r1",
+    });
+  });
+
   it("links new drivers to their profile", () => {
     expect(describeActivity({ ...base, type: "PLAYER_JOINED", race: null })).toEqual({
       subject: "Ana",

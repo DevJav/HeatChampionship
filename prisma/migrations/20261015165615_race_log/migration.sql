@@ -1,0 +1,8 @@
+-- CreateTable
+CREATE TABLE "RaceLog" (
+    "raceId" TEXT NOT NULL PRIMARY KEY,
+    "data" JSONB NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "RaceLog_raceId_fkey" FOREIGN KEY ("raceId") REFERENCES "Race" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

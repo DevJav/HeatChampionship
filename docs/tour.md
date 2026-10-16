@@ -8,6 +8,7 @@ The screenshots come from the English demo league (see [Try it with demo data](.
 - [Races](#races)
 - [Before a race](#before-a-race)
 - [After a race](#after-a-race)
+- [Logging a race round by round](#logging-a-race-round-by-round)
 - [Standings](#standings)
 - [Statistics](#statistics)
 - [Drivers](#drivers)
@@ -52,6 +53,16 @@ Each race has its own page, with the track's country flag in the banner. Before 
 ![Finished race page](screenshots/race-results.png)
 
 Once the organiser enters the results, the page switches to the **podium** and the **full results**: finishing and starting position (with places gained or lost), the upgrade cards each driver used, spins and notes. It also lists the **achievements unlocked** in that race, and the race's drivers can upload **photos** of the final board.
+
+## Logging a race round by round
+
+During the race the organiser can log it from a phone with **Log race** (a button on the race page, for admins). It only needs the end of each round:
+- **Starting grid:** the confirmed drivers, ordered with arrows or a random draw, each with a car colour (their favourite one by default).
+- **Each round:** the map zooms in on the car whose turn it is and lights up the spaces it can reach; tap where it finished, in turn order. The spot within a space, the turn order and the running order are worked out from the positions. Slipstreams and spins are one tap after placing the car, and the odd spin-out that lands out of order can be swapped.
+- **Saving** happens after every change, with a copy on the phone in case there's no signal.
+- When everyone has crossed the line, **Go to results** opens the results sheet already filled in (positions, grid, spins and colours).
+
+Once a round is closed, the race page shows a **round by round** section: an animated replay on the track map, a lap chart, per-driver numbers (overtakes, slipstreams, spins, average and best move, rounds led) and downloads as **JSON** (a self-describing document, handy for writing the race report) or **CSV**. For now only the USA track has a map; the others need their card traced into `src/lib/race-log/`.
 
 ## Standings
 

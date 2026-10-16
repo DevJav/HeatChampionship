@@ -219,6 +219,7 @@ model Race {
   registrations Registration[]
   results       RaceResult[]
   photos        RacePhoto[]
+  log           RaceLog?
   articles      Article[]
   notifications Notification[]
   activity      Activity[]
@@ -282,6 +283,17 @@ model ResultUpgrade {
   upgrade Upgrade    @relation(fields: [upgradeId], references: [id], onDelete: Cascade)
 
   @@id([resultId, upgradeId])
+}
+
+/// Round-by-round record of a race: where every car ended each round
+model RaceLog {
+  raceId    String   @id
+  /// RaceLogData (src/lib/race-log/log.ts): cars in grid order, closed rounds and the round being entered
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  race Race @relation(fields: [raceId], references: [id], onDelete: Cascade)
 }
 
 model RacePhoto {

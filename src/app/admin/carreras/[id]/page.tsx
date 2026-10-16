@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ExternalLink, Flag, X } from "lucide-react";
+import { ExternalLink, Flag, NotebookPen, X } from "lucide-react";
 import { addEntrant, deleteRace, removeEntrant, updateRace } from "@/actions/races";
 import {
   Button,
@@ -19,6 +19,7 @@ import { EntryList } from "@/components/races/EntryList";
 import { listSeasons, listTracks } from "@/lib/data/catalog";
 import { getRace } from "@/lib/data/races";
 import { listUsers } from "@/lib/data/users";
+import { hasTrackDrawing } from "@/lib/race-log/tracks";
 import { raceTitle } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
@@ -54,6 +55,11 @@ async function EditRacePageContent({ params }: PageProps<"/admin/carreras/[id]">
           <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">
             <ExternalLink /> {t.admin.racesAdmin.viewPage}
           </ButtonLink>
+          {hasTrackDrawing(race.track.slug) && (
+            <ButtonLink href={`/carreras/${race.id}/anotar`} variant="secondary" size="sm">
+              <NotebookPen /> {t.raceLog.recordRace}
+            </ButtonLink>
+          )}
           <ButtonLink href={`/admin/carreras/${race.id}/resultados`} size="sm">
             <Flag /> {race.status === "FINISHED" ? t.races.editResults : t.races.results}
           </ButtonLink>

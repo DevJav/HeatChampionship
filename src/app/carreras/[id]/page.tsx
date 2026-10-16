@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Flag, Pencil } from "lucide-react";
+import { Flag, NotebookPen, Pencil } from "lucide-react";
 import {
   Alert,
   Badge,
@@ -25,6 +25,7 @@ import { Podium } from "@/components/races/Podium";
 import { RaceMeta } from "@/components/races/RaceMeta";
 import { RacePhotos } from "@/components/races/RacePhotos";
 import { RaceSignupPanel } from "@/components/races/RaceSignupPanel";
+import { RaceLogSection } from "@/components/races/RaceLogSection";
 import { ResultsTable } from "@/components/races/ResultsTable";
 import { CalendarButtons } from "@/components/races/CalendarButtons";
 import { ShareButtons } from "@/components/races/ShareButtons";
@@ -33,6 +34,7 @@ import { googleCalendarUrl } from "@/lib/calendar";
 import { raceCalendarEvent, raceShareText, whatsappUrl } from "@/lib/race-share";
 import { absoluteUrl } from "@/lib/site-url";
 import { formatRaceDay } from "@/lib/format";
+import { hasTrackDrawing } from "@/lib/race-log/tracks";
 import { raceTitle } from "@/lib/races";
 import { getRace, type RaceDetail } from "@/lib/data/races";
 import { getRaceResults, type RaceResultDetail } from "@/lib/data/results";
@@ -91,6 +93,11 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
             <ButtonLink href={`/admin/carreras/${race.id}`} variant="inverse" size="sm">
               <Pencil /> {t.common.edit}
             </ButtonLink>
+            {hasTrackDrawing(race.track.slug) && (
+              <ButtonLink href={`/carreras/${race.id}/anotar`} variant="inverse" size="sm">
+                <NotebookPen /> {t.raceLog.recordRace}
+              </ButtonLink>
+            )}
             <ButtonLink href={`/admin/carreras/${race.id}/resultados`} variant="inverse" size="sm">
               <Flag /> {race.status === "FINISHED" ? t.races.editResults : t.races.results}
             </ButtonLink>
@@ -217,6 +224,9 @@ async function RaceView({ params }: { params: Promise<{ id: string }> }) {
         <RaceArticles raceId={race.id} />
       </Suspense>
       {race.status === "FINISHED" ? <FinishedRace race={race} results={results} /> : <UpcomingRace race={race} />}
+      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+        <RaceLogSection raceId={race.id} />
+      </Suspense>
     </div>
   );
 }

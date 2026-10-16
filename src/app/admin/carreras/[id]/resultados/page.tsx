@@ -5,7 +5,10 @@ import { clearResults } from "@/actions/results";
 import { Alert, ButtonLink, Card, CardBody, CardDescription, CardHeader, CardTitle, ConfirmButton, EmptyState } from "@/components/ui";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
 import { ResultsEditor, type ResultsEditorProps } from "@/components/admin/ResultsEditor";
+import { getRaceLog } from "@/lib/data/race-logs";
 import { getResultsEditorData } from "@/lib/data/results";
+import { resultsFromLog } from "@/lib/race-log/log";
+import { trackDrawing } from "@/lib/race-log/tracks";
 import { raceTitle } from "@/lib/races";
 import { parsePointsTable } from "@/lib/scoring";
 import { requireAdmin } from "@/lib/session";
@@ -22,19 +25,36 @@ async function ResultsPageContent({ params }: PageProps<"/admin/carreras/[id]/re
   const finished = race.status === "FINISHED";
   const pointsTable = parsePointsTable(race.season.pointsTable);
 
-  const initial: ResultsEditorProps["initial"] = Object.fromEntries(
-    race.results.map((result) => [
-      result.userId,
-      {
-        position: String(result.position),
-        spins: result.spins,
-        startPosition: result.startPosition == null ? "" : String(result.startPosition),
-        carColorId: result.carColorId ?? "",
-        upgradeIds: result.upgrades.map((u) => u.upgradeId),
-        notes: result.notes ?? "",
-      },
-    ]),
-  );
+  // A race without results yet starts from its round-by-round log, if it has one
+  const saved = race.results.length === 0 ? await getRaceLog(race.id) : null;
+  const drawing = saved && trackDrawing(saved.log.track, saved.log.laps);
+  const fromLog = saved && drawing ? resultsFromLog(drawing.layout, saved.log) : null;
+
+  const initial: ResultsEditorProps["initial"] = fromLog
+    ? Object.fromEntries(
+        fromLog.map((row) => [
+          row.userId,
+          {
+            position: String(row.position),
+            spins: row.spins,
+            startPosition: String(row.startPosition),
+            carColorId: row.carColorId ?? "",
+          },
+        ]),
+      )
+    : Object.fromEntries(
+        race.results.map((result) => [
+          result.userId,
+          {
+            position: String(result.position),
+            spins: result.spins,
+            startPosition: result.startPosition == null ? "" : String(result.startPosition),
+            carColorId: result.carColorId ?? "",
+            upgradeIds: result.upgrades.map((u) => u.upgradeId),
+            notes: result.notes ?? "",
+          },
+        ]),
+      );
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,6 +64,8 @@ async function ResultsPageContent({ params }: PageProps<"/admin/carreras/[id]/re
           <ArrowLeft /> {t.admin.results.backToRace}
         </ButtonLink>
       </div>
+
+      {fromLog && <Alert tone="info">{t.raceLog.resultsPrefilled}</Alert>}
 
       {finished && (
         <Alert tone="info">

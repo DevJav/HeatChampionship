@@ -80,6 +80,14 @@
   --diverging-neg-2: #e06e68;
   --diverging-neg-3: #b43b3a;
 
+  /* Track map (race log): asphalt, painted lines, corner badges */
+  --track-ground: #e9dccb;
+  --track-asphalt: #2e2324;
+  --track-edge: #f4ede4;
+  --track-line: rgb(255 255 255 / 0.55);
+  --track-highlight: rgb(242 169 0 / 0.35);
+  --track-blocked: rgb(209 5 0 / 0.35);
+
   /* LED countdown board (seven-segment digits) */
   --led-on: #ff2b1c;
   --led-off: #240806;

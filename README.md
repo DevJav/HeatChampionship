@@ -15,6 +15,7 @@ It was built for one group of friends, but anyone can run their own copy. The si
 - **Statistics:** records, head-to-head, win rate by starting position, track kings, results by car and upgrade card.
 - **Achievements** worked out from the results: season trophies and badges like *From the back* or *Hat-trick*.
 - **Driver profiles** with career numbers, form and race history.
+- **Round-by-round race log** from a phone at the table: tap where each car ended every round, then get a replay, a lap chart, race stats, pre-filled results and a JSON/CSV export.
 - **News** with live race cards, podiums and standings inside the articles, plus comments and `@mentions`.
 - **Activity feed** and a **notification bell**.
 - **Admin panel** for the organiser: races, results, seasons, articles, drivers and catalogues.

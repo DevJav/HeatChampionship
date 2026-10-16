@@ -44,6 +44,7 @@ src/
     standings.ts, player-stats.ts   Standings with countback, points progression, player summaries (pure, unit-tested)
     stats.ts, achievements.ts       Records, head to head, tallies; trophies and badges (pure, unit-tested)
     articles.ts                     Article embeds and mentions
+    race-log/                       Round-by-round race log: track layouts and traced maps, round rules, stats, export (pure, unit-tested)
     activity.ts, notifications.ts   Text and links for feed entries and notifications
     format.ts, dates.ts             Date and number formatting; site time zone ⇄ UTC
     uploads.ts                      Photo and avatar storage (sharp → WebP), served by app/media/[...path]

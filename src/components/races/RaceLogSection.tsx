@@ -2,6 +2,7 @@ import { Download } from "lucide-react";
 import { ButtonLink, Section } from "@/components/ui";
 import { LoggedRaceReplay } from "@/components/race-log/LoggedRaceReplay";
 import { MomentOfTheRace, RivalryOfTheRace } from "@/components/race-log/RaceHighlights";
+import { ReplayVideoButton } from "@/components/race-log/ReplayVideoButton";
 import { getRaceLog } from "@/lib/data/race-logs";
 import { momentOfTheRace, pairDuels, rivalryOfTheRace } from "@/lib/race-log/highlights";
 import { carLabels } from "@/lib/race-log/log";
@@ -9,7 +10,7 @@ import { trackDrawing } from "@/lib/race-log/tracks";
 import { t } from "@/i18n";
 
 /** Replay, lap chart and stats of a race logged round by round, with the downloads. Nothing until a round is closed. */
-export async function RaceLogSection({ raceId }: { raceId: string }) {
+export async function RaceLogSection({ raceId, title }: { raceId: string; title: string }) {
   const saved = await getRaceLog(raceId);
   if (!saved || saved.log.rounds.length < 2) return null;
   const { log, names } = saved;
@@ -27,6 +28,7 @@ export async function RaceLogSection({ raceId }: { raceId: string }) {
       title={t.raceLog.cardTitle}
       actions={
         <div className="flex gap-1">
+          <ReplayVideoButton track={log.track} laps={log.laps} cars={cars} rounds={log.rounds} title={title} />
           <ButtonLink href={`/carreras/${raceId}/registro.json`} variant="ghost" size="sm" title={t.raceLog.download}>
             <Download /> JSON
           </ButtonLink>

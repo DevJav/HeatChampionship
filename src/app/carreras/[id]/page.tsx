@@ -225,7 +225,7 @@ async function RaceView({ params }: { params: Promise<{ id: string }> }) {
       </Suspense>
       {race.status === "FINISHED" ? <FinishedRace race={race} results={results} /> : <UpcomingRace race={race} />}
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-        <RaceLogSection raceId={race.id} />
+        <RaceLogSection raceId={race.id} title={raceTitle(race)} />
       </Suspense>
     </div>
   );

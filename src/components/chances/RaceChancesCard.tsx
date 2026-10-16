@@ -2,7 +2,7 @@ import { raceChances } from "@/lib/chances";
 import type { RaceDetail } from "@/lib/data/races";
 import { getStatsData } from "@/lib/data/stats";
 import { formatPercent } from "@/lib/format";
-import { Badge, Card, CardBody, CardHeader, CardTitle, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
+import { Badge, Card, CardHeader, CardTitle, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { t } from "@/i18n";
 
@@ -20,7 +20,6 @@ export async function RaceChancesCard({ race }: { race: RaceDetail }) {
     race.id,
   );
   const byId = new Map(entrants.map((e) => [e.id, e]));
-  const top = chances[0].win;
 
   return (
     <Card>
@@ -46,14 +45,8 @@ export async function RaceChancesCard({ race }: { race: RaceDetail }) {
                     {i === 0 && <Badge tone="accent">{t.chances.favourite}</Badge>}
                   </span>
                 </Td>
-                <Td align="right">
-                  <span className="inline-flex items-center justify-end gap-3">
-                    {/* Bar relative to the favourite, so the gaps read at a glance */}
-                    <span aria-hidden className="hidden h-2 w-24 bg-surface-2 sm:block">
-                      <span className="block h-full rounded-r-sm bg-primary" style={{ width: `${(c.win / top) * 100}%` }} />
-                    </span>
-                    <span className="w-14 font-display text-lg font-bold italic tabular-nums">{percent(c.win)}</span>
-                  </span>
+                <Td align="right" className="font-display text-lg font-bold italic tabular-nums">
+                  {percent(c.win)}
                 </Td>
                 <Td align="right" className="tabular-nums text-fg-muted">
                   {percent(c.podium)}
@@ -63,7 +56,6 @@ export async function RaceChancesCard({ race }: { race: RaceDetail }) {
           })}
         </TBody>
       </Table>
-      <CardBody className="py-3 text-xs text-fg-subtle">{t.chances.note}</CardBody>
     </Card>
   );
 }

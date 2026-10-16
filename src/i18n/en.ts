@@ -688,7 +688,6 @@ export const en: Dictionary = {
     podium: "Podium",
     favourite: "Favourite",
     tiny: "<1%",
-    note: "Chances for fun, from recent form and history at this track.",
   },
 
   predictions: {

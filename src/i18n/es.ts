@@ -703,7 +703,6 @@ export const es = {
     podium: "Podio",
     favourite: "Favorito",
     tiny: "<1 %",
-    note: "Probabilidades de broma, calculadas con la forma reciente y el historial en este circuito.",
   },
 
   predictions: {

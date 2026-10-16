@@ -62,7 +62,7 @@ During the race the organiser can log it from a phone with **Log race** (a butto
 - **Saving** happens after every change, with a copy on the phone in case there's no signal.
 - When everyone has crossed the line, **Go to results** opens the results sheet already filled in (positions, grid, spins and colours).
 
-Once a round is closed, the race page shows a **round by round** section: the **moment of the race** (the biggest climb up the order in a single round) and the **rivalry of the race** (the pair that swapped places most often), an animated replay on the track map, a lap chart, per-driver numbers (overtakes, slipstreams, spins, average and best move, rounds led) and downloads as **JSON** (a self-describing document, handy for writing the race report) or **CSV**. For now only the USA track has a map; the others need their card traced into `src/lib/race-log/`.
+Once a round is closed, the race page shows a **round by round** section: the **moment of the race** (the biggest climb up the order in a single round) and the **rivalry of the race** (the pair that swapped places most often), an animated replay on the track map, a lap chart, a **corners** heat map (passes on each stretch of track, with spins and slipstreams per corner), per-driver numbers (overtakes, slipstreams, spins, average and best move, rounds led) and downloads as **JSON** (a self-describing document, handy for writing the race report) or **CSV**. For now only the USA track has a map; the others need their card traced into `src/lib/race-log/`.
 
 ## Standings
 

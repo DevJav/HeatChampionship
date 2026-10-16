@@ -664,6 +664,13 @@ export const en: Dictionary = {
 
   raceLog: {
     momentTitle: "Moment of the race",
+    cornersTitle: "Corners",
+    cornersHint: "Passes completed on each stretch, from one corner to the next.",
+    corner: (n, limit) => `Corner ${n} · ${limit}`,
+    passes: "Passes",
+    fewerPasses: "Fewer passes",
+    morePasses: "More",
+    cornerTooltip: (n, passes, spins) => `Corner ${n}: ${passes} passes, ${spins} spins`,
     rivalryTitle: "Rivalry of the race",
     rivalrySwaps: (n) => `Swapped places ${n} times`,
     rivalryClose: (n) => `side by side for ${n} ${n === 1 ? "round" : "rounds"}`,

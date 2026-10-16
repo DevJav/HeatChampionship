@@ -679,6 +679,13 @@ export const es = {
 
   raceLog: {
     momentTitle: "Momento de la carrera",
+    cornersTitle: "Curvas",
+    cornersHint: "Adelantamientos completados en cada tramo, de una curva a la siguiente.",
+    corner: (n: number, limit: number) => `Curva ${n} · ${limit}`,
+    passes: "Adelant.",
+    fewerPasses: "Menos adelantamientos",
+    morePasses: "Más",
+    cornerTooltip: (n: number, passes: number, spins: number) => `Curva ${n}: ${passes} adelantamientos, ${spins} trompos`,
     rivalryTitle: "Rivalidad de la carrera",
     rivalrySwaps: (n: number) => `Se cambiaron de posición ${n} veces`,
     rivalryClose: (n: number) => `${n} ${n === 1 ? "ronda" : "rondas"} codo con codo`,

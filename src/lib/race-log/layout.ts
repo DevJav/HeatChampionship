@@ -53,11 +53,15 @@ export function lapSpace(layout: TrackLayout, pos: number) {
   return mod(pos, layout.spacesPerLap);
 }
 
-/** The corner a lap space belongs to: the last corner line crossed to reach it */
-export function cornerBehind(layout: TrackLayout, space: number) {
+/** Index of the corner a lap space belongs to: the last corner line crossed to reach it */
+export function cornerOf(layout: TrackLayout, space: number) {
   const { corners } = layout;
-  for (let i = corners.length - 1; i >= 0; i--) if (space >= corners[i].before) return corners[i];
-  return corners[corners.length - 1];
+  for (let i = corners.length - 1; i >= 0; i--) if (space >= corners[i].before) return i;
+  return corners.length - 1;
+}
+
+export function cornerBehind(layout: TrackLayout, space: number) {
+  return layout.corners[cornerOf(layout, space)];
 }
 
 /** Which side of the track spot 0 is on at this lap space */

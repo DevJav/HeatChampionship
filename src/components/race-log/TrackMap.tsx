@@ -35,6 +35,8 @@ type TrackMapProps = {
   reachable?: Set<number>;
   /** Lap spaces that are full */
   blocked?: Set<number>;
+  /** Fill and hover text per lap space, for heat maps */
+  heat?: Map<number, { fill: string; title: string }>;
   /** Width / height of the frame; defaults to the track card's. Squarer frames zoom in further on phones. */
   aspect?: number;
   onSpaceTap?: (space: number) => void;
@@ -84,6 +86,7 @@ export function TrackMap({
   focus = [],
   reachable,
   blocked,
+  heat,
   onSpaceTap,
   aspect: frameAspect,
   className,
@@ -152,7 +155,12 @@ export function TrackMap({
 
       {/* Tap targets and highlights */}
       {geometry.dividers.map((_, s) => {
-        const tint = blocked?.has(s) ? "var(--track-blocked)" : reachable?.has(s) ? "var(--track-highlight)" : "transparent";
+        const hot = heat?.get(s);
+        const tint = blocked?.has(s)
+          ? "var(--track-blocked)"
+          : reachable?.has(s)
+            ? "var(--track-highlight)"
+            : (hot?.fill ?? "transparent");
         return (
           <polygon
             key={s}
@@ -160,7 +168,9 @@ export function TrackMap({
             fill={tint}
             className={onSpaceTap ? "cursor-pointer" : undefined}
             onClick={onSpaceTap ? () => onSpaceTap(s) : undefined}
-          />
+          >
+            {hot && <title>{hot.title}</title>}
+          </polygon>
         );
       })}
 

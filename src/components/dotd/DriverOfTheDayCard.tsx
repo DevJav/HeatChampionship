@@ -50,7 +50,9 @@ export async function DriverOfTheDayCard({ race, results }: { race: RaceDetail; 
             <DotdVoteForm
               raceId={race.id}
               current={mine?.driverId ?? null}
-              candidates={results.filter((r) => r.user.id !== user.id).map((r) => ({ id: r.user.id, name: r.user.name, color: color(r) }))}
+              candidates={results
+                .filter((r) => r.user.id !== user.id)
+                .map((r) => ({ id: r.user.id, name: r.user.name, color: color(r), position: r.position }))}
             />
           </>
         ) : (

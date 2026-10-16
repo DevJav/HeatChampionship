@@ -187,14 +187,19 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid items-start gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>{t.races.grid}</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <EntryList entrants={race.registrations} maxPlayers={race.maxPlayers} />
-          </CardBody>
-        </Card>
+        <div className="flex flex-col gap-6 lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.races.grid}</CardTitle>
+            </CardHeader>
+            <CardBody>
+              <EntryList entrants={race.registrations} maxPlayers={race.maxPlayers} />
+            </CardBody>
+          </Card>
+          <Suspense>
+            <RacePredictions race={race} />
+          </Suspense>
+        </div>
 
         <div className="flex flex-col gap-6">
           <Card>
@@ -205,9 +210,6 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
               <RaceSignupPanel race={race} />
             </CardBody>
           </Card>
-          <Suspense>
-            <RacePredictions race={race} />
-          </Suspense>
           {race.notes && <NotesCard notes={race.notes} />}
         </div>
       </div>

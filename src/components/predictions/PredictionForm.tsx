@@ -27,26 +27,28 @@ export function PredictionForm({ raceId, drivers, current }: { raceId: string; d
       <input type="hidden" name="raceId" value={raceId} />
       {state.error && <Alert tone="danger">{state.error}</Alert>}
       {state.message && <Alert tone="success">{state.message}</Alert>}
-      {KEYS.map((key, i) => (
-        <Field key={key} label={t.predictions.places[i]} htmlFor={`prediction-${key}`}>
-          <Select
-            id={`prediction-${key}`}
-            name={key}
-            required
-            value={picks[i]}
-            onChange={(e) => setPicks((p) => p.map((v, j) => (j === i ? e.target.value : v)))}
-          >
-            <option value="" disabled>
-              {t.predictions.choose}
-            </option>
-            {drivers.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
+      <div className="grid gap-3 sm:grid-cols-3">
+        {KEYS.map((key, i) => (
+          <Field key={key} label={t.predictions.places[i]} htmlFor={`prediction-${key}`}>
+            <Select
+              id={`prediction-${key}`}
+              name={key}
+              required
+              value={picks[i]}
+              onChange={(e) => setPicks((p) => p.map((v, j) => (j === i ? e.target.value : v)))}
+            >
+              <option value="" disabled>
+                {t.predictions.choose}
               </option>
-            ))}
-          </Select>
-        </Field>
-      ))}
+              {drivers.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        ))}
+      </div>
       <Button type="submit" size="sm" loading={pending} className="self-start">
         <Target /> {current ? t.predictions.update : t.predictions.save}
       </Button>

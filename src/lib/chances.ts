@@ -1,10 +1,10 @@
 /**
- * Pre-race "bookmaker" odds, just for fun. Each driver gets a rating from
+ * Pre-race chances, just for fun. Each driver gets a rating from
  * past results (recent races and this track count more, newcomers start near
  * average), then the race is simulated many times with a Plackett–Luce draw
  * (the next finisher is picked with probability proportional to strength)
  * to estimate each driver's chance of winning and of a podium.
- * Pure functions, unit-tested in odds.test.ts.
+ * Pure functions, unit-tested in chances.test.ts.
  */
 
 import type { StatsRace } from "./stats";
@@ -17,9 +17,6 @@ const SAME_TRACK = 2;
 const PRIOR_WEIGHT = 1.5;
 /** How much a rating difference matters: strength = e^(SPREAD × rating) */
 const SPREAD = 3.5;
-/** The house's cut, like a real bookmaker */
-const MARGIN = 0.08;
-const MAX_ODDS = 100;
 const SIMULATIONS = 4000;
 
 /**
@@ -43,7 +40,7 @@ export function driverRating(userId: string, races: StatsRace[], trackId: string
   return sum / weights;
 }
 
-/** Small seeded generator, so the same race shows the same odds on every load. */
+/** Small seeded generator, so the same race shows the same numbers on every load. */
 function mulberry32(seed: number) {
   return () => {
     seed = (seed + 0x6d2b79f5) | 0;
@@ -55,16 +52,10 @@ function mulberry32(seed: number) {
 
 const hash = (text: string) => [...text].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) | 0, 7);
 
-/** Decimal odds for a probability, with the house margin; capped for long shots. */
-export function decimalOdds(probability: number) {
-  if (probability <= 0) return MAX_ODDS;
-  return Math.min(MAX_ODDS, Math.max(1.01, Math.round((1 / (probability * (1 + MARGIN))) * 100) / 100));
-}
+export type DriverChances = { userId: string; rating: number; win: number; podium: number };
 
-export type DriverOdds = { userId: string; rating: number; win: number; podium: number; winOdds: number; podiumOdds: number };
-
-/** Odds for each entrant, favourite first. `races` are finished races, oldest first. */
-export function raceOdds(entrantIds: string[], races: StatsRace[], trackId: string, seed = entrantIds.join()): DriverOdds[] {
+/** Chance of a win and of a podium for each entrant, favourite first. `races` are finished races, oldest first. */
+export function raceChances(entrantIds: string[], races: StatsRace[], trackId: string, seed = entrantIds.join()): DriverChances[] {
   const ratings = entrantIds.map((id) => driverRating(id, races, trackId));
   const strengths = ratings.map((r) => Math.exp(SPREAD * r));
   const wins = entrantIds.map(() => 0);
@@ -87,10 +78,6 @@ export function raceOdds(entrantIds: string[], races: StatsRace[], trackId: stri
   }
 
   return entrantIds
-    .map((userId, i) => {
-      const win = wins[i] / SIMULATIONS;
-      const podium = podiums[i] / SIMULATIONS;
-      return { userId, rating: ratings[i], win, podium, winOdds: decimalOdds(win), podiumOdds: decimalOdds(podium) };
-    })
+    .map((userId, i) => ({ userId, rating: ratings[i], win: wins[i] / SIMULATIONS, podium: podiums[i] / SIMULATIONS }))
     .sort((a, b) => b.win - a.win || b.rating - a.rating);
 }

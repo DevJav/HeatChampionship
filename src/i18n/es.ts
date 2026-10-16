@@ -697,13 +697,13 @@ export const es = {
     note: "Cuentas sin desempates: igualar al líder te mantiene en la pelea.",
   },
 
-  odds: {
-    title: "Cuotas",
+  chances: {
+    title: "Probabilidades",
     win: "Victoria",
     podium: "Podio",
     favourite: "Favorito",
-    chance: (percent: number) => `${percent}% de ganar`,
-    note: "Cuotas de broma, calculadas con la forma reciente y el historial en este circuito. Aquí no se apuesta.",
+    tiny: "<1 %",
+    note: "Probabilidades de broma, calculadas con la forma reciente y el historial en este circuito.",
   },
 
   predictions: {

@@ -682,13 +682,13 @@ export const en: Dictionary = {
     note: "Without tie-breaks: matching the leader keeps you in the fight.",
   },
 
-  odds: {
-    title: "Odds",
+  chances: {
+    title: "Chances",
     win: "Win",
     podium: "Podium",
     favourite: "Favourite",
-    chance: (percent) => `${percent}% to win`,
-    note: "Odds for fun, from recent form and history at this track. No betting here.",
+    tiny: "<1%",
+    note: "Chances for fun, from recent form and history at this track.",
   },
 
   predictions: {

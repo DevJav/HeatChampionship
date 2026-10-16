@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decimalOdds, driverRating, raceOdds } from "./odds";
+import { driverRating, raceChances } from "./chances";
 import type { StatsRace, StatsResult } from "./stats";
 
 const r = (userId: string, position: number): StatsResult => ({
@@ -41,26 +41,18 @@ describe("driverRating", () => {
   });
 });
 
-describe("raceOdds", () => {
+describe("raceChances", () => {
   const history = Array.from({ length: 6 }, () => race(["ana", "leo", "eva", "max"]));
 
   it("makes the in-form driver favourite, with probabilities that add up", () => {
-    const odds = raceOdds(["max", "eva", "leo", "ana"], history, "italia");
-    expect(odds[0].userId).toBe("ana");
-    expect(odds[0].winOdds).toBeLessThan(odds[3].winOdds);
-    expect(odds.reduce((sum, o) => sum + o.win, 0)).toBeCloseTo(1, 5);
-    expect(odds.reduce((sum, o) => sum + o.podium, 0)).toBeCloseTo(3, 5);
+    const chances = raceChances(["max", "eva", "leo", "ana"], history, "italia");
+    expect(chances[0].userId).toBe("ana");
+    expect(chances[0].win).toBeGreaterThan(chances[3].win);
+    expect(chances.reduce((sum, o) => sum + o.win, 0)).toBeCloseTo(1, 5);
+    expect(chances.reduce((sum, o) => sum + o.podium, 0)).toBeCloseTo(3, 5);
   });
 
   it("is stable for the same race", () => {
-    expect(raceOdds(["ana", "leo", "eva"], history, "italia")).toEqual(raceOdds(["ana", "leo", "eva"], history, "italia"));
-  });
-});
-
-describe("decimalOdds", () => {
-  it("adds the margin and caps long shots", () => {
-    expect(decimalOdds(0.5)).toBe(1.85);
-    expect(decimalOdds(0)).toBe(100);
-    expect(decimalOdds(0.001)).toBe(100);
+    expect(raceChances(["ana", "leo", "eva"], history, "italia")).toEqual(raceChances(["ana", "leo", "eva"], history, "italia"));
   });
 });

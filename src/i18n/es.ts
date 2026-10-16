@@ -683,6 +683,20 @@ export const es = {
       `Termina ${season}${champion ? `: el título es para ${champion}` : ""}`,
   },
 
+  titleFight: {
+    title: "Lucha por el título",
+    left: (races: number, points: number) => `${races === 1 ? "Queda 1 carrera" : `Quedan ${races} carreras`} · ${points} puntos en juego`,
+    decided: (name: string) => `${name} ya es campeón matemáticamente.`,
+    clinch: (name: string, race: string, position: number, ordinal: string) =>
+      position === 1 ? `${name} será campeón en ${race} si gana.` : `${name} será campeón en ${race} si acaba ${ordinal} o mejor.`,
+    clinchNext: (name: string, position: number, ordinal: string) =>
+      position === 1 ? `${name} será campeón en la próxima carrera si gana.` : `${name} será campeón en la próxima carrera si acaba ${ordinal} o mejor.`,
+    notYet: (name: string) => `${name} aún no puede cerrar el título en la próxima carrera.`,
+    max: (points: number) => `máx. ${points}`,
+    out: (n: number) => (n === 1 ? "1 piloto ya no puede ser campeón." : `${n} pilotos ya no pueden ser campeones.`),
+    note: "Cuentas sin desempates: igualar al líder te mantiene en la pelea.",
+  },
+
   odds: {
     title: "Cuotas",
     win: "Victoria",

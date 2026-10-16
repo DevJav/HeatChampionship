@@ -668,6 +668,20 @@ export const en: Dictionary = {
     seasonFinished: (season, champion) => `${season} is over${champion ? `: ${champion} takes the title` : ""}`,
   },
 
+  titleFight: {
+    title: "Title fight",
+    left: (races, points) => `${races === 1 ? "1 race" : `${races} races`} left · ${points} points up for grabs`,
+    decided: (name) => `${name} is already champion, mathematically.`,
+    clinch: (name, race, position, ordinal) =>
+      position === 1 ? `${name} is champion at ${race} with a win.` : `${name} is champion at ${race} by finishing ${ordinal} or better.`,
+    clinchNext: (name, position, ordinal) =>
+      position === 1 ? `${name} is champion at the next race with a win.` : `${name} is champion at the next race by finishing ${ordinal} or better.`,
+    notYet: (name) => `${name} can't seal the title at the next race yet.`,
+    max: (points) => `max ${points}`,
+    out: (n) => (n === 1 ? "1 driver can no longer be champion." : `${n} drivers can no longer be champion.`),
+    note: "Without tie-breaks: matching the leader keeps you in the fight.",
+  },
+
   odds: {
     title: "Odds",
     win: "Win",

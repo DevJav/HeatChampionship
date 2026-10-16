@@ -19,6 +19,10 @@ import { StandingsChart } from "@/components/standings/StandingsChart";
 import { StandingsTable } from "@/components/standings/StandingsTable";
 import { OracleTable } from "@/components/predictions/OracleTable";
 import { getSeasonOracle } from "@/lib/data/predictions";
+import { TitleFightCard } from "@/components/standings/TitleFightCard";
+import { getNextRace } from "@/lib/data/races";
+import { parsePointsTable } from "@/lib/scoring";
+import { titleFight } from "@/lib/title-fight";
 import { getCurrentSeason, listSeasons } from "@/lib/data/catalog";
 import { getSeasonStandings } from "@/lib/data/standings";
 import { cn } from "@/lib/cn";
@@ -40,12 +44,13 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
     );
   }
 
-  const [standings, oracle] = await Promise.all([getSeasonStandings(season.id), getSeasonOracle(season.id)]);
+  const [standings, oracle, next] = await Promise.all([getSeasonStandings(season.id), getSeasonOracle(season.id), getNextRace()]);
   const finished = season.status === "FINISHED";
   const { rows, races, drivers, scheduledRaces } = standings;
   const leader = rows[0] ? drivers.get(rows[0].userId) : null;
   const topWins = Math.max(...rows.map((r) => r.wins));
   const winLeaders = rows.filter((r) => r.wins === topWins).map((r) => drivers.get(r.userId)?.name ?? "—");
+  const fight = finished ? null : titleFight(rows, parsePointsTable(season.pointsTable), scheduledRaces - races.length);
 
   return (
     <div className="flex flex-col gap-8">
@@ -103,6 +108,15 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
             </CardHeader>
             <StandingsTable standings={standings} />
           </Card>
+
+          {fight && (
+            <TitleFightCard
+              fight={fight}
+              drivers={drivers}
+              total={rows.length}
+              nextRace={next?.seasonId === season.id ? next : null}
+            />
+          )}
 
           {races.length >= 2 && (
             <Card>

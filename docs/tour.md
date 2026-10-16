@@ -68,7 +68,7 @@ Once a round is closed, the race page shows a **round by round** section: the **
 
 ![Standings](screenshots/standings.png)
 
-The championship table: points, gap to the leader, wins, podiums and each round's result. Ties are broken by countback (most wins, then most second places, and so on), and arrows show who moved up or down since the previous race. Once a season has two or more races, a chart shows how the points built up round by round. Past seasons are one click away.
+The championship table: points, gap to the leader, wins, podiums and each round's result. Ties are broken by countback (most wins, then most second places, and so on), and arrows show who moved up or down since the previous race. Once a season has two or more races, a chart shows how the points built up round by round. While a season is running, a **title fight** card shows the points still up for grabs, who can still be champion and what the leader needs at the next race to seal it. Past seasons are one click away.
 
 ## Statistics
 

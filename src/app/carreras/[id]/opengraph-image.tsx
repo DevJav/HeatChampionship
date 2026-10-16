@@ -12,7 +12,26 @@ export const alt = t.og.raceAlt;
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
-/** Link preview for a race: track, date, place and sign-ups or the winner. */
+const PODIUM = ["#d4a017", "#b8bcc4", "#b06a2c"];
+const MAX_CHIPS = 8;
+
+/** A driver as a broadcast chip: optional place, colour stripe, name. */
+function DriverChip({ name, color, place }: { name: string; color: string | null; place?: number }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.55)", padding: "6px 18px 6px 8px", height: 46 }}>
+      {place && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 38, height: 34, background: PODIUM[place - 1], color: place === 3 ? "#fff" : "#111", fontSize: 24, fontWeight: 700, fontStyle: "italic" }}>
+          {place}
+        </div>
+      )}
+      {/* Faint outline so dark car colours still show on the chip */}
+      <div style={{ display: "flex", width: 8, height: 30, background: color ?? "#9ca3af", border: "1px solid rgba(255,255,255,0.45)", transform: "skewX(-12deg)" }} />
+      <div style={{ display: "flex", fontSize: 26, fontWeight: 700, fontStyle: "italic", textTransform: "uppercase", color: "#fff" }}>{name}</div>
+    </div>
+  );
+}
+
+/** Link preview for a race: track, date, place, sign-ups or the winner, and the grid or the podium. */
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const race = await getRace(id);
@@ -31,8 +50,15 @@ export default async function Image({ params }: { params: Promise<{ id: string }
 
   const phase = racePhase(race);
   const confirmed = race.registrations.filter((r) => r.status === "CONFIRMED").length;
-  const winner =
-    phase === "FINISHED" ? (await getRaceResults(race.id)).find((r) => r.position === 1)?.user.name : undefined;
+  const results = phase === "FINISHED" ? await getRaceResults(race.id) : [];
+  const winner = results.find((r) => r.position === 1)?.user.name;
+  const chips =
+    phase === "FINISHED"
+      ? results.slice(0, 3).map((r) => ({ name: r.user.name, color: r.carColor?.hex ?? r.user.favoriteColor?.hex ?? null, place: r.position }))
+      : race.registrations
+          .filter((r) => r.status === "CONFIRMED")
+          .map((r) => ({ name: r.user.name, color: r.user.favoriteColor?.hex ?? null, place: undefined }));
+  const shown = chips.slice(0, MAX_CHIPS);
 
   const status =
     phase === "FINISHED" ? (
@@ -59,14 +85,27 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             <OgTag>{t.common.round(race.round)}</OgTag>
             <OgTag background="#000">{race.season.name}</OgTag>
           </div>
-          <div style={{ display: "flex", fontSize: 140, fontWeight: 700, fontStyle: "italic", textTransform: "uppercase", color: "#fff", lineHeight: 0.95 }}>
+          <div style={{ display: "flex", fontSize: shown.length ? 110 : 140, fontWeight: 700, fontStyle: "italic", textTransform: "uppercase", color: "#fff", lineHeight: 0.95 }}>
             {race.track.name}
           </div>
-          <div style={{ display: "flex", fontSize: 34, color: "rgba(255,255,255,0.85)" }}>
-            {formatRaceDay(race.scheduledAt)}
-            {race.location ? ` · ${race.location}` : ""}
+          {/* Date and status share a line so two rows of drivers still fit */}
+          <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+            <div style={{ display: "flex", fontSize: 34, color: "rgba(255,255,255,0.85)" }}>
+              {formatRaceDay(race.scheduledAt)}
+              {race.location ? ` · ${race.location}` : ""}
+            </div>
+            {status}
           </div>
-          <div style={{ display: "flex", marginTop: 6 }}>{status}</div>
+          {shown.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, maxWidth: 1040 }}>
+              {shown.map((chip) => (
+                <DriverChip key={chip.name} {...chip} />
+              ))}
+              {chips.length > shown.length && (
+                <div style={{ display: "flex", alignItems: "center", fontSize: 26, color: "rgba(255,255,255,0.8)" }}>+{chips.length - shown.length}</div>
+              )}
+            </div>
+          )}
         </div>
       </OgFrame>
     ),

@@ -1,6 +1,7 @@
 import {
   Award,
   CalendarCheck,
+  CircleDot,
   Crown,
   Flag,
   Flame,
@@ -14,6 +15,9 @@ import {
   Timer,
   TrendingUp,
   Trophy,
+  Waypoints,
+  Wind,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import type { AchievementId } from "@/lib/achievements";
@@ -28,6 +32,10 @@ const ICONS: Record<AchievementId, LucideIcon> = {
   "from-the-back": Rocket,
   comeback: TrendingUp,
   "pole-to-win": Timer,
+  "wire-to-wire": Waypoints,
+  "last-gasp": Zap,
+  "spun-podium": CircleDot,
+  "slipstream-king": Wind,
   "hat-trick": Flame,
   "podium-streak": Repeat,
   globetrotter: Globe,

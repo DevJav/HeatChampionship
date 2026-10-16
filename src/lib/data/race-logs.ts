@@ -1,12 +1,6 @@
 import { connection } from "next/server";
 import { db } from "../db";
-import { raceLogSchema, type DriverNames, type RaceLogData } from "../race-log/log";
-
-/** Stored data that no longer parses is treated as no log rather than crashing the page. */
-function parseLog(data: unknown): RaceLogData | null {
-  const parsed = raceLogSchema.safeParse(data);
-  return parsed.success ? (parsed.data as RaceLogData) : null;
-}
+import { parseRaceLog as parseLog, type DriverNames } from "../race-log/log";
 
 async function namesOf(userIds: string[]): Promise<DriverNames> {
   const users = await db.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true } });

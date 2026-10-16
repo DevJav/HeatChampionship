@@ -1,7 +1,14 @@
 import { connection } from "next/server";
 import type { StatsRace } from "../stats";
 import { db } from "../db";
+import { raceHighlights } from "../race-log/highlights";
+import { storedLog } from "../race-log/tracks";
 import { driverSelect } from "./standings";
+
+function highlightsOf(data: unknown) {
+  const stored = storedLog(data);
+  return stored && raceHighlights(stored.layout, stored.log.rounds);
+}
 
 /** Finished races with full results; all of them, or narrowed to a season and/or a track. */
 export async function getStatsData({ seasonId, trackId }: { seasonId?: string | null; trackId?: string } = {}) {
@@ -26,10 +33,12 @@ export async function getStatsData({ seasonId, trackId }: { seasonId?: string | 
           upgrades: { select: { upgrade: { select: { id: true, name: true } } } },
         },
       },
+      log: { select: { data: true } },
     },
   });
-  const statsRaces: StatsRace[] = races.map((race) => ({
+  const statsRaces: StatsRace[] = races.map(({ log, ...race }) => ({
     ...race,
+    highlights: log && highlightsOf(log.data),
     results: race.results.map((result) => ({ ...result, upgrades: result.upgrades.map((u) => u.upgrade) })),
   }));
 

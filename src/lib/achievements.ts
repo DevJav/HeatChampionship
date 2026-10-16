@@ -20,6 +20,10 @@ export type AchievementId =
   | "from-the-back"
   | "comeback"
   | "pole-to-win"
+  | "wire-to-wire"
+  | "last-gasp"
+  | "spun-podium"
+  | "slipstream-king"
   | "hat-trick"
   | "podium-streak"
   | "globetrotter"
@@ -62,8 +66,12 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
   { id: "podium-streak", ...text["podium-streak"], description: text["podium-streak"].description(PODIUM_STREAK), tier: "special", repeatable: true },
   { id: "comeback", ...text["comeback"], description: text["comeback"].description(COMEBACK_PLACES), tier: "special", repeatable: true },
   { id: "pole-to-win", ...text["pole-to-win"], tier: "special", repeatable: true },
+  { id: "wire-to-wire", ...text["wire-to-wire"], tier: "special", repeatable: true },
+  { id: "last-gasp", ...text["last-gasp"], tier: "special", repeatable: true },
+  { id: "spun-podium", ...text["spun-podium"], tier: "special", repeatable: true },
   { id: "globetrotter", ...text["globetrotter"], description: text["globetrotter"].description(GLOBETROTTER_TRACKS), tier: "special" },
   { id: "ironman", ...text["ironman"], tier: "special", repeatable: true },
+  { id: "slipstream-king", ...text["slipstream-king"], tier: "special", repeatable: true },
   { id: "first-win", ...text["first-win"], tier: "common" },
   { id: "first-podium", ...text["first-podium"], tier: "common" },
   { id: "first-race", ...text["first-race"], tier: "common" },
@@ -132,6 +140,11 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
         if (c.wins === 1) add("first-win", userId);
         if (c.winStreak === HAT_TRICK_WINS) add("hat-trick", userId);
         if (startPosition === 1) add("pole-to-win", userId);
+        // Log-based wins only count when the log agrees with the official result
+        if (race.highlights?.winner === userId) {
+          if (race.highlights.wireToWire) add("wire-to-wire", userId);
+          if (race.highlights.lastGasp) add("last-gasp", userId);
+        }
         if (startPosition != null && startPosition === lastGridSlot && lastGridSlot >= FROM_THE_BACK_MIN_FIELD) {
           add("from-the-back", userId);
         }
@@ -146,6 +159,7 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
         c.podiums += 1;
         if (c.podiums === 1) add("first-podium", userId);
         if (c.podiumStreak === PODIUM_STREAK) add("podium-streak", userId);
+        if (result.spins > 0) add("spun-podium", userId);
       }
 
       const gained = positionsGained(startPosition, position);
@@ -166,6 +180,18 @@ export function computeUnlocks(races: StatsRace[], seasons: SeasonInfo[]): Unloc
       if (seasonRaces.length >= IRONMAN_MIN_RACES && row.starts === seasonRaces.length) {
         unlocks.push({ achievementId: "ironman", userId: row.userId, date, season: ref });
       }
+    }
+
+    // Most slipstreams over the season's logged races; ties share it
+    const slipstreams = new Map<string, number>();
+    for (const race of seasonRaces) {
+      for (const [userId, n] of Object.entries(race.highlights?.slipstreams ?? {})) {
+        slipstreams.set(userId, (slipstreams.get(userId) ?? 0) + n);
+      }
+    }
+    const most = Math.max(0, ...slipstreams.values());
+    for (const [userId, n] of slipstreams) {
+      if (most > 0 && n === most) unlocks.push({ achievementId: "slipstream-king", userId, date, season: ref });
     }
   }
 

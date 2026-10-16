@@ -3,6 +3,7 @@
 import { intlLocale, t } from "@/i18n";
 import { summarizePlayer, type PlayerResult, type PlayerSummary } from "./player-stats";
 import { positionsGained } from "./scoring";
+import type { RaceHighlights } from "./race-log/highlights";
 
 export type StatsResult = {
   userId: string;
@@ -22,6 +23,8 @@ export type StatsRace = {
   season: { id: string; name: string };
   track: { id: string; name: string };
   results: StatsResult[];
+  /** Story beats from the round-by-round log, when the race was logged on a traced track */
+  highlights?: RaceHighlights | null;
 };
 
 /** Where a single-race record happened. */

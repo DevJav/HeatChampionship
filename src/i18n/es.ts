@@ -339,6 +339,10 @@ export const es = {
       "podium-streak": { name: "Fijo en el podio", description: (n: number) => `${n} podios seguidos.` },
       comeback: { name: "Remontada", description: (n: number) => `Ganó ${n} o más posiciones en una carrera.` },
       "pole-to-win": { name: "De principio a fin", description: "Ganó saliendo primero." },
+      "wire-to-wire": { name: "De principio a fin", description: "Ganó liderando todas las rondas." },
+      "last-gasp": { name: "Al último suspiro", description: "Ganó adelantando al líder en la última ronda." },
+      "spun-podium": { name: "Trompo y podio", description: "Subió al podio después de hacer un trompo." },
+      "slipstream-king": { name: "Rey del rebufo", description: "Más rebufos de la temporada en las carreras anotadas." },
       globetrotter: { name: "Trotamundos", description: (n: number) => `Ganó en ${n} circuitos distintos.` },
       ironman: { name: "Incansable", description: "Corrió todas las carreras de una temporada." },
       "first-win": { name: "Primera victoria", description: "Ganó su primera carrera." },
@@ -673,6 +677,8 @@ export const es = {
   },
 
   raceLog: {
+    momentTitle: "Momento de la carrera",
+    moment: (name: string, from: string, to: string, round: number) => `${name} pasó de ${from} a ${to} en la ronda ${round}`,
     recordRace: "Anotar carrera",
     record: "Anotar",
     replay: "Repetición",

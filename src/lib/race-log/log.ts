@@ -56,6 +56,12 @@ export const raceLogSchema = z
     return ids.size === log.cars.length && log.rounds.every((r) => same(r.positions)) && same(log.draft.positions);
   });
 
+/** Stored data that no longer parses is treated as no log rather than crashing the page. */
+export function parseRaceLog(data: unknown): RaceLogData | null {
+  const parsed = raceLogSchema.safeParse(data);
+  return parsed.success ? (parsed.data as RaceLogData) : null;
+}
+
 export function newRaceLog(track: string, laps: number, cars: LogCar[]): RaceLogData {
   const grid = gridPositions(cars.map((c) => c.userId));
   return { version: 1, track, laps, cars, rounds: [{ positions: grid, flags: {} }], draft: { positions: grid, placed: [], flags: {} } };

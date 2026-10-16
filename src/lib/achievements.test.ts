@@ -126,3 +126,39 @@ describe("awardsFor", () => {
     expect(awards.length).toBeGreaterThan(earned.length);
   });
 });
+
+describe("computeUnlocks — race log feats", () => {
+  const logged = (results: StatsResult[], highlights: StatsRace["highlights"], season = "s1") => ({ ...race(results, { season }), highlights });
+  const beats = (winner: string, extra: Partial<NonNullable<StatsRace["highlights"]>> = {}) => ({
+    winner,
+    wireToWire: false,
+    lastGasp: false,
+    slipstreams: {},
+    ...extra,
+  });
+
+  it("awards wire to wire and last gasp to the winner on the log", () => {
+    expect(ids("ana", [logged([r("ana", 1), r("leo", 2)], beats("ana", { wireToWire: true }))])).toContain("wire-to-wire");
+    expect(ids("leo", [logged([r("leo", 1), r("ana", 2)], beats("leo", { lastGasp: true }))])).toContain("last-gasp");
+  });
+
+  it("ignores the log when it disagrees with the official result", () => {
+    expect(ids("leo", [logged([r("ana", 1), r("leo", 2)], beats("leo", { wireToWire: true }))])).not.toContain("wire-to-wire");
+  });
+
+  it("rewards a podium after a spin, logged or not", () => {
+    expect(ids("leo", [race([r("ana", 1), r("leo", 3, null, 1)])])).toContain("spun-podium");
+    expect(ids("eva", [race([r("ana", 1), r("eva", 4, null, 1)])])).not.toContain("spun-podium");
+  });
+
+  it("crowns the season's slipstream king, sharing ties", () => {
+    const races = [
+      logged([r("ana", 1), r("leo", 2), r("eva", 3)], beats("ana", { slipstreams: { ana: 2, leo: 1 } }), "s9"),
+      logged([r("ana", 1), r("leo", 2), r("eva", 3)], beats("ana", { slipstreams: { leo: 1, eva: 1 } }), "s9"),
+    ];
+    const kings = computeUnlocks(races, [{ id: "s9", name: "s9", finished: true }])
+      .filter((u) => u.achievementId === "slipstream-king")
+      .map((u) => u.userId);
+    expect(kings.sort()).toEqual(["ana", "leo"]);
+  });
+});

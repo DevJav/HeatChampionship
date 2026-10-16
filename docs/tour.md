@@ -62,7 +62,7 @@ During the race the organiser can log it from a phone with **Log race** (a butto
 - **Saving** happens after every change, with a copy on the phone in case there's no signal.
 - When everyone has crossed the line, **Go to results** opens the results sheet already filled in (positions, grid, spins and colours).
 
-Once a round is closed, the race page shows a **round by round** section: an animated replay on the track map, a lap chart, per-driver numbers (overtakes, slipstreams, spins, average and best move, rounds led) and downloads as **JSON** (a self-describing document, handy for writing the race report) or **CSV**. For now only the USA track has a map; the others need their card traced into `src/lib/race-log/`.
+Once a round is closed, the race page shows a **round by round** section: the **moment of the race** (the biggest climb up the order in a single round), an animated replay on the track map, a lap chart, per-driver numbers (overtakes, slipstreams, spins, average and best move, rounds led) and downloads as **JSON** (a self-describing document, handy for writing the race report) or **CSV**. For now only the USA track has a map; the others need their card traced into `src/lib/race-log/`.
 
 ## Standings
 
@@ -94,7 +94,7 @@ Every driver in the championship, most points first. Each card shows their seaso
 
 A driver's own page: career stats, **achievements**, recent form, best track and full race history. Players edit their own name, photo, bio, favourite car colour and password from "My profile".
 
-Achievements are worked out from the results, so nothing is entered by hand. When a season finishes, its top three get the **Champion**, **Runner-up** and **Third** trophies. Badges cover things like winning from last on the grid, gaining 4 or more places, three wins in a row, five podiums in a row, winning at three different tracks or racing every race of a season. Badges not earned yet are listed under "Still to earn". The definitions and thresholds are in [`src/lib/achievements.ts`](../src/lib/achievements.ts).
+Achievements are worked out from the results, so nothing is entered by hand. When a season finishes, its top three get the **Champion**, **Runner-up** and **Third** trophies. Badges cover things like winning from last on the grid, gaining 4 or more places, three wins in a row, five podiums in a row, winning at three different tracks, racing every race of a season or reaching the podium after a spin. Races logged round by round add a few more: leading every round, winning by passing the leader in the final round, and the season's most slipstreams. Badges not earned yet are listed under "Still to earn". The definitions and thresholds are in [`src/lib/achievements.ts`](../src/lib/achievements.ts).
 
 ## News
 

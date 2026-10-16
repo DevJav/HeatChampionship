@@ -334,6 +334,10 @@ export const en: Dictionary = {
       "podium-streak": { name: "Podium regular", description: (n) => `${n} podiums in a row.` },
       comeback: { name: "Comeback", description: (n) => `Gained ${n} or more places in a race.` },
       "pole-to-win": { name: "Lights to flag", description: "Won starting first." },
+      "wire-to-wire": { name: "Wire to wire", description: "Won leading every round." },
+      "last-gasp": { name: "Last gasp", description: "Won by passing the leader in the final round." },
+      "spun-podium": { name: "Spin and podium", description: "Reached the podium after spinning out." },
+      "slipstream-king": { name: "Slipstream king", description: "Most slipstreams of the season in logged races." },
       globetrotter: { name: "Globetrotter", description: (n) => `Won at ${n} different tracks.` },
       ironman: { name: "Ironman", description: "Raced every race of a season." },
       "first-win": { name: "First win", description: "Won their first race." },
@@ -658,6 +662,8 @@ export const en: Dictionary = {
   },
 
   raceLog: {
+    momentTitle: "Moment of the race",
+    moment: (name, from, to, round) => `${name} went from ${from} to ${to} in round ${round}`,
     recordRace: "Log race",
     record: "Log",
     replay: "Replay",

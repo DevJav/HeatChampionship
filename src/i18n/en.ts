@@ -668,6 +668,15 @@ export const en: Dictionary = {
     seasonFinished: (season, champion) => `${season} is over${champion ? `: ${champion} takes the title` : ""}`,
   },
 
+  odds: {
+    title: "Odds",
+    win: "Win",
+    podium: "Podium",
+    favourite: "Favourite",
+    chance: (percent) => `${percent}% to win`,
+    note: "Odds for fun, from recent form and history at this track. No betting here.",
+  },
+
   predictions: {
     title: "Podium prediction",
     intro: "Pick who finishes 1st, 2nd and 3rd. 3 points for each exact place and 1 for a podium driver in another place. Nobody sees the picks until the start.",

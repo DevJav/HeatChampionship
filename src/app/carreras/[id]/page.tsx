@@ -21,6 +21,7 @@ import { RaceArticles } from "@/components/articles/RaceArticles";
 import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
 import { DriverOfTheDayCard } from "@/components/dotd/DriverOfTheDayCard";
 import { RacePredictions } from "@/components/predictions/RacePredictions";
+import { RaceOddsCard } from "@/components/odds/RaceOddsCard";
 import { getAchievements } from "@/lib/data/achievements";
 import { EntryList } from "@/components/races/EntryList";
 import { Podium } from "@/components/races/Podium";
@@ -196,6 +197,11 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
               <EntryList entrants={race.registrations} maxPlayers={race.maxPlayers} />
             </CardBody>
           </Card>
+          {!started && (
+            <Suspense>
+              <RaceOddsCard race={race} />
+            </Suspense>
+          )}
           <Suspense>
             <RacePredictions race={race} />
           </Suspense>

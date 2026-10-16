@@ -683,6 +683,15 @@ export const es = {
       `Termina ${season}${champion ? `: el título es para ${champion}` : ""}`,
   },
 
+  odds: {
+    title: "Cuotas",
+    win: "Victoria",
+    podium: "Podio",
+    favourite: "Favorito",
+    chance: (percent: number) => `${percent}% de ganar`,
+    note: "Cuotas de broma, calculadas con la forma reciente y el historial en este circuito. Aquí no se apuesta.",
+  },
+
   predictions: {
     title: "Pronóstico del podio",
     intro: "Elige quién acaba 1º, 2º y 3º. 3 puntos por cada puesto exacto y 1 por acertar un piloto del podio en otro puesto. Nadie ve los pronósticos hasta la salida.",

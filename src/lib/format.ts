@@ -27,6 +27,10 @@ const signedFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1, s
 
 /** "2,5" */
 export const formatDecimal = (value: number) => decimalFormat.format(value);
+
+const oddsFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** Decimal betting odds: "3,50" */
+export const formatOdds = (value: number) => oddsFormat.format(value);
 /** "+1,5" / "−0,5" / "0" */
 export const formatSigned = (value: number) => signedFormat.format(value);
 

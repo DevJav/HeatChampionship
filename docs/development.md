@@ -9,6 +9,7 @@
 - [Conventions](#conventions)
 - [Cache Components rules](#cache-components-rules)
 - [Accounts](#accounts)
+- [Releases](#releases)
 
 ## Stack
 
@@ -101,3 +102,16 @@ Retro style utilities, defined in `globals.css`:
 ## Accounts
 
 Players log in with a username and password. Better Auth also needs an email, so one is generated behind the scenes (`<username>@users.heat.local`); no real emails are collected or sent. The registration on/off switch is enforced inside the auth API itself, so the sign-up endpoint can't be called directly to get around it.
+
+## Releases
+
+What changed in each version is in [`CHANGELOG.md`](../CHANGELOG.md) (English) and [`CHANGELOG.es.md`](../CHANGELOG.es.md) (Spanish). The site shows the one for its language on `/novedades`, linked from the version number in the footer. Entries are written for the drivers, not as a commit log: say what they can now do or what looks different.
+
+Versions are `MAJOR.MINOR.PATCH`: a minor version for new features, a patch for fixes and small tweaks. Each version has a git tag (`v1.6.0`).
+
+While working, add entries under `## [Unreleased]` in both files. To release:
+
+1. Rename `[Unreleased]` to `## [x.y.z] - yyyy-mm-dd` in both files, add an empty `## [Unreleased]` above it and update the compare links at the bottom.
+2. `npm version x.y.z --no-git-tag-version` bumps `package.json` and the lockfile.
+3. `npm test`: it checks both files list the same releases, newest first, starting with the `package.json` version.
+4. Commit, then `git tag -a vx.y.z -m "x.y.z"` and `git push --follow-tags`.

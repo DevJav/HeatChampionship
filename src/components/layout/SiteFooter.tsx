@@ -1,3 +1,5 @@
+import Link from "next/link";
+import packageJson from "../../../package.json";
 import { siteConfig } from "@/config/site";
 import { ChequeredStrip, Container } from "@/components/ui";
 import { t } from "@/i18n";
@@ -10,7 +12,12 @@ export function SiteFooter() {
         <span className="font-display font-bold uppercase italic tracking-wide text-bar-fg">
           {siteConfig.name}
         </span>
-        <span>{t.layout.footer}</span>
+        <span className="flex flex-wrap gap-x-3">
+          <span>{t.layout.footer}</span>
+          <Link href="/novedades" title={t.changelog.title} className="underline-offset-2 hover:text-bar-fg hover:underline">
+            v{packageJson.version}
+          </Link>
+        </span>
       </Container>
     </footer>
   );

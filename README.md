@@ -48,7 +48,8 @@ The demo database has two seasons of results, an open race with a waitlist, arti
 |---|---|
 | [A tour of the site](docs/tour.md) | Every page, with a screenshot and what it does, including the admin panel |
 | [Running your own league](docs/setup.md) | Configuration, first start, deploying, back-ups, languages and npm scripts |
-| [Developer guide](docs/development.md) | Project layout, translations, customising the look and the code conventions |
+| [Developer guide](docs/development.md) | Project layout, translations, customising the look, the code conventions and releases |
+| [Changelog](CHANGELOG.md) | What changed in each version |
 
 Built with Next.js 16, React 19, Tailwind CSS 4, TypeScript, Prisma 7 + SQLite and Better Auth.
 

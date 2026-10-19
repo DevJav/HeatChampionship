@@ -458,6 +458,13 @@ export const es = {
     } as Record<string, string>,
   },
 
+  changelog: {
+    title: "Novedades",
+    description: "Lo nuevo de la web, versión a versión.",
+    version: (version: string) => `Versión ${version}`,
+    latest: "Última",
+  },
+
   errors: {
     notFoundTitle: "Página no encontrada",
     notFoundHeading: "Fuera de pista",

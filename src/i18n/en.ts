@@ -452,6 +452,13 @@ export const en: Dictionary = {
     },
   },
 
+  changelog: {
+    title: "What's new",
+    description: "New on the site, release by release.",
+    version: (version: string) => `Version ${version}`,
+    latest: "Latest",
+  },
+
   errors: {
     notFoundTitle: "Page not found",
     notFoundHeading: "Off the track",

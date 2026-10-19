@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkPicks, oracleTable, PredictionError, picksRevealed, predictionsOpen, scorePicks, type Picks } from "./predictions";
+import { checkPicks, oracleTable, PredictionError, predictionsClosed, predictionsOpen, scorePicks, type Picks } from "./predictions";
 
 const start = new Date("2026-11-14T17:00:00Z");
 const race = { status: "OPEN", scheduledAt: start };
@@ -7,11 +7,11 @@ const before = new Date("2026-11-14T16:00:00Z");
 const after = new Date("2026-11-14T18:00:00Z");
 
 describe("prediction window", () => {
-  it("is open until the start, then picks are revealed", () => {
+  it("is open until the start, then closed", () => {
     expect(predictionsOpen(race, before)).toBe(true);
     expect(predictionsOpen(race, after)).toBe(false);
-    expect(picksRevealed(race, before)).toBe(false);
-    expect(picksRevealed(race, after)).toBe(true);
+    expect(predictionsClosed(race, before)).toBe(false);
+    expect(predictionsClosed(race, after)).toBe(true);
     expect(predictionsOpen({ status: "DRAFT", scheduledAt: start }, before)).toBe(false);
   });
 });

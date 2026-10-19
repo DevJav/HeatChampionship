@@ -1,7 +1,7 @@
 /**
  * Podium predictions: before a race starts, anyone in the league picks who
- * finishes 1st, 2nd and 3rd (racers included, themselves too). Picks stay
- * private until the start. Each pick scores PREDICTION_POINTS.exact for the
+ * finishes 1st, 2nd and 3rd (racers included, themselves too). Everyone's
+ * picks are public, and they can be changed until the start. Each pick scores PREDICTION_POINTS.exact for the
  * right place, PREDICTION_POINTS.podium for a podium finisher in another place.
  * Pure functions, unit-tested in predictions.test.ts.
  */
@@ -20,8 +20,8 @@ export function predictionsOpen(race: PredictionRace, now: Date) {
   return (race.status === "UPCOMING" || race.status === "OPEN" || race.status === "CLOSED") && now < race.scheduledAt;
 }
 
-/** Everyone's picks are shown once the race has started. */
-export function picksRevealed(race: PredictionRace, now: Date) {
+/** The race has started: the picks are final. */
+export function predictionsClosed(race: PredictionRace, now: Date) {
   return race.status === "FINISHED" || (race.status !== "DRAFT" && now >= race.scheduledAt);
 }
 

@@ -7,7 +7,7 @@ import { db } from "../db";
 import type { DossierInput } from "../dossier";
 import { tallyVotes, votingClosesAt, votingPhase } from "../driver-of-the-day";
 import { formatDate, formatDateTime, formatRaceDay } from "../format";
-import { picksRevealed, podiumOf, scorePicks } from "../predictions";
+import { podiumOf, scorePicks } from "../predictions";
 import { cornerStats } from "../race-log/corners";
 import { momentOfTheRace, pairDuels, raceHighlights, rivalryOfTheRace } from "../race-log/highlights";
 import { driverInsights, rankHistory } from "../race-log/insights";
@@ -155,14 +155,12 @@ export async function getDossierInput(raceId: string): Promise<DossierInput | nu
       winners: phase === "closed" ? tally.winners.map((id) => ({ driver: name(id), votes: tally.most })) : [],
     },
     predictions: {
-      revealed: picksRevealed(race, now),
-      count: predictions.length,
-      rows: picksRevealed(race, now)
-        ? predictions.map((p) => {
-            const score = finished ? scorePicks(p.picks, podiumOf(results.map((r) => ({ userId: r.user.id, position: r.position })))) : null;
-            return { who: p.user.name, picks: p.names, points: score?.points ?? null, perfect: score?.perfect ?? false };
-          }).sort((a, b) => (b.points ?? 0) - (a.points ?? 0))
-        : [],
+      rows: predictions
+        .map((p) => {
+          const score = finished ? scorePicks(p.picks, podiumOf(results.map((r) => ({ userId: r.user.id, position: r.position })))) : null;
+          return { who: p.user.name, picks: p.names, points: score?.points ?? null, perfect: score?.perfect ?? false };
+        })
+        .sort((a, b) => (b.points ?? 0) - (a.points ?? 0)),
     },
   };
 }

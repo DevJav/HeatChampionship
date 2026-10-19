@@ -18,7 +18,7 @@ const base: DossierInput = {
   careers: [{ driver: "Ana", starts: 5, wins: 2, podiums: 3 }],
   achievements: [{ driver: "Ana", name: "Remontada", description: "Ganó 3 puestos." }],
   driverOfTheDay: { status: "open", closesAt: "21 nov", votes: 1, voters: 2, winners: [] },
-  predictions: { revealed: true, count: 1, rows: [{ who: "Zoe", picks: ["Ana", "Leo", "Eva"], points: 6, perfect: false }] },
+  predictions: { rows: [{ who: "Zoe", picks: ["Ana", "Leo", "Eva"], points: 6, perfect: false }] },
 };
 
 describe("raceDossier", () => {
@@ -54,11 +54,11 @@ describe("raceDossier", () => {
       results: [],
       entrants: ["Ana", "Leo"],
       chances: [{ driver: "Ana", win: 0.6, podium: 0.9 }],
-      predictions: { revealed: false, count: 3, rows: [] },
+      predictions: { rows: [] },
     });
     expect(md).toContain("# Race preview dossier");
     expect(md).toContain("| Ana | 60% | 90% |");
-    expect(md).toContain("3 prediction(s) made; picks stay private");
+    expect(md).toContain("Nobody has predicted yet.");
     expect(md).not.toContain("## Results");
   });
 });

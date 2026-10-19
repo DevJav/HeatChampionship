@@ -752,11 +752,13 @@ export const en: Dictionary = {
 
   predictions: {
     title: "Podium prediction",
-    intro: "Pick who finishes 1st, 2nd and 3rd. 3 points for each exact place and 1 for a podium driver in another place. Nobody sees the picks until the start.",
+    intro: "Pick who finishes 1st, 2nd and 3rd. 3 points for each exact place and 1 for a podium driver in another place. You can change it until the start.",
     places: ["1st", "2nd", "3rd"],
+    rules: "3 points per exact place, 1 for a podium driver in another place.",
     choose: "Choose a driver",
-    save: "Save prediction",
+    save: "Make prediction",
     update: "Change prediction",
+    submit: "Save",
     saved: "Prediction saved.",
     count: (n) => (n === 1 ? "1 prediction so far." : `${n} predictions so far.`),
     needDrivers: "Predictions open once at least 3 drivers are confirmed.",

@@ -54,7 +54,7 @@ export type DossierInput = {
   careers: { driver: string; starts: number; wins: number; podiums: number }[];
   achievements: { driver: string; name: string; description: string }[];
   driverOfTheDay: { status: "open" | "closed" | "none"; closesAt: string | null; votes: number; voters: number; winners: { driver: string; votes: number }[] };
-  predictions: { revealed: boolean; count: number; rows: { who: string; picks: string[]; points: number | null; perfect: boolean }[] };
+  predictions: { rows: { who: string; picks: string[]; points: number | null; perfect: boolean }[] };
 };
 
 const cell = (value: string | number | null | undefined) => (value == null || value === "" ? "–" : String(value).replace(/\|/g, "\\|").replace(/\n/g, " "));
@@ -190,7 +190,7 @@ export function raceDossier(d: DossierInput): string {
 
   const p = d.predictions;
   add("## Podium predictions", "");
-  if (!p.revealed) add(`- ${p.count} prediction(s) made; picks stay private until the start.`, "");
+  if (p.rows.length === 0) add("- Nobody has predicted yet.", "");
   else
     add(
       table(

@@ -767,11 +767,13 @@ export const es = {
 
   predictions: {
     title: "Pronóstico del podio",
-    intro: "Elige quién acaba 1º, 2º y 3º. 3 puntos por cada puesto exacto y 1 por acertar un piloto del podio en otro puesto. Nadie ve los pronósticos hasta la salida.",
+    intro: "Elige quién acaba 1º, 2º y 3º. 3 puntos por cada puesto exacto y 1 por acertar un piloto del podio en otro puesto. Puedes cambiarlo hasta la salida.",
     places: ["1º", "2º", "3º"] as [string, string, string],
+    rules: "3 puntos por puesto exacto, 1 por un piloto del podio en otro puesto.",
     choose: "Elige piloto",
-    save: "Guardar pronóstico",
+    save: "Hacer pronóstico",
     update: "Cambiar pronóstico",
+    submit: "Guardar",
     saved: "Pronóstico guardado.",
     count: (n: number) => (n === 1 ? "1 pronóstico hasta ahora." : `${n} pronósticos hasta ahora.`),
     needDrivers: "Se podrá pronosticar cuando haya al menos 3 pilotos confirmados.",

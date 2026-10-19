@@ -23,7 +23,7 @@ export async function NextRaceCard() {
           <CardBody className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <h3 className="text-3xl">{raceTitle(race)}</h3>
-              <RaceMeta race={race} className="text-fg-muted" />
+              <RaceMeta race={race} className="text-fg-muted" withWeekday />
             </div>
             <RaceCountdown target={race.scheduledAt.toISOString()} />
             <RaceSignupPanel race={race} />

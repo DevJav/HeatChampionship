@@ -54,7 +54,7 @@ export function Section({ title, actions, className, children, ...props }: Secti
   return (
     <section className={cn("flex flex-col gap-4", className)} {...props}>
       {(title || actions) && (
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           {title && (
             <h2 className="flex items-center gap-3 text-2xl">
               <span aria-hidden className="h-6 w-2 -skew-x-12 bg-primary" />

@@ -46,7 +46,7 @@ export function GridChart({ slots }: { slots: GridSlot[] }) {
         role="img"
         aria-label={t.stats.gridChart.label}
         tabIndex={0}
-        className="block touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="block max-w-full touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onPointerLeave={() => setActive(null)}
         onBlur={() => setActive(null)}
         onKeyDown={(e) => {

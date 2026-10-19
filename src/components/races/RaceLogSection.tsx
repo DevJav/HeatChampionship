@@ -27,7 +27,7 @@ export async function RaceLogSection({ raceId, title }: { raceId: string; title:
     <Section
       title={t.raceLog.cardTitle}
       actions={
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           <ReplayVideoButton track={log.track} laps={log.laps} cars={cars} rounds={log.rounds} title={title} />
           <ButtonLink href={`/carreras/${raceId}/registro.json`} variant="ghost" size="sm" title={t.raceLog.download}>
             <Download /> JSON

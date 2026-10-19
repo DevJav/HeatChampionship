@@ -98,7 +98,7 @@ export function PointsChart({ rounds, series }: { rounds: ChartRound[]; series: 
           role="img"
           aria-label={t.standings.chart.label}
           tabIndex={0}
-          className="block touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="block max-w-full touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onPointerMove={(e) => pick(e.clientX)}
           onPointerDown={(e) => pick(e.clientX)}
           onPointerLeave={() => setActive(null)}

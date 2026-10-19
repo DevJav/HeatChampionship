@@ -9,6 +9,11 @@ const dateTimeFormat = new Intl.DateTimeFormat(locale, {
   timeStyle: "short",
   timeZone,
 });
+const fullDateTimeFormat = new Intl.DateTimeFormat(locale, {
+  dateStyle: "full",
+  timeStyle: "short",
+  timeZone,
+});
 const shortDateFormat = new Intl.DateTimeFormat(locale, {
   day: "numeric",
   month: "short",
@@ -19,6 +24,8 @@ const shortDateFormat = new Intl.DateTimeFormat(locale, {
 export const formatDate = (date: Date) => dateFormat.format(date);
 /** "13 de octubre de 2026, 19:30" */
 export const formatDateTime = (date: Date) => dateTimeFormat.format(date);
+/** "martes, 13 de octubre de 2026, 19:30" */
+export const formatFullDateTime = (date: Date) => fullDateTimeFormat.format(date);
 /** "13 oct" */
 export const formatShortDate = (date: Date) => shortDateFormat.format(date);
 

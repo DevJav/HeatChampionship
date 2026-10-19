@@ -46,7 +46,7 @@ export function LapChart({
         height={height}
         role="img"
         aria-label={t.raceLog.positionsByRound}
-        className="block touch-pan-y"
+        className="block max-w-full touch-pan-y"
         onPointerDown={(e) => pick(e.clientX)}
       >
         {cars.map((_, i) => (

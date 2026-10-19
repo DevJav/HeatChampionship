@@ -195,7 +195,7 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid items-start gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>
             <CardHeader>

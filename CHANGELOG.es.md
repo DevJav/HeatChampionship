@@ -6,6 +6,9 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+### Nuevo
+- **Repetición 3D:** las carreras anotadas vuelta a vuelta se pueden ver como una carrera de verdad, en un circuito en 3D con coches de vuestros colores. Ábrela con el botón **3D** en **Vuelta a vuelta**. Cada coche acaba cada ronda donde se anotó, y entre medias frena en las curvas, adelanta, coge el rebufo y hace trompos. La **Realización** cambia de cámara como en la tele (helicóptero, persecución, a bordo y cámaras de curva), o elige una cámara y a quién seguir. Lleva tabla de tiempos, rótulos y la radio de cada piloto al cruzar la meta, y con **Vídeo** se graba para compartir.
+
 ## [1.9.0] - 2026-10-23
 
 ### Nuevo

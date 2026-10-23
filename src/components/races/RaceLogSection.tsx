@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Download, Rotate3d } from "lucide-react";
 import { ButtonLink, Section } from "@/components/ui";
 import { LoggedRaceReplay } from "@/components/race-log/LoggedRaceReplay";
 import { MomentOfTheRace, RivalryOfTheRace } from "@/components/race-log/RaceHighlights";
@@ -28,6 +28,11 @@ export async function RaceLogSection({ raceId, title }: { raceId: string; title:
       title={t.raceLog.cardTitle}
       actions={
         <div className="flex flex-wrap gap-1">
+          {layout && (
+            <ButtonLink href={`/carreras/${raceId}/repeticion-3d`} variant="ghost" size="sm" title={t.raceLog.replay3d.button}>
+              <Rotate3d /> {t.raceLog.replay3d.short}
+            </ButtonLink>
+          )}
           <ReplayVideoButton track={log.track} laps={log.laps} cars={cars} rounds={log.rounds} title={title} />
           <ButtonLink href={`/carreras/${raceId}/registro.json`} variant="ghost" size="sm" title={t.raceLog.download}>
             <Download /> JSON

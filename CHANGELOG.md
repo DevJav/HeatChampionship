@@ -6,6 +6,9 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Added
+- **3D replay:** races logged round by round can be watched like a real race, on a 3D track with cars in your colours. Open it with the **3D** button in **Round by round**. Every car ends each round where it was logged, and in between it brakes for corners, overtakes, slipstreams and spins. **TV** cuts between cameras like a broadcast (helicopter, chase, onboard and corner cameras), or pick a camera and who to follow. It comes with a timing tower, captions and each driver's team radio as they cross the line, and **Video** records it to share.
+
 ## [1.9.0] - 2026-10-23
 
 ### Added

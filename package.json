@@ -46,6 +46,7 @@
     "resend": "^6.33.0",
     "sharp": "^0.35.5",
     "tailwind-merge": "^3.7.0",
+    "three": "^0.186.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -54,6 +55,7 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
     "dotenv": "^18.0.7",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",

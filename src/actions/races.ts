@@ -11,7 +11,9 @@ import { db } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/db-errors";
 import { announceSignupsOpen } from "@/lib/email/announce";
 import { logRaceStatusChange } from "@/lib/log-activity";
-import { formValues, int, optionalInt, optionalText, parseForm, text, type FormState } from "@/lib/forms";
+import { checkbox, formValues, int, optionalInt, optionalText, parseForm, text, type FormState } from "@/lib/forms";
+import { isMonthKey } from "@/lib/month-calendar";
+import { tbdPlaceholder } from "@/lib/races";
 import { joinRace, leaveRace, rebalanceSeats, RegistrationError } from "@/lib/registrations";
 import { recomputeSeasonPoints } from "@/lib/results";
 import { requireAdmin, requireUser } from "@/lib/session";
@@ -43,16 +45,6 @@ export async function updateMyRegistration(_prev: FormState, formData: FormData)
 // Admin: races
 // ---------------------------------------------------------------------------
 
-const dateTime = (message: string) =>
-  z.string().transform((value, ctx) => {
-    const date = fromLocalInput(value);
-    if (!date) {
-      ctx.addIssue({ code: "custom", message });
-      return z.NEVER;
-    }
-    return date;
-  });
-
 const optionalDateTime = z
   .string()
   .optional()
@@ -71,7 +63,10 @@ const raceSchema = z
     seasonId: text(),
     trackId: text(),
     round: int(1, 99),
-    scheduledAt: dateTime(t.admin.racesAdmin.dateRequired),
+    // Either a day and time, or (with "date to be decided") just a month
+    dateTbd: checkbox(),
+    scheduledAt: z.string().optional(),
+    month: z.string().optional(),
     signupDeadline: optionalDateTime,
     location: optionalText(120),
     laps: optionalInt(1, 10),
@@ -79,6 +74,20 @@ const raceSchema = z
     // Absent when the select is disabled (finished races)
     status: z.enum(["DRAFT", "UPCOMING", "OPEN", "CLOSED"]).optional(),
     notes: optionalText(2000),
+  })
+  .transform(({ month, ...race }, ctx) => {
+    const scheduledAt = race.dateTbd
+      ? month && isMonthKey(month) ? tbdPlaceholder(month) : null
+      : fromLocalInput(race.scheduledAt ?? "");
+    if (!scheduledAt) {
+      ctx.addIssue(
+        race.dateTbd
+          ? { code: "custom", path: ["month"], message: t.admin.racesAdmin.monthRequired }
+          : { code: "custom", path: ["scheduledAt"], message: t.admin.racesAdmin.dateRequired },
+      );
+      return z.NEVER;
+    }
+    return { ...race, scheduledAt };
   })
   .refine((race) => !race.signupDeadline || race.signupDeadline <= race.scheduledAt, {
     path: ["signupDeadline"],

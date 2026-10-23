@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import { Flag } from "lucide-react";
 import { createRace } from "@/actions/races";
 import { ButtonLink, Card, CardBody, CardHeader, CardTitle, EmptyState } from "@/components/ui";
@@ -12,9 +13,6 @@ import { t } from "@/i18n";
 export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.racesAdmin.new) };
 
 const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-/** Time used for a day picked in a date poll when there's no earlier race to copy */
-const FALLBACK_TIME = "18:00";
 
 async function NewRacePageContent({ searchParams }: { searchParams: PageProps<"/admin/carreras/nueva">["searchParams"] }) {
   await requireAdmin("/admin/carreras/nueva");
@@ -54,7 +52,7 @@ async function NewRacePageContent({ searchParams }: { searchParams: PageProps<"/
           defaults={{
             seasonId: current?.id,
             round,
-            scheduledAt: day && `${day}T${time ?? FALLBACK_TIME}`,
+            scheduledAt: day && `${day}T${time ?? siteConfig.fallbackRaceTime}`,
             datePollId: typeof encuesta === "string" ? encuesta : undefined,
           }}
         />

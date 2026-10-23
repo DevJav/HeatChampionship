@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { describeActivity, type ActivityRecord } from "./activity";
 
-const race = { id: "r1", round: 3, scheduledAt: new Date("2026-11-14T17:00:00Z"), track: { name: "Italia" }, winner: null };
+const race = { id: "r1", round: 3, scheduledAt: new Date("2026-11-14T17:00:00Z"), dateTbd: false, track: { name: "Italia" }, winner: null };
 const season = { id: "s1", name: "Temporada 2026/27", champion: null };
 const base: ActivityRecord = { type: "RACE_SIGNUP", actor: { name: "Ana", username: "ana" }, race, season: null };
 

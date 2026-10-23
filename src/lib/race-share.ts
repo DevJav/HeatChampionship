@@ -2,7 +2,7 @@
 
 import { siteConfig } from "@/config/site";
 import type { CalendarEvent } from "./calendar";
-import { formatRaceDay } from "./format";
+import { formatRaceDate } from "./format";
 import { raceTitle } from "./races";
 import { racePhase, type WindowRace } from "./registration-rules";
 import { t } from "@/i18n";
@@ -12,6 +12,7 @@ type ShareRace = WindowRace & {
   updatedAt: Date;
   round: number;
   scheduledAt: Date;
+  dateTbd: boolean;
   location: string | null;
   notes: string | null;
   maxPlayers: number;
@@ -58,7 +59,7 @@ export function raceShareText(race: ShareRace, url: string, { confirmed, podium 
       : t.races.share.seatsOpen(confirmed, race.maxPlayers);
   return [
     `🏁 ${title}`,
-    `📅 ${formatRaceDay(race.scheduledAt)}`,
+    `📅 ${formatRaceDate(race)}`,
     ...(race.location ? [`📍 ${race.location}`] : []),
     ...(phase === "OPEN" ? [`🏎️ ${seats}`] : []),
     url,

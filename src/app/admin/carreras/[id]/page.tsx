@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import { notFound } from "next/navigation";
 import { CalendarCheck, ExternalLink, Flag, NotebookPen, X } from "lucide-react";
 import { addEntrant, deleteRace, removeEntrant, updateRace } from "@/actions/races";
@@ -18,10 +19,10 @@ import { DeleteForm } from "@/components/admin/DeleteForm";
 import { RaceForm } from "@/components/admin/RaceForm";
 import { EntryList } from "@/components/races/EntryList";
 import { listSeasons, listTracks } from "@/lib/data/catalog";
-import { getRace } from "@/lib/data/races";
+import { getRace, lastRaceTime } from "@/lib/data/races";
 import { listUsers } from "@/lib/data/users";
 import { fromLocalInput, toLocalInput } from "@/lib/dates";
-import { formatRaceDay } from "@/lib/format";
+import { formatRaceDate, formatRaceDay } from "@/lib/format";
 import { hasTrackDrawing } from "@/lib/race-log/tracks";
 import { raceTitle } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
@@ -32,12 +33,21 @@ export const metadata: Metadata = { title: t.admin.pageTitle(t.admin.racesAdmin.
 
 const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+type MovableRace = { scheduledAt: Date; dateTbd: boolean; signupDeadline: Date | null };
+
 /**
  * ?dia=2026-11-14&encuesta=<poll id>, from a date poll's "Move here": the race
- * moves to that day at its usual time, and the sign-up deadline keeps the same gap.
+ * moves to that day at its usual time, and the sign-up deadline keeps the same
+ * gap. A race with no day yet takes the latest race's time and keeps its
+ * deadline only if it's still before the race (an empty one clears it).
  */
-function movedByPoll(race: { scheduledAt: Date; signupDeadline: Date | null }, dia: unknown, encuesta: unknown) {
+async function movedByPoll(race: MovableRace, dia: unknown, encuesta: unknown) {
   if (typeof dia !== "string" || !DAY_PATTERN.test(dia) || typeof encuesta !== "string") return null;
+  if (race.dateTbd) {
+    const scheduledAt = `${dia}T${(await lastRaceTime()) ?? siteConfig.fallbackRaceTime}`;
+    const keep = race.signupDeadline && race.signupDeadline <= fromLocalInput(scheduledAt)!;
+    return { scheduledAt, signupDeadline: keep ? toLocalInput(race.signupDeadline!) : "", datePollId: encuesta };
+  }
   const scheduledAt = `${dia}T${toLocalInput(race.scheduledAt).slice(11)}`;
   const shift = fromLocalInput(scheduledAt)!.getTime() - race.scheduledAt.getTime();
   return {
@@ -61,7 +71,7 @@ async function EditRacePageContent({ params, searchParams }: PageProps<"/admin/c
   if (!race) notFound();
 
   // Finished races keep their date
-  const moved = race.status === "FINISHED" ? null : movedByPoll(race, dia, encuesta);
+  const moved = race.status === "FINISHED" ? null : await movedByPoll(race, dia, encuesta);
   const entered = new Set(race.registrations.map((r) => r.user.id));
   const available = users.filter((user) => !entered.has(user.id));
   // Keep the race's own track selectable even if it was deactivated
@@ -97,7 +107,7 @@ async function EditRacePageContent({ params, searchParams }: PageProps<"/admin/c
           <CardBody className="flex flex-col gap-5">
             {moved && (
               <Alert tone="warning" icon={<CalendarCheck />}>
-                {t.datePoll.movedNotice(formatRaceDay(race.scheduledAt), formatRaceDay(fromLocalInput(moved.scheduledAt)!))}
+                {t.datePoll.movedNotice(formatRaceDate(race), formatRaceDay(fromLocalInput(moved.scheduledAt)!))}
               </Alert>
             )}
             <RaceForm

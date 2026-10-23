@@ -5,13 +5,13 @@ import { driverSelect } from "./standings";
 
 const pollInclude = {
   answers: { select: { userId: true, day: true, answer: true } },
-  race: { select: { id: true, round: true, scheduledAt: true, status: true, track: { select: { name: true } } } },
+  race: { select: { id: true, round: true, scheduledAt: true, dateTbd: true, status: true, track: { select: { name: true } } } },
 } as const;
 
 /**
  * The open date poll, or else the latest closed one (to show what was decided),
- * with every answer and the drivers asked: whoever has raced or signed up, plus
- * anyone who answered.
+ * with every answer and the drivers asked: every account that isn't banned, plus
+ * anyone who answered (even if banned since).
  */
 export async function getDatePoll() {
   await connection();
@@ -23,14 +23,8 @@ export async function getDatePoll() {
   const answered = [...new Set(poll.answers.map((a) => a.userId))];
   const drivers = await db.user.findMany({
     where: {
-      OR: [
-        { id: { in: answered } },
-        {
-          // `not: true` would also drop a NULL `banned`
-          OR: [{ banned: false }, { banned: null }],
-          AND: { OR: [{ results: { some: {} } }, { registrations: { some: { status: { not: "WITHDRAWN" } } } }] },
-        },
-      ],
+      // `banned: { not: true }` would also drop a NULL `banned`
+      OR: [{ id: { in: answered } }, { banned: false }, { banned: null }],
     },
     orderBy: { name: "asc" },
     select: driverSelect,

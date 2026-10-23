@@ -210,7 +210,10 @@ model Race {
   seasonId       String
   trackId        String
   round          Int
+  /// With `dateTbd`, the last minute of the race's month (see tbdPlaceholder in src/lib/races.ts)
   scheduledAt    DateTime
+  /// Only the month is known: the day is still to be decided (e.g. by a date poll)
+  dateTbd        Boolean    @default(false)
   location       String?
   laps           Int?
   maxPlayers     Int        @default(8)

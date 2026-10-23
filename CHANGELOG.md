@@ -6,6 +6,17 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-23
+
+### Added
+- Races can be announced with just a month while the day is still to be decided. They show "December 2026 · date to be decided", with a **Pick a date** button on the race page that leads to the date poll; the countdown and the calendar invite appear once the day is set. For admins: tick **Date to be decided** in the race form and choose the month, then use **Schedule race** on the date poll to give it a day.
+
+### Changed
+- **When do we race?** Drivers who haven't raced yet now count too: they appear under **Still to answer** and in the number of drivers who have answered.
+
+### Fixed
+- **News:** articles are now laid out on a plain white page under the title, instead of over the striped background, so they're easier to read.
+
 ## [1.8.0] - 2026-10-23
 
 ### Added
@@ -133,7 +144,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/DevJav/HeatChampionship/compare/v1.6.0...v1.6.1

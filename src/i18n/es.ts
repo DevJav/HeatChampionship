@@ -110,6 +110,9 @@ export const es = {
     nextRace: "Próxima carrera",
     viewGrid: "Ver parrilla",
     nextRaceEmpty: "Cuando se programe una carrera aparecerá aquí con el botón de inscripción.",
+    /** "diciembre 2026 · fecha por decidir" */
+    dateTbd: (month: string) => `${month} · fecha por decidir`,
+    dateTbdShort: "Fecha por decidir",
     /** "Última carrera · Ronda 3 · Italia" */
     lastRace: (title: string) => `Última carrera · ${title}`,
     viewResults: "Ver resultados",
@@ -1146,6 +1149,10 @@ export const es = {
       notesPlaceholder: "Reglas especiales, qué traer, módulos que se usan…",
       invalidDate: "Fecha no válida.",
       dateRequired: "Indica la fecha y hora de la carrera.",
+      dateTbd: "Fecha por decidir",
+      dateTbdHint: "Indica solo el mes. Pon el día más adelante, por ejemplo con una encuesta de fecha.",
+      month: "Mes",
+      monthRequired: "Elige el mes de la carrera.",
       deadlineAfterRace: "El cierre de inscripciones debe ser antes de la carrera.",
       duplicateRound: "Ya hay una carrera con esa ronda en la temporada.",
     },
@@ -1182,6 +1189,7 @@ export const es = {
       allPositions: "Indica la posición de todos los pilotos.",
       missingPosition: "Falta la posición.",
       invalidData: "Datos no válidos. Recarga la página.",
+      dateTbd: "La carrera todavía no tiene día: ponle fecha antes de guardar los resultados.",
       noDriversError: "No hay pilotos en la carrera.",
       invalidPosition: "Posición no válida.",
       repeatedPosition: "Posición repetida.",

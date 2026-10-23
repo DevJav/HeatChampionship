@@ -1,10 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { siteConfig } from "@/config/site";
 import type { Race, RaceStatus } from "@/generated/prisma/client";
 import { toLocalInput } from "@/lib/dates";
-import { RACE_STATUS } from "@/lib/races";
+import { addMonths, formatMonth, monthRange } from "@/lib/month-calendar";
+import { RACE_STATUS, raceMonth } from "@/lib/races";
+import { Checkbox } from "@/components/ui";
 import { DateTimeField, FormLayout, SelectField, TextareaField, TextField } from "@/components/forms/FormFields";
 import type { FormAction } from "@/lib/forms";
 import { t } from "@/i18n";
@@ -26,9 +28,19 @@ type RaceFormProps = {
 
 const editableStatuses: RaceStatus[] = ["DRAFT", "UPCOMING", "OPEN", "CLOSED"];
 
+/** Months a race with no day yet can be in: from a little back to a year and a half ahead, plus its own. */
+function monthOptions(current: string | undefined) {
+  const thisMonth = toLocalInput(new Date()).slice(0, 7);
+  const first = current && current < thisMonth ? current : addMonths(thisMonth, -2);
+  return monthRange(first, addMonths(thisMonth, 18)).map((month) => ({ value: month, label: formatMonth(month) }));
+}
+
 export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormProps) {
   const [state, formAction] = useActionState(action, {});
   const finished = race?.status === "FINISHED";
+  // A date poll's "Schedule race" brings a real day
+  const [tbd, setTbd] = useState(!defaults?.scheduledAt && (race?.dateTbd ?? false));
+  const month = race ? raceMonth(race) : undefined;
 
   return (
     <form action={formAction}>
@@ -69,13 +81,35 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
           hint={t.admin.racesAdmin.lapsHint}
           defaultValue={race?.laps}
         />
-        <DateTimeField
-          name="scheduledAt"
-          label={t.admin.racesAdmin.dateTime}
-          state={state}
-          hint={t.admin.racesAdmin.timeZoneHint(siteConfig.timeZone.split("/").at(-1)!.replaceAll("_", " "))}
-          defaultValue={defaults?.scheduledAt ?? (race ? toLocalInput(race.scheduledAt) : undefined)}
-        />
+        <div className="flex flex-col gap-2">
+          {tbd ? (
+            <SelectField
+              name="month"
+              label={t.admin.racesAdmin.month}
+              state={state}
+              hint={t.admin.racesAdmin.dateTbdHint}
+              options={monthOptions(month)}
+              defaultValue={month ?? addMonths(toLocalInput(new Date()).slice(0, 7), 1)}
+            />
+          ) : (
+            <DateTimeField
+              name="scheduledAt"
+              label={t.admin.racesAdmin.dateTime}
+              state={state}
+              hint={t.admin.racesAdmin.timeZoneHint(siteConfig.timeZone.split("/").at(-1)!.replaceAll("_", " "))}
+              // A race with no day yet holds a placeholder time, not worth showing
+              defaultValue={defaults?.scheduledAt ?? (race && !race.dateTbd ? toLocalInput(race.scheduledAt) : undefined)}
+            />
+          )}
+          <Checkbox
+            id="dateTbd"
+            name="dateTbd"
+            label={t.admin.racesAdmin.dateTbd}
+            checked={tbd}
+            disabled={finished}
+            onChange={(e) => setTbd(e.target.checked)}
+          />
+        </div>
         <DateTimeField
           name="signupDeadline"
           label={t.admin.racesAdmin.signupDeadline}

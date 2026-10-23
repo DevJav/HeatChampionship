@@ -4,7 +4,7 @@ import { CalendarCheck, CalendarDays, Plus } from "lucide-react";
 import { ButtonLink, Card, EmptyState, Section, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { listAllRaces } from "@/lib/data/races";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatRaceDate } from "@/lib/format";
 import { raceTitle } from "@/lib/races";
 import { requireAdmin } from "@/lib/session";
 import { AdminSuspense } from "@/components/admin/AdminSuspense";
@@ -53,7 +53,7 @@ async function AdminRacesPageContent() {
                     </Link>
                   </Td>
                   <Td className="text-fg-muted">{race.season.name}</Td>
-                  <Td className="text-fg-muted">{formatDateTime(race.scheduledAt)}</Td>
+                  <Td className="text-fg-muted">{formatRaceDate(race, formatDateTime)}</Td>
                   <Td>
                     <RaceStatusBadge race={race} />
                   </Td>

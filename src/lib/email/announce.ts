@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { formatDateTime, formatNames, formatRaceDay } from "@/lib/format";
+import { formatDateTime, formatNames, formatRaceDate } from "@/lib/format";
 import { raceTitle } from "@/lib/races";
 import { absoluteUrl } from "@/lib/site-url";
 import { sendToSubscribers } from "./send";
@@ -23,7 +23,7 @@ export async function announceSignupsOpen(raceId: string) {
     subject: t.email.signupsOpenSubject(title),
     heading: t.email.signupsOpenSubject(title),
     paragraphs: [
-      t.email.signupsOpenWhen(race.season.name, formatRaceDay(race.scheduledAt), race.location),
+      t.email.signupsOpenWhen(race.season.name, formatRaceDate(race), race.location),
       t.email.signupsOpenSeats(race.maxPlayers, race.signupDeadline && formatDateTime(race.signupDeadline)),
       ...(race.notes ? [race.notes] : []),
     ],

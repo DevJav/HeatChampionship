@@ -60,6 +60,7 @@ export async function listActivity({ limit = 10, after: cursor }: { limit?: numb
           id: true,
           round: true,
           scheduledAt: true,
+          dateTbd: true,
           track: { select: { name: true } },
           results: { where: { position: 1 }, select: { user: { select: { name: true } } } },
         },

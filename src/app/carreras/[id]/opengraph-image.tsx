@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 import { OgFrame, OgTag, flagDataUri } from "@/components/og/OgFrame";
 import { getRace } from "@/lib/data/races";
 import { getRaceResults } from "@/lib/data/results";
-import { formatRaceDay } from "@/lib/format";
+import { formatRaceDate } from "@/lib/format";
 import { OG_SIZE, ogFonts } from "@/lib/og-fonts";
 import { racePhase } from "@/lib/registration-rules";
 import { t } from "@/i18n";
@@ -91,7 +91,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           {/* Date and status share a line so two rows of drivers still fit */}
           <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
             <div style={{ display: "flex", fontSize: 34, color: "rgba(255,255,255,0.85)" }}>
-              {formatRaceDay(race.scheduledAt)}
+              {formatRaceDate(race)}
               {race.location ? ` · ${race.location}` : ""}
             </div>
             {status}

@@ -12,6 +12,8 @@ export const siteConfig = {
   /** Dates are shown in this time zone regardless of where the server runs (APP_TIME_ZONE) */
   timeZone: process.env.APP_TIME_ZONE || "Europe/Madrid",
   maxPlayersPerRace: 8,
+  /** Start time for a day picked in a date poll when no earlier race has one to copy */
+  fallbackRaceTime: "18:00",
   /** How long a race night lasts, for calendar invites */
   raceDurationHours: 3,
   nav: [

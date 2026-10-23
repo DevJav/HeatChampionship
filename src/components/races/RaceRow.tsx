@@ -27,9 +27,10 @@ export function RaceRow({ race }: { race: RaceListItem }) {
       >
         {/* Date block */}
         <span className="flex w-16 flex-col items-center surface-bar border-b-2 border-primary py-1.5 text-bar-fg">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-bar-fg/70">{date.weekday}</span>
-          <span className="font-display text-3xl font-bold italic italic-center leading-none" style={italicCenterStyle(date.day)}>
-            {date.day}
+          {/* No day yet: just the month, with a "?" for the day */}
+          <span className="text-[10px] font-bold uppercase tracking-widest text-bar-fg/70">{race.dateTbd ? "\u00a0" : date.weekday}</span>
+          <span className="font-display text-3xl font-bold italic italic-center leading-none" style={italicCenterStyle(race.dateTbd ? "?" : date.day)}>
+            {race.dateTbd ? "?" : date.day}
           </span>
           <span className="text-[11px] font-bold uppercase tracking-wider">{date.month}</span>
         </span>
@@ -50,7 +51,7 @@ export function RaceRow({ race }: { race: RaceListItem }) {
           </span>
           <span className="flex flex-wrap items-center gap-x-3 text-sm text-fg-muted">
             <span>
-              {date.time} · {date.year}
+              {race.dateTbd ? t.races.dateTbdShort : date.time} · {date.year}
             </span>
             {race.location && (
               <span className="flex items-center gap-1">

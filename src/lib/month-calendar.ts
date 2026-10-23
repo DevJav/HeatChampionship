@@ -26,6 +26,14 @@ function parseMonth(month: string) {
 
 const keyOf = (date: Date) => `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
 
+export const isMonthKey = (value: string) => /^\d{4}-\d{2}$/.test(value);
+
+/** "2026-11" → "2026-11-30" */
+export function lastDayOf(month: string) {
+  const { year, mon } = parseMonth(month);
+  return keyOf(new Date(Date.UTC(year, mon, 0)));
+}
+
 /** "2026-11-14" → "2026-11" */
 export const monthOf = (day: string) => day.slice(0, 7);
 

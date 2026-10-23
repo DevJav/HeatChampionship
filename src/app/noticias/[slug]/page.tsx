@@ -89,15 +89,20 @@ async function ArticleView({ params }: { params: PageProps<"/noticias/[slug]">["
   return (
     <article className="flex flex-col gap-8">
       {article.status === "DRAFT" && <Alert tone="warning">{t.races.draftNotice}</Alert>}
-      <ArticleHero article={article} admin={admin} />
-      <div className="mx-auto w-full max-w-3xl">
-        <ArticleBody body={article.body} />
-      </div>
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 border-t border-border pt-6">
-        {article.status === "PUBLISHED" && <ArticleComments article={article} user={user} />}
-        <ButtonLink href="/noticias" variant="secondary" size="sm" className="self-start">
-          <ChevronLeft /> {t.articles.allNews}
-        </ButtonLink>
+      <div>
+        <ArticleHero article={article} admin={admin} />
+        {/* A plain sheet under the hero so the text doesn't sit on the page's striped texture */}
+        <div className="flex flex-col gap-8 bg-surface px-5 py-8 shadow-[var(--gloss)] sm:px-10 sm:py-10">
+          <div className="mx-auto w-full max-w-3xl">
+            <ArticleBody body={article.body} />
+          </div>
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 border-t border-border pt-6">
+            {article.status === "PUBLISHED" && <ArticleComments article={article} user={user} />}
+            <ButtonLink href="/noticias" variant="secondary" size="sm" className="self-start">
+              <ChevronLeft /> {t.articles.allNews}
+            </ButtonLink>
+          </div>
+        </div>
       </div>
     </article>
   );

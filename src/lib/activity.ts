@@ -1,5 +1,5 @@
 import type { ActivityType } from "@/generated/prisma/client";
-import { formatShortDate } from "./format";
+import { formatRaceDate, formatShortDate } from "./format";
 import { raceTitle } from "./races";
 import { t } from "@/i18n";
 
@@ -7,7 +7,7 @@ import { t } from "@/i18n";
 export type ActivityRecord = {
   type: ActivityType;
   actor: { name: string; username: string | null } | null;
-  race: { id: string; round: number; scheduledAt: Date; track: { name: string }; winner: string | null } | null;
+  race: { id: string; round: number; scheduledAt: Date; dateTbd: boolean; track: { name: string }; winner: string | null } | null;
   season: { id: string; name: string; champion: string | null } | null;
 };
 
@@ -31,7 +31,7 @@ export function describeActivity(a: ActivityRecord): { subject: string | null; t
         href: a.actor?.username ? `/pilotos/${a.actor.username}` : "/pilotos",
       };
     case "RACE_ANNOUNCED": {
-      const when = a.race ? formatShortDate(a.race.scheduledAt) : "";
+      const when = a.race ? formatRaceDate(a.race, formatShortDate) : "";
       return { subject: null, text: t.activity.raceAnnounced(race, when), href: raceHref };
     }
     case "SIGNUPS_OPENED":

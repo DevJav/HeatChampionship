@@ -6,6 +6,17 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.9.0] - 2026-10-23
+
+### Nuevo
+- Las carreras se pueden anunciar solo con el mes mientras el día está por decidir. Se ven como "diciembre 2026 · fecha por decidir", con un botón **Elegir fecha** en la página de la carrera que lleva a la encuesta de fecha; la cuenta atrás y la invitación al calendario aparecen cuando ya hay día. Para administradores: marca **Fecha por decidir** en el formulario de la carrera y elige el mes, y después usa **Programar carrera** en la encuesta para darle día.
+
+### Cambios
+- **¿Cuándo corremos?** Ahora también cuentan los pilotos que aún no han corrido: salen en **Sin responder todavía** y en el número de pilotos que han respondido.
+
+### Arreglos
+- **Noticias:** los artículos van ahora sobre una hoja blanca lisa bajo el título, en vez de sobre el fondo de rayas, así se leen mejor.
+
 ## [1.8.0] - 2026-10-23
 
 ### Nuevo
@@ -133,7 +144,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/DevJav/HeatChampionship/compare/v1.6.0...v1.6.1

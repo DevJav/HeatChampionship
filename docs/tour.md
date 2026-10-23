@@ -134,7 +134,7 @@ The organiser runs everything from **`/admin`** (shield icon in the header):
 |---|---|
 | **Overview** | Open or close registration for new players. |
 | **Drivers** | Rename players, reset forgotten passwords (it can generate an easy one to read out), give or remove the admin role. |
-| **Races** | Create a race with its season, track, date, place, seats and optional sign-up deadline. *Draft* hides it, *Sign-up open* lets players join, *Sign-up closed* stops new sign-ups. You can also add or remove drivers yourself, even when sign-up is closed. **Date poll** opens the date poll: on any of the best days, **Schedule race** creates a race on that date or moves one that's already scheduled there, and saving the race closes the poll. |
+| **Races** | Create a race with its season, track, date (or just the month, with the day *to be decided*), place, seats and optional sign-up deadline. *Draft* hides it, *Sign-up open* lets players join, *Sign-up closed* stops new sign-ups. You can also add or remove drivers yourself, even when sign-up is closed. **Date poll** opens the date poll: on any of the best days, **Schedule race** creates a race on that date or moves one that's already scheduled there, and saving the race closes the poll. |
 | **News** | Write articles with a toolbar, drag-and-drop images and a live preview. |
 | **Seasons** | Seasons and their points table. Only one season can be in progress at a time. Changing the points table re-scores that season's finished races. |
 | **Tracks / Upgrades / Colours** | The catalogues: tracks (with country flag and default laps), upgrade cards and car colours. Anything already used can be deactivated but not deleted. |

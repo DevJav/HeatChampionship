@@ -7,6 +7,7 @@ const race = {
   round: 3,
   status: "OPEN" as const,
   scheduledAt: new Date("2026-11-14T17:00:00Z"),
+  dateTbd: false,
   signupDeadline: null,
   location: "Casa de Ana",
   notes: "Traed algo de picar.",
@@ -28,6 +29,11 @@ describe("raceShareText", () => {
         url,
       ].join("\n"),
     );
+  });
+
+  it("gives just the month while the day is to be decided", () => {
+    const tbd = { ...race, dateTbd: true, scheduledAt: new Date("2026-12-31T22:59:00Z") };
+    expect(raceShareText(tbd, url, { confirmed: 4, podium: [] }, before)).toContain("📅 diciembre 2026 · fecha por decidir");
   });
 
   it("mentions the waitlist when the race is full", () => {

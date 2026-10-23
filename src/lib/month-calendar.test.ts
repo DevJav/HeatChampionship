@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addMonths, formatDayKey, formatMonth, monthRange, monthWeeks } from "./month-calendar";
+import { addMonths, formatDayKey, formatMonth, isMonthKey, lastDayOf, monthRange, monthWeeks } from "./month-calendar";
 
 describe("monthWeeks", () => {
   it("starts weeks on Monday", () => {
@@ -44,5 +44,18 @@ describe("formatting", () => {
 
   it("names months in Spanish", () => {
     expect(formatMonth("2026-11")).toBe("noviembre 2026");
+  });
+});
+
+describe("month keys", () => {
+  it("knows the last day, leap years included", () => {
+    expect(lastDayOf("2026-11")).toBe("2026-11-30");
+    expect(lastDayOf("2028-02")).toBe("2028-02-29");
+    expect(lastDayOf("2026-12")).toBe("2026-12-31");
+  });
+
+  it("recognises month keys", () => {
+    expect(isMonthKey("2026-12")).toBe(true);
+    expect(isMonthKey("2026-12-01")).toBe(false);
   });
 });

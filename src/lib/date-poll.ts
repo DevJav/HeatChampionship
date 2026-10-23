@@ -1,5 +1,5 @@
 import type { Availability } from "@/generated/prisma/client";
-import { addMonths, monthOf } from "./month-calendar";
+import { addMonths, lastDayOf, monthOf } from "./month-calendar";
 
 /**
  * Date polls: the admin offers a range of days ("2026-11-01" keys, site time
@@ -15,9 +15,6 @@ export type PollRange = { firstDay: string; lastDay: string; blockedDays: string
 export const MAX_POLL_MONTHS = 3;
 
 const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const MONTH_PATTERN = /^\d{4}-\d{2}$/;
-
-export const isMonthKey = (value: string) => MONTH_PATTERN.test(value);
 
 const toDate = (day: string) => new Date(`${day}T00:00:00Z`);
 const toKey = (date: Date) => date.toISOString().slice(0, 10);
@@ -31,9 +28,7 @@ export function daysBetween(first: string, last: string) {
 
 /** "2026-11" to "2026-12" → the 1st of November to the 31st of December. */
 export function monthsToRange(from: string, to: string) {
-  const end = toDate(`${addMonths(to, 1)}-01`);
-  end.setUTCDate(0);
-  return { firstDay: `${from}-01`, lastDay: toKey(end) };
+  return { firstDay: `${from}-01`, lastDay: lastDayOf(to) };
 }
 
 /** The months a poll's calendar shows. */

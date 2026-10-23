@@ -1,4 +1,6 @@
 import type { RaceStatus, SeasonStatus } from "@/generated/prisma/client";
+import { fromLocalInput, toLocalInput } from "./dates";
+import { lastDayOf } from "./month-calendar";
 import type { RacePhase } from "./registration-rules";
 import { t } from "@/i18n";
 
@@ -6,6 +8,16 @@ import { t } from "@/i18n";
 export function raceTitle(race: { round: number; track: { name: string } }) {
   return `${t.common.round(race.round)} · ${race.track.name}`;
 }
+
+/**
+ * "2026-12" → where a race whose day isn't decided yet is stored: the last
+ * minute of that month (site time zone). It sorts after the month's dated
+ * races, and sign-ups and predictions stay open all month.
+ */
+export const tbdPlaceholder = (month: string) => fromLocalInput(`${lastDayOf(month)}T23:59`)!;
+
+/** "2026-12": the month a race is in (site time zone) */
+export const raceMonth = (race: { scheduledAt: Date }) => toLocalInput(race.scheduledAt).slice(0, 7);
 
 /** Laps set on the race, falling back to the track's default. */
 export function raceLaps(race: { laps: number | null; track: { defaultLaps: number | null } }) {

@@ -6,7 +6,7 @@ import { raceChances } from "../chances";
 import { db } from "../db";
 import type { DossierInput } from "../dossier";
 import { tallyVotes, votingClosesAt, votingPhase } from "../driver-of-the-day";
-import { formatDate, formatDateTime, formatRaceDay } from "../format";
+import { formatDate, formatDateTime, formatRaceDate } from "../format";
 import { podiumOf, scorePicks } from "../predictions";
 import { cornerStats } from "../race-log/corners";
 import { momentOfTheRace, pairDuels, raceHighlights, rivalryOfTheRace } from "../race-log/highlights";
@@ -96,7 +96,7 @@ export async function getDossierInput(raceId: string): Promise<DossierInput | nu
       season: race.season.name,
       round: race.round,
       track: race.track.name,
-      date: formatRaceDay(race.scheduledAt),
+      date: formatRaceDate(race),
       location: race.location,
       laps: race.laps ?? race.track.defaultLaps,
       notes: race.notes,

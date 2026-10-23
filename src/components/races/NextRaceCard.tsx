@@ -25,7 +25,7 @@ export async function NextRaceCard() {
               <h3 className="text-3xl">{raceTitle(race)}</h3>
               <RaceMeta race={race} className="text-fg-muted" withWeekday />
             </div>
-            <RaceCountdown target={race.scheduledAt.toISOString()} />
+            {!race.dateTbd && <RaceCountdown target={race.scheduledAt.toISOString()} />}
             <RaceSignupPanel race={race} />
           </CardBody>
           <CardFooter>

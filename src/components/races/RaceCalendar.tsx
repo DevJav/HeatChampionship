@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { RaceListItem } from "@/lib/data/races";
 import { cn } from "@/lib/cn";
 import { toLocalInput } from "@/lib/dates";
+import { raceMonth } from "@/lib/races";
 import { formatDayKey, formatMonth, monthOf, monthRange, monthWeeks, WEEKDAYS } from "@/lib/month-calendar";
 import { CountryFlag } from "@/components/domain/CountryFlag";
 import { MonthPager } from "./MonthPager";
@@ -17,10 +18,14 @@ type RaceCalendarProps = {
 /** Madrid wall-clock day and time of a race: ["2026-11-14", "19:30"] */
 const raceDay = (race: RaceListItem) => toLocalInput(race.scheduledAt).split("T");
 
-/** Month grid (Monday first) per month, from the first race to the last, with that month's races listed below. */
+/**
+ * Month grid (Monday first) per month, from the first race to the last, with
+ * that month's races listed below. Races with no day yet are only listed.
+ */
 export function RaceCalendar({ races, today }: RaceCalendarProps) {
-  const byDay = Map.groupBy(races, (race) => raceDay(race)[0]);
-  const days = [...byDay.keys(), today].sort();
+  const byDay = Map.groupBy(races.filter((race) => !race.dateTbd), (race) => raceDay(race)[0]);
+  const undated = Map.groupBy(races.filter((race) => race.dateTbd), raceMonth);
+  const days = [...races.map((race) => raceDay(race)[0]), today].sort();
   const months = monthRange(monthOf(days[0]), monthOf(days.at(-1)!));
 
   return (
@@ -29,7 +34,7 @@ export function RaceCalendar({ races, today }: RaceCalendarProps) {
       months={months.map((month) => ({
         key: month,
         label: formatMonth(month),
-        content: <MonthView month={month} byDay={byDay} today={today} />,
+        content: <MonthView month={month} byDay={byDay} undated={undated.get(month) ?? []} today={today} />,
       }))}
     />
   );
@@ -38,12 +43,14 @@ export function RaceCalendar({ races, today }: RaceCalendarProps) {
 type MonthViewProps = {
   month: string;
   byDay: Map<string, RaceListItem[]>;
+  /** The month's races with no day yet */
+  undated: RaceListItem[];
   today: string;
 };
 
-function MonthView({ month, byDay, today }: MonthViewProps) {
+function MonthView({ month, byDay, undated, today }: MonthViewProps) {
   const weeks = monthWeeks(month);
-  const monthRaces = weeks.flat().flatMap((day) => (day.inMonth ? (byDay.get(day.key) ?? []) : []));
+  const monthRaces = [...weeks.flat().flatMap((day) => (day.inMonth ? (byDay.get(day.key) ?? []) : [])), ...undated];
 
   return (
     <div className="flex flex-col gap-6">

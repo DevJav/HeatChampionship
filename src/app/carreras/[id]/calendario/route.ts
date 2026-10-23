@@ -7,7 +7,8 @@ import { absoluteUrl } from "@/lib/site-url";
 export async function GET(_request: Request, { params }: RouteContext<"/carreras/[id]/calendario">) {
   const { id } = await params;
   const race = await getRace(id);
-  if (!race) return new Response("Not found", { status: 404 });
+  // No invite until the day is known
+  if (!race || race.dateTbd) return new Response("Not found", { status: 404 });
 
   const ics = icsCalendar(raceCalendarEvent(race, absoluteUrl(`/carreras/${race.id}`)));
   const filename = `heat-ronda-${race.round}-${race.track.slug}.ics`;

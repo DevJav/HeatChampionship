@@ -100,7 +100,7 @@ export async function listUnfinishedRaces() {
   return db.race.findMany({
     where: { status: { not: "FINISHED" } },
     orderBy: { scheduledAt: "asc" },
-    select: { id: true, round: true, scheduledAt: true, status: true, track: { select: { name: true } } },
+    select: { id: true, round: true, scheduledAt: true, dateTbd: true, status: true, track: { select: { name: true } } },
   });
 }
 
@@ -118,7 +118,8 @@ export async function nextRoundNumber(seasonId: string) {
 /** Start time ("19:30") of the latest race, so a new one can default to the usual time. */
 export async function lastRaceTime() {
   await connection();
-  const last = await db.race.findFirst({ orderBy: { scheduledAt: "desc" }, select: { scheduledAt: true } });
+  // A race with no day yet only holds a placeholder time
+  const last = await db.race.findFirst({ where: { dateTbd: false }, orderBy: { scheduledAt: "desc" }, select: { scheduledAt: true } });
   return last ? toLocalInput(last.scheduledAt).slice(11) : null;
 }
 

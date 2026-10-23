@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Race" ADD COLUMN "dateTbd" BOOLEAN NOT NULL DEFAULT false;

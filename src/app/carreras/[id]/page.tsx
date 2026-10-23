@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { FileText, Flag, NotebookPen, Pencil } from "lucide-react";
+import { CalendarCheck, FileText, Flag, NotebookPen, Pencil } from "lucide-react";
 import {
   Alert,
   Badge,
@@ -38,7 +38,7 @@ import { TrackPreview } from "@/components/races/TrackPreview";
 import { googleCalendarUrl } from "@/lib/calendar";
 import { raceCalendarEvent, raceShareText, whatsappUrl } from "@/lib/race-share";
 import { absoluteUrl } from "@/lib/site-url";
-import { formatRaceDay } from "@/lib/format";
+import { formatRaceDate } from "@/lib/format";
 import { hasTrackDrawing } from "@/lib/race-log/tracks";
 import { raceTitle } from "@/lib/races";
 import { getRace, type RaceDetail } from "@/lib/data/races";
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps<"/carreras/[id]">):
   const { id } = await params;
   const race = await getRace(id);
   if (!race) return { title: t.races.fallbackTitle };
-  const description = [formatRaceDay(race.scheduledAt), race.location, race.season.name].filter(Boolean).join(" · ");
+  const description = [formatRaceDate(race), race.location, race.season.name].filter(Boolean).join(" · ");
   return { title: raceTitle(race), description, openGraph: { title: raceTitle(race), description } };
 }
 
@@ -85,7 +85,12 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
         {race.status !== "DRAFT" && (
           <div className="flex flex-wrap gap-2">
             <ShareButtons whatsappHref={whatsappUrl(share)} url={url} />
-            {upcoming && (
+            {upcoming && race.dateTbd && (
+              <ButtonLink href="/carreras/fecha" variant="inverse" size="sm">
+                <CalendarCheck /> {t.datePoll.link}
+              </ButtonLink>
+            )}
+            {upcoming && !race.dateTbd && (
               <CalendarButtons
                 icsHref={`/carreras/${race.id}/calendario`}
                 googleHref={googleCalendarUrl(raceCalendarEvent(race, url))}

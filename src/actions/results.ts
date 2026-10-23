@@ -41,8 +41,11 @@ export async function saveResults(raceId: string, input: unknown): Promise<Resul
   const validation = validateResults(parsed.data);
   if (validation.error) return validation;
 
+  const race = await db.race.findUnique({ where: { id: raceId }, select: { status: true, dateTbd: true } });
+  // Its date goes into history, stats and the race report
+  if (race?.dateTbd) return { error: t.admin.results.dateTbd, rowErrors: {} };
   // Corrections to a finished race aren't news
-  const wasFinished = (await db.race.findUnique({ where: { id: raceId }, select: { status: true } }))?.status === "FINISHED";
+  const wasFinished = race?.status === "FINISHED";
   await saveRaceResults(raceId, parsed.data);
   await notifyRaceResults(raceId);
   if (!wasFinished) after(() => announceResults(raceId));

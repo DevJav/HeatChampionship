@@ -1,4 +1,6 @@
 import { siteConfig } from "@/config/site";
+import { toLocalInput } from "./dates";
+import { formatMonth } from "./month-calendar";
 import { t } from "@/i18n";
 
 const { locale, timeZone } = siteConfig;
@@ -68,6 +70,14 @@ const dayNameFormat = new Intl.DateTimeFormat(locale, { weekday: "long", day: "n
 
 /** "2026-11-14" → "sábado, 14 de noviembre" (a calendar day key, see month-calendar.ts) */
 export const formatDayName = (day: string) => dayNameFormat.format(new Date(`${day}T12:00:00Z`));
+
+/**
+ * A race's date written with `format`, or "diciembre 2026 · fecha por decidir"
+ * while only its month is known.
+ */
+export function formatRaceDate(race: { scheduledAt: Date; dateTbd: boolean }, format: (date: Date) => string = formatRaceDay) {
+  return race.dateTbd ? t.races.dateTbd(formatMonth(toLocalInput(race.scheduledAt).slice(0, 7))) : format(race.scheduledAt);
+}
 
 const dayPartsFormat = new Intl.DateTimeFormat(locale, {
   weekday: "short",

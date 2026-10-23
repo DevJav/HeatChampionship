@@ -4,12 +4,12 @@ import { refresh } from "next/cache";
 import { after } from "next/server";
 import { z } from "zod";
 import type { Availability } from "@/generated/prisma/client";
-import { blockedDaysOf, isBlockableDay, isMonthKey, isOpenDay, MAX_POLL_MONTHS, monthsToRange } from "@/lib/date-poll";
+import { blockedDaysOf, isBlockableDay, isOpenDay, MAX_POLL_MONTHS, monthsToRange } from "@/lib/date-poll";
 import { toLocalInput } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { announceDatePoll } from "@/lib/email/announce";
 import { optionalText, parseForm, type FormState } from "@/lib/forms";
-import { addMonths } from "@/lib/month-calendar";
+import { addMonths, isMonthKey } from "@/lib/month-calendar";
 import { requireAdmin, requireUser } from "@/lib/session";
 import { t } from "@/i18n";
 

@@ -112,7 +112,7 @@ async function RaceCardEmbed(props: EmbedProps) {
         </div>
       </div>
       <CardBody className="flex flex-col gap-4">
-        {upcoming && <RaceCountdown target={race.scheduledAt.toISOString()} />}
+        {upcoming && !race.dateTbd && <RaceCountdown target={race.scheduledAt.toISOString()} />}
         {race.status === "FINISHED" ? <RaceWinners race={race} /> : <RaceSignupPanel race={race} />}
       </CardBody>
       <SeeMore href={`/carreras/${race.id}`}>{race.status === "FINISHED" ? t.races.viewResults : t.races.viewGrid}</SeeMore>

@@ -1,12 +1,13 @@
 import { CalendarDays, MapPin, RotateCw } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { formatDateTime, formatFullDateTime } from "@/lib/format";
+import { formatDateTime, formatFullDateTime, formatRaceDate } from "@/lib/format";
 import { raceLaps } from "@/lib/races";
 import { t } from "@/i18n";
 
 type RaceMetaProps = {
   race: {
     scheduledAt: Date;
+    dateTbd: boolean;
     location: string | null;
     laps: number | null;
     track: { defaultLaps: number | null };
@@ -22,7 +23,7 @@ export function RaceMeta({ race, className, withWeekday }: RaceMetaProps) {
   return (
     <ul className={cn("flex flex-wrap gap-x-5 gap-y-1 text-sm [&_svg]:size-4 [&_svg]:shrink-0", className)}>
       <li className="flex items-center gap-1.5">
-        <CalendarDays /> {(withWeekday ? formatFullDateTime : formatDateTime)(race.scheduledAt)}
+        <CalendarDays /> {formatRaceDate(race, withWeekday ? formatFullDateTime : formatDateTime)}
       </li>
       {race.location && (
         <li className="flex items-center gap-1.5">

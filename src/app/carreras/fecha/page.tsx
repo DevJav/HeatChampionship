@@ -11,7 +11,7 @@ import { getDatePoll, type DatePollView } from "@/lib/data/date-polls";
 import { listUnfinishedRaces } from "@/lib/data/races";
 import { daysBetween, pollMonths } from "@/lib/date-poll";
 import { toLocalInput } from "@/lib/dates";
-import { formatDayName, formatRaceDay } from "@/lib/format";
+import { formatDayName, formatRaceDate } from "@/lib/format";
 import { addMonths, monthOf, monthRange } from "@/lib/month-calendar";
 import { raceTitle } from "@/lib/races";
 import { getCurrentUser, isAdmin } from "@/lib/session";
@@ -76,7 +76,7 @@ async function AdminBestDays({ poll, today }: { poll: DatePollView; today: strin
     <BestDays
       poll={poll}
       today={today}
-      races={races.map((race) => ({ id: race.id, title: raceTitle(race), when: formatRaceDay(race.scheduledAt) }))}
+      races={races.map((race) => ({ id: race.id, title: raceTitle(race), when: formatRaceDate(race) }))}
     />
   );
 }
@@ -90,7 +90,7 @@ function ClosedPoll({ poll }: { poll: DatePollView }) {
         <CardTitle>{t.datePoll.decided}</CardTitle>
       </CardHeader>
       <CardBody className="flex flex-col items-start gap-3">
-        <p>{race && race.status !== "DRAFT" ? t.datePoll.decidedBody(raceTitle(race), formatRaceDay(race.scheduledAt)) : t.datePoll.decidedPending}</p>
+        <p>{race && race.status !== "DRAFT" ? t.datePoll.decidedBody(raceTitle(race), formatRaceDate(race)) : t.datePoll.decidedPending}</p>
         {race && race.status !== "DRAFT" && (
           <ButtonLink href={`/carreras/${race.id}`} size="sm" variant="secondary">
             {t.datePoll.seeRace} <ChevronRight />

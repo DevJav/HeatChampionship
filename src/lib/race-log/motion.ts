@@ -46,6 +46,11 @@ export type RaceMotion = {
   /** Official classification from the log */
   official: string[];
   events: MotionEvent[];
+  /** For the debug view: the lanes across the road (shares of the half width), the racing line
+   * at a length along the track, and the lane a car holds at a time (null on the racing line) */
+  lanes: number[];
+  racingLine(arc: number): number;
+  laneAt(id: string, t: number): number | null;
 };
 
 /** The car beside the racing line arrived first; the other one sits a bit behind. */
@@ -53,11 +58,16 @@ const SPOT_BEHIND = 0.3;
 /** Rounds of rolling on after the last round */
 const COAST_ROUNDS = 4;
 const SAMPLES_PER_ROUND = 48;
-/** Cars this close (in spaces) are alongside each other and need their own lane */
-const OVERLAP = 0.62;
-/** Closest two cars side by side may be, as a share of the half width */
-const SEPARATION = 0.46;
-const LAT_MAX = 0.62;
+/** Size of a car in drawing units, wheels included */
+export type CarSize = { length: number; width: number };
+/** Room between two cars side by side, and between a car and the edge of the road */
+const LANE_GAP = 1.4;
+const EDGE_GAP = 1.2;
+
+/** Half width of a road with one lane per car. */
+export function roadHalfWidthFor(cars: number, car: CarSize) {
+  return ((cars - 1) * (car.width + LANE_GAP) + car.width + 2 * EDGE_GAP) / 2;
+}
 
 const smoothstep = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
@@ -159,8 +169,13 @@ function hermite(y: number[], m: number[], t: number) {
   return (2 * u3 - 3 * u2 + 1) * y[i] + (u3 - 2 * u2 + u) * m[i] + (-2 * u3 + 3 * u2) * y[i + 1] + (u3 - u2) * m[i + 1];
 }
 
-export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedRound[]): RaceMotion {
+export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedRound[], car: CarSize = { length: 16, width: 9 }): RaceMotion {
   const ids = Object.keys(rounds[0].positions);
+  // Cars this close (in spaces) are alongside each other and need their own lane
+  const OVERLAP = (car.length + 4) / (path.length / layout.spacesPerLap);
+  // Closest two cars side by side may be, and how far out a car can go, as shares of the half width
+  const SEPARATION = (car.width + LANE_GAP) / path.halfWidth;
+  const LAT_MAX = 1 - (car.width / 2 + EDGE_GAP) / path.halfWidth;
   const lastRound = rounds.length - 1;
   const end = lastRound + COAST_ROUNDS;
   const finish = finishLine(layout);
@@ -229,64 +244,87 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
     return null;
   };
 
-  // Sideways positions are simulated forward in time so cars avoid each other
+  // Sideways positions: everyone follows the racing line (inside at the apex) until
+  // cars are, or are about to be, alongside each other. Then each of them takes one
+  // of a few fixed lanes across the road, the car in front choosing first, and keeps
+  // it until the road around it is clear again.
   const count = end * SAMPLES_PER_ROUND + 1;
   const dt = 1 / SAMPLES_PER_ROUND;
-  const posSamples = new Map(ids.map((id) => [id, new Float64Array(count)]));
+  const posSamples = new Map(ids.map((id) => [id, Float64Array.from({ length: count }, (_, k) => progress.get(id)!(k * dt))]));
   const latSamples = new Map(ids.map((id) => [id, new Float64Array(count)]));
+  const posAt = (id: string, k: number) => posSamples.get(id)![Math.min(count - 1, k)];
+
+  const laneCount = Math.max(2, Math.min(ids.length, Math.floor((2 * LAT_MAX) / SEPARATION + 1e-6) + 1));
+  const lanes = Array.from({ length: laneCount }, (_, i) => -LAT_MAX + (2 * LAT_MAX * i) / (laneCount - 1));
+  const nearestLane = (l: number) => lanes.reduce((best, x, i) => (Math.abs(x - l) < Math.abs(lanes[best] - l) ? i : best), 0);
+  // How far ahead (in samples) to check who will end up alongside whom, so cars move over in time
+  const LOOKAHEAD = [0, 4, 8, 12];
+  // A car goes back to the racing line once it has been clear for this many samples
+  const RELEASE = 14;
+
   // Grid: spot 0 on one side, spot 1 on the other
-  const lat = new Map(ids.map((id) => [id, rounds[0].positions[id].spot === 0 ? -0.3 : 0.3]));
+  const lat = new Map(ids.map((id) => [id, (rounds[0].positions[id].spot === 0 ? -0.6 : 0.6) * SEPARATION]));
+  const lane = new Map<string, number | null>(ids.map((id) => [id, null]));
+  const laneSamples = new Map(ids.map((id) => [id, new Int8Array(count)]));
+  const racingLineAt = (arc: number) => 0.8 * LAT_MAX * Math.tanh(path.curvature(arc) * 80 * path.scale);
+  const clearSince = new Map(ids.map((id) => [id, 0]));
 
   for (let k = 0; k < count; k++) {
     const t = k * dt;
-    const pos = new Map(ids.map((id) => [id, progress.get(id)!(t)]));
-    const speed = new Map(ids.map((id) => [id, (progress.get(id)!(t + dt) - pos.get(id)!) / dt]));
-    const sorted = [...ids].sort((a, b) => pos.get(b)! - pos.get(a)!);
+    const sorted = [...ids].sort((a, b) => posAt(b, k) - posAt(a, k));
+    const alongside = (a: string, b: string) => LOOKAHEAD.some((o) => Math.abs(posAt(a, k + o) - posAt(b, k + o)) < OVERLAP);
+    const taken = new Map<string, number>();
     for (const id of sorted) {
-      const p = pos.get(id)!;
-      const arc = path.arcOf(p);
       const current = lat.get(id)!;
-      // Inside at the apex
-      let wanted = 0.5 * Math.tanh(path.curvature(arc) * 80);
+      const arc = path.arcOf(posAt(id, k));
       const spin = spinOf(id, t);
-      if (spin?.active) wanted = clamp(-Math.sign(path.curvature(arc + 60)) * 0.55, -LAT_MAX, LAT_MAX);
+      const racingLine = racingLineAt(arc);
+      const others = sorted.filter((other) => other !== id && alongside(id, other));
+      // Cars right beside it now, which it can't drive through
+      const beside = others.filter((other) => Math.abs(posAt(other, k) - posAt(id, k)) < OVERLAP).map((other) => lat.get(other)!);
+      const blocks = (from: number, to: number) => beside.filter((b) => Math.min(from, to) < b && b < Math.max(from, to)).length;
 
-      // The car ahead has right of way: cars alongside or being caught from behind
-      // must find their own lane, and only try not to squeeze the cars behind them.
-      // A car a little ahead is followed for the slipstream.
-      const blockers: number[] = [];
-      const behind: number[] = [];
-      let tuck: number | null = null;
-      for (const other of sorted) {
-        if (other === id) continue;
-        const gap = pos.get(other)! - p;
-        const closing = speed.get(id)! - speed.get(other)!;
-        const otherLat = lat.get(other)!;
-        const ahead = gap > 0 || (gap === 0 && sorted.indexOf(other) < sorted.indexOf(id));
-        if (ahead && (gap < OVERLAP || (gap < OVERLAP + 0.8 && closing > 1.5))) blockers.push(otherLat);
-        else if (!ahead && -gap < OVERLAP) behind.push(otherLat);
-        else if (ahead && gap < 2 && tuck === null && Math.abs(otherLat - current) < 0.5) tuck = otherLat;
-      }
-      if (tuck !== null && !spin?.active) wanted = wanted * 0.4 + tuck * 0.6;
+      if (others.length) clearSince.set(id, k);
+      else if (k - clearSince.get(id)! > RELEASE) lane.set(id, null);
 
-      let target = wanted;
-      if (blockers.length || behind.length) {
-        let best = Infinity;
-        for (let c = -LAT_MAX; c <= LAT_MAX + 1e-9; c += 0.02) {
-          if (blockers.some((b) => Math.abs(c - b) < SEPARATION)) continue;
-          const squeeze = behind.reduce((sum, b) => sum + Math.max(0, SEPARATION - Math.abs(c - b)), 0);
-          const score = Math.abs(c - wanted) + 0.6 * Math.abs(c - current) + 3 * squeeze;
-          if (score < best) [best, target] = [score, c];
+      let target = racingLine;
+      if (spin?.active) {
+        // Sliding wide, off line: whatever lane it is in is taken
+        target = -Math.sign(path.curvature(arc + 60 * path.scale) || 1) * LAT_MAX;
+        taken.set(id, nearestLane(current));
+      } else if (lane.get(id) !== null || others.length) {
+        const busy = new Set(others.filter((o) => taken.has(o)).map((o) => taken.get(o)!));
+        const keep = lane.get(id) ?? nearestLane(current);
+        let chosen = keep;
+        if (busy.has(keep)) {
+          // The free lane closest to where the car is, leaning towards the racing line,
+          // without crossing a car alongside to get there
+          let best = Infinity;
+          lanes.forEach((x, i) => {
+            const score = (busy.has(i) ? 10 : 0) + 5 * blocks(current, x) + Math.abs(x - current) + 0.4 * Math.abs(x - racingLine);
+            if (score < best) [best, chosen] = [score, i];
+          });
         }
+        lane.set(id, chosen);
+        taken.set(id, chosen);
+        target = lanes[chosen];
       }
+
       // Sideways speed grows with forward speed, so lane changes take a car length or two
-      const moved = Math.abs(speed.get(id)!) * dt;
-      const rate = (blockers.length ? 0.05 : 0.02) + 0.45 * moved;
-      lat.set(id, current + clamp((target - current) * 0.5, -rate, rate));
+      const moved = Math.abs(posAt(id, k + 1) - posAt(id, k));
+      const rate = 0.03 + 0.55 * moved;
+      let next = current + clamp(target - current, -rate, rate);
+      // Stop short of a car beside it rather than sliding into it (moving away is always fine)
+      for (const b of beside) {
+        if (Math.abs(current - b) < SEPARATION) continue;
+        if (current < b) next = Math.min(next, b - SEPARATION);
+        else next = Math.max(next, b + SEPARATION);
+      }
+      lat.set(id, next);
     }
     for (const id of ids) {
-      posSamples.get(id)![k] = pos.get(id)!;
       latSamples.get(id)![k] = lat.get(id)!;
+      laneSamples.get(id)![k] = lane.get(id) ?? -1;
     }
   }
 
@@ -388,5 +426,11 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
     finishedAt,
     official,
     events,
+    lanes,
+    racingLine: racingLineAt,
+    laneAt(id, t) {
+      const lane = laneSamples.get(id)![Math.round(clamp(t, 0, end) * SAMPLES_PER_ROUND)];
+      return lane < 0 ? null : lane;
+    },
   };
 }

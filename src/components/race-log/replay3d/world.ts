@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { TrackGeometry } from "@/lib/race-log/layout";
 import { besideLine, type TrackPath } from "@/lib/race-log/track-path";
-import { carPose, INTRO, tracksideCameras, type CameraPose, type Stage } from "./director";
+import { CAR_SCALE, carPose, INTRO, tracksideCameras, type CameraPose, type Stage } from "./director";
 
 /**
  * The 3D scene of the replay: the traced track as a real circuit (asphalt,
@@ -10,7 +10,7 @@ import { carPose, INTRO, tracksideCameras, type CameraPose, type Stage } from ".
  * page, so three.js stays out of every other bundle.
  */
 
-export type WorldCar = { id: string; label: string; color: string };
+export type WorldCar = { id: string; color: string };
 
 export type World = {
   canvas: HTMLCanvasElement;
@@ -124,22 +124,6 @@ function speedSign(limit: number) {
   });
 }
 
-function labelTexture(label: string, color: string) {
-  return canvasTexture(128, 64, (ctx) => {
-    ctx.fillStyle = "rgba(8, 9, 10, 0.85)";
-    ctx.beginPath();
-    ctx.roundRect(4, 8, 120, 48, 10);
-    ctx.fill();
-    ctx.fillStyle = color;
-    ctx.fillRect(4, 8, 14, 48);
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 34px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(label, 70, 34);
-  });
-}
-
 function smokeTexture() {
   return canvasTexture(64, 64, (ctx) => {
     const g = ctx.createRadialGradient(32, 32, 2, 32, 32, 32);
@@ -203,7 +187,7 @@ function cornerStretches(path: TrackPath) {
   const stretches: [number, number][] = [];
   let start: number | null = null;
   for (let arc = 0; arc <= path.length; arc += 2) {
-    const tight = Math.abs(path.curvature(arc)) > 1 / 110;
+    const tight = Math.abs(path.curvature(arc)) > 1 / (110 * path.scale);
     if (tight && start === null) start = arc;
     if (!tight && start !== null) {
       stretches.push([start - 10, arc + 10]);
@@ -268,9 +252,10 @@ function buildTrack(scene: THREE.Scene, stage: Stage, geometry: TrackGeometry, c
   flat(ribbon(path, -2.5, 2.5, -hw, hw, { step: 5 }), material({ map: chequered(2, 12), roughness: 0.7 }), 0.11);
   for (const id of stage.motion.ids) {
     const start = stage.motion.at(id, 0);
-    const arc = path.arcOf(start.pos) + 9;
+    // A white line just ahead of each car's front wing
+    const arc = path.arcOf(start.pos) + 9 * CAR_SCALE;
     const off = start.lat * hw;
-    flat(ribbon(path, arc - 0.6, arc + 0.6, off - 4, off + 4, { step: 1.2 }), lineMat, 0.11);
+    flat(ribbon(path, arc - 0.6, arc + 0.6, off - 4 * CAR_SCALE, off + 4 * CAR_SCALE, { step: 1.2 }), lineMat, 0.11);
   }
 
   // Barriers: blocks of tyre wall, red and white, well off the track
@@ -305,7 +290,7 @@ function buildTrack(scene: THREE.Scene, stage: Stage, geometry: TrackGeometry, c
   const standMat = material({ map: crowd(5), roughness: 1 });
   const roofMat = material({ color: "#d8dde3", roughness: 0.6 });
   const stand = new THREE.Group();
-  for (let arc = -230; arc < 70; arc += 22) {
+  for (let arc = -230 * path.scale; arc < 70 * path.scale; arc += 22) {
     const p = besideLine(path, arc + 11, (outside * (hw + 48)) / hw);
     if (near(p.x, p.y) < hw + 40) continue;
     const segment = new THREE.Group();
@@ -362,7 +347,7 @@ function buildTrack(scene: THREE.Scene, stage: Stage, geometry: TrackGeometry, c
 
   // Speed-limit boards where the card has its corner badges
   layout.corners.forEach((corner, i) => {
-    const [x, z] = geometry.badges[i];
+    const [x, z] = stage.boards[i];
     const map = speedSign(corner.limit);
     const mat = new THREE.SpriteMaterial({ map });
     disposables.push(map, mat);
@@ -380,9 +365,10 @@ function buildTrack(scene: THREE.Scene, stage: Stage, geometry: TrackGeometry, c
   const cams = tracksideCameras(stage);
   const rand = random(42);
   const spots: [number, number, number][] = [];
-  for (let tries = 0; tries < 4000 && spots.length < 420; tries++) {
-    const x = -300 + rand() * (geometry.width + 600);
-    const z = -260 + rand() * (geometry.height + 520);
+  const treeCount = Math.round(420 * path.scale ** 2);
+  for (let tries = 0; tries < treeCount * 10 && spots.length < treeCount; tries++) {
+    const x = -300 + rand() * (geometry.width * path.scale + 600);
+    const z = -260 + rand() * (geometry.height * path.scale + 520);
     if (near(x, z) < hw + 46 || cams.some((c) => Math.hypot(c.x - x, c.z - z) < 40)) continue;
     spots.push([x, z, 0.7 + rand() * 0.8]);
   }
@@ -414,9 +400,9 @@ function buildTrack(scene: THREE.Scene, stage: Stage, geometry: TrackGeometry, c
   };
 }
 
-type CarModel = { group: THREE.Group; body: THREE.Group; wheels: THREE.Mesh[]; label: THREE.Sprite };
+type CarModel = { group: THREE.Group; body: THREE.Group; wheels: THREE.Mesh[] };
 
-function buildCar(color: string, label: string, shared: { carbon: THREE.Material; tyre: THREE.Material; rim: THREE.Material }) {
+function buildCar(color: string, shared: { carbon: THREE.Material; tyre: THREE.Material; rim: THREE.Material }) {
   const paint = new THREE.MeshStandardMaterial({ color, roughness: 0.35, metalness: 0.25 });
   const helmet = new THREE.MeshStandardMaterial({ color: "#f5f5f5", roughness: 0.3 });
   const body = new THREE.Group();
@@ -460,18 +446,52 @@ function buildCar(color: string, label: string, shared: { carbon: THREE.Material
     wheels.push(wheel);
   }
 
+  body.scale.setScalar(CAR_SCALE);
   const group = new THREE.Group();
   group.add(body);
-  // Same size on screen however far the camera is
-  const tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTexture(label, color), depthTest: false, transparent: true, sizeAttenuation: false }));
-  tag.scale.set(0.07, 0.035, 1);
-  tag.position.set(0, 9, 0);
-  tag.renderOrder = 10;
-  group.add(tag);
-  return { group, body, wheels, label: tag } satisfies CarModel;
+  return { group, body, wheels } satisfies CarModel;
 }
 
-export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: TrackGeometry, cars: WorldCar[], options: { preserve?: boolean } = {}): World {
+/** Lines on the road for the lanes and the racing line, and a disc under each car: green on the racing line, orange holding a lane. */
+function buildDebug(scene: THREE.Scene, stage: Stage, models: Map<string, CarModel>) {
+  const { path, motion } = stage;
+  const hw = path.halfWidth;
+  const strip = (offset: (arc: number) => number, color: string, y: number) => {
+    const positions: number[] = [];
+    for (let arc = 0; arc < path.length; arc += 3) {
+      const quad = [arc, arc + 3].flatMap((a) => [besideLine(path, a, offset(a) - 0.25 / hw), besideLine(path, a, offset(a) + 0.25 / hw)]);
+      const [p0, p1, p2, p3] = quad;
+      positions.push(p0.x, y, p0.y, p2.x, y, p2.y, p1.x, y, p1.y, p1.x, y, p1.y, p2.x, y, p2.y, p3.x, y, p3.y);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    scene.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })));
+  };
+  for (const lane of motion.lanes) strip(() => lane, "#22d3ee", 0.14);
+  strip(motion.racingLine, "#facc15", 0.16);
+
+  const discGeo = new THREE.CircleGeometry(5 * CAR_SCALE, 20).rotateX(-Math.PI / 2);
+  const onLine = new THREE.MeshBasicMaterial({ color: "#22c55e", transparent: true, opacity: 0.8 });
+  const inLane = new THREE.MeshBasicMaterial({ color: "#f97316", transparent: true, opacity: 0.8 });
+  const discs = new Map<string, THREE.Mesh>();
+  for (const [id, model] of models) {
+    const disc = new THREE.Mesh(discGeo, onLine);
+    disc.position.y = 0.18;
+    model.group.add(disc);
+    discs.set(id, disc);
+  }
+  return (t: number) => {
+    for (const [id, disc] of discs) disc.material = motion.laneAt(id, t) === null ? onLine : inLane;
+  };
+}
+
+export function createWorld(
+  canvas: HTMLCanvasElement,
+  stage: Stage,
+  geometry: TrackGeometry,
+  cars: WorldCar[],
+  options: { preserve?: boolean; debug?: boolean } = {},
+): World {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: options.preserve ?? false });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -480,7 +500,8 @@ export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: T
   renderer.shadowMap.type = THREE.PCFShadowMap;
 
   const scene = new THREE.Scene();
-  const center = { x: geometry.width / 2, z: geometry.height / 2 };
+  const s = stage.path.scale;
+  const center = { x: (geometry.width / 2) * s, z: (geometry.height / 2) * s };
   const sky = canvasTexture(4, 256, (ctx) => {
     const g = ctx.createLinearGradient(0, 0, 0, 256);
     g.addColorStop(0, "#4f8fd1");
@@ -490,15 +511,15 @@ export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: T
     ctx.fillRect(0, 0, 4, 256);
   });
   scene.background = sky;
-  scene.fog = new THREE.Fog(COLORS.horizon, 700, 2600);
+  scene.fog = new THREE.Fog(COLORS.horizon, 700 * s, 2600 * s);
 
   scene.add(new THREE.HemisphereLight("#dceeff", "#4a6b3a", 1.1));
   const sun = new THREE.DirectionalLight("#fff4e0", 2.4);
-  sun.position.set(center.x - 350, 600, center.z - 250);
+  sun.position.set(center.x - 350 * s, 600 * s, center.z - 250 * s);
   sun.target.position.set(center.x, 0, center.z);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { left: -650, right: 650, top: 650, bottom: -650, near: 10, far: 1600 });
+  Object.assign(sun.shadow.camera, { left: -650 * s, right: 650 * s, top: 650 * s, bottom: -650 * s, near: 10, far: 1600 * s });
   sun.shadow.bias = -0.0005;
   sun.shadow.normalBias = 0.6;
   scene.add(sun, sun.target);
@@ -510,8 +531,9 @@ export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: T
     tyre: new THREE.MeshStandardMaterial({ color: COLORS.tyre, roughness: 0.9 }),
     rim: new THREE.MeshStandardMaterial({ color: COLORS.rim, roughness: 0.4, metalness: 0.7 }),
   };
-  const models = new Map(cars.map((car) => [car.id, buildCar(car.color, car.label, shared)]));
+  const models = new Map(cars.map((car) => [car.id, buildCar(car.color, shared)]));
   for (const model of models.values()) scene.add(model.group);
+  const updateDebug = options.debug ? buildDebug(scene, stage, models) : null;
 
   // Tyre smoke for each spin-out, worked out from the time so scrubbing replays it
   const smokeMap = smokeTexture();
@@ -524,7 +546,7 @@ export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: T
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeMap, transparent: true, depthWrite: false }));
       sprite.visible = false;
       scene.add(sprite);
-      puffs.push({ sprite, born, x: car.x - car.dx * 5, z: car.z - car.dz * 5, drift: (i % 2 ? 1 : -1) * (0.5 + (i % 3)) });
+      puffs.push({ sprite, born, x: car.x - car.dx * 5 * CAR_SCALE, z: car.z - car.dz * 5 * CAR_SCALE, drift: (i % 2 ? 1 : -1) * (0.5 + (i % 3)) });
     }
   }
 
@@ -533,6 +555,7 @@ export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: T
   function render(t: number, pose: CameraPose) {
     track.setLights(t);
     const time = Math.max(0, t);
+    updateDebug?.(time);
     for (const [id, model] of models) {
       const car = carPose(stage, id, time);
       model.group.position.set(car.x, 0, car.z);
@@ -541,7 +564,6 @@ export function createWorld(canvas: HTMLCanvasElement, stage: Stage, geometry: T
       // Wheels turn with the distance covered
       const spinAngle = -car.arc / 1.35;
       for (const wheel of model.wheels) wheel.rotation.z = spinAngle;
-      model.label.visible = !(pose.subject === id && pose.fov > 60);
     }
     for (const puff of puffs) {
       const age = time - puff.born;

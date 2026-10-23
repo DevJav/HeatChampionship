@@ -1,6 +1,6 @@
 import type { TrackGeometry } from "@/lib/race-log/layout";
 import { videoMimeType } from "../replay-video";
-import { cameraPose, replayDuration, SECONDS_PER_ROUND, type Replay } from "./director";
+import { cameraPose, replayDuration, type Replay } from "./director";
 import { drawHud, readHudStyle } from "./hud";
 import { createWorld, type WorldCar } from "./world";
 
@@ -38,7 +38,7 @@ export function recordReplay3d(
   const duration = replayDuration(replay);
 
   const frame = (ms: number) => {
-    const t = replay.start + ms / 1000 / SECONDS_PER_ROUND;
+    const t = replay.start + ms / 1000 / replay.secondsPerRound;
     const camera = cameraPose(replay.stage, replay.shots, "tv", "", t);
     world.render(t, camera);
     drawHud(hudCtx, W, H, replay.stage, t, style, { title, camera, captions: replay.captions });

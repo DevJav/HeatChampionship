@@ -16,6 +16,8 @@ export type PathPoint = {
 };
 
 export type TrackPath = {
+  /** How much bigger than the drawing the circuit is */
+  scale: number;
   /** Length of one lap */
   length: number;
   halfWidth: number;
@@ -35,10 +37,10 @@ const SMOOTH = 30;
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
-function parsePath(d: string): [number, number][] {
+function parsePath(d: string, scale: number): [number, number][] {
   const nums = d.match(/-?\d+(\.\d+)?/g)?.map(Number) ?? [];
   const points: [number, number][] = [];
-  for (let i = 0; i + 1 < nums.length; i += 2) points.push([nums[i], nums[i + 1]]);
+  for (let i = 0; i + 1 < nums.length; i += 2) points.push([nums[i] * scale, nums[i + 1] * scale]);
   return points;
 }
 
@@ -94,16 +96,18 @@ function nearestIndex(xs: Float64Array, ys: Float64Array, x: number, y: number) 
   return best;
 }
 
-export function trackPath(layout: TrackLayout, geometry: TrackGeometry): TrackPath {
-  const loop = resample(smoothLoop(parsePath(geometry.path)));
+/** `scale` enlarges the whole circuit (road included); the 3D replay uses it to fit every car side by side. */
+export function trackPath(layout: TrackLayout, geometry: TrackGeometry, scale = 1): TrackPath {
+  const halfWidth = geometry.halfWidth * scale;
+  const loop = resample(smoothLoop(parsePath(geometry.path, scale)));
   const { length } = loop;
   let { xs, ys } = loop;
   const count = xs.length;
   const step = length / count;
 
   // Start the curve at the start/finish line and run it in the direction of travel
-  const start = nearestIndex(xs, ys, geometry.dividers[0][0], geometry.dividers[0][1]);
-  const next = nearestIndex(xs, ys, geometry.dividers[1][0], geometry.dividers[1][1]);
+  const start = nearestIndex(xs, ys, geometry.dividers[0][0] * scale, geometry.dividers[0][1] * scale);
+  const next = nearestIndex(xs, ys, geometry.dividers[1][0] * scale, geometry.dividers[1][1] * scale);
   const forward = mod(next - start, count) < count / 2;
   const order = Array.from({ length: count }, (_, k) => (forward ? mod(start + k, count) : mod(start - k, count)));
   [xs, ys] = [Float64Array.from(order, (i) => xs[i]), Float64Array.from(order, (i) => ys[i])];
@@ -123,7 +127,7 @@ export function trackPath(layout: TrackLayout, geometry: TrackGeometry): TrackPa
     const [a, b] = [mod(i - 2, count), mod(i + 2, count)];
     raw[i] = (dxs[a] * dys[b] - dys[a] * dxs[b]) / (4 * step);
   }
-  const window = Math.round(SMOOTH / step);
+  const window = Math.round((SMOOTH * scale) / step);
   const curv = new Float64Array(count);
   for (let i = 0; i < count; i++) {
     let sum = 0;
@@ -131,7 +135,7 @@ export function trackPath(layout: TrackLayout, geometry: TrackGeometry): TrackPa
     curv[i] = sum / (2 * window + 1);
   }
 
-  const dividers = geometry.dividers.map(([x, y], i) => (i === 0 ? 0 : nearestIndex(xs, ys, x, y) * step));
+  const dividers = geometry.dividers.map(([x, y], i) => (i === 0 ? 0 : nearestIndex(xs, ys, x * scale, y * scale) * step));
 
   const sample = (arr: Float64Array, arc: number) => {
     const u = mod(arc, length) / step;
@@ -142,8 +146,9 @@ export function trackPath(layout: TrackLayout, geometry: TrackGeometry): TrackPa
 
   const n = layout.spacesPerLap;
   return {
+    scale,
     length,
-    halfWidth: geometry.halfWidth,
+    halfWidth,
     spacesPerLap: n,
     dividers,
     at(arc) {

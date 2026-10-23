@@ -8,12 +8,12 @@ import type { LoggedRound } from "@/lib/race-log/rounds";
 import { trackDrawing } from "@/lib/race-log/tracks";
 import { slugify } from "@/lib/slug";
 import { videoMimeType } from "../replay-video";
-import { cameraPose, prepareReplay, replayDuration, SECONDS_PER_ROUND, type CameraMode } from "./director";
+import { cameraPose, prepareReplay, replayDuration, type CameraMode } from "./director";
 import { drawHud, readHudStyle, type HudStyle } from "./hud";
 import type { World } from "./world";
 import { t } from "@/i18n";
 
-export type Replay3DCar = { id: string; name: string; label: string; color: string };
+export type Replay3DCar = { id: string; name: string; color: string };
 
 type Replay3DProps = {
   track: string;
@@ -23,6 +23,8 @@ type Replay3DProps = {
   title: string;
   /** Team radio line per driver id, shown as they cross the line */
   radio: Record<string, string>;
+  /** Draw the imaginary lanes and racing line (?debug in the URL) */
+  debug?: boolean;
 };
 
 type Recording = { step: "idle" } | { step: "recording"; progress: number } | { step: "ready"; file: File; url: string } | { step: "failed" };
@@ -31,7 +33,7 @@ const MODES: CameraMode[] = ["tv", "chase", "onboard", "heli"];
 const SPEEDS = [1, 2, 0.5];
 
 /** The logged race as a 3D broadcast: TV cameras or follow one car, plus a video to share. */
-export function Replay3D({ track, laps, cars, rounds, title, radio }: Replay3DProps) {
+export function Replay3D({ track, laps, cars, rounds, title, radio, debug = false }: Replay3DProps) {
   const drawing = useMemo(() => trackDrawing(track, laps)!, [track, laps]);
   const replay = useMemo(() => prepareReplay(drawing.layout, drawing.geometry, rounds, cars, radio), [drawing, rounds, cars, radio]);
 
@@ -65,7 +67,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio }: Replay3DPr
     import("./world")
       .then(({ createWorld }) => {
         if (cancelled || !glCanvas.current) return;
-        created = createWorld(glCanvas.current, replay.stage, drawing.geometry, cars);
+        created = createWorld(glCanvas.current, replay.stage, drawing.geometry, cars, { debug });
         world.current = created;
         dirty.current = true;
         setStatus("ready");
@@ -79,7 +81,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio }: Replay3DPr
       created?.dispose();
       world.current = null;
     };
-  }, [replay, drawing, cars]);
+  }, [replay, drawing, cars, debug]);
 
   // Keep the canvases the size of the view
   const size = useRef({ width: 0, height: 0 });
@@ -119,7 +121,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio }: Replay3DPr
       const dt = (now - last) / 1000;
       last = now;
       if (playing) {
-        clock.current = Math.min(replay.end, clock.current + (dt * speed) / SECONDS_PER_ROUND);
+        clock.current = Math.min(replay.end, clock.current + (dt * speed) / replay.secondsPerRound);
         dirty.current = true;
         if (clock.current >= replay.end) setPlaying(false);
       }

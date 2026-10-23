@@ -1,5 +1,5 @@
 import type { TrackGeometry, TrackLayout } from "@/lib/race-log/layout";
-import { raceMotion, type RaceMotion } from "@/lib/race-log/motion";
+import { raceMotion, roadHalfWidthFor, type RaceMotion } from "@/lib/race-log/motion";
 import type { LoggedRound } from "@/lib/race-log/rounds";
 import { besideLine, trackPath, type TrackPath } from "@/lib/race-log/track-path";
 import { t as text } from "@/i18n";
@@ -28,12 +28,23 @@ export type Stage = {
   motion: RaceMotion;
   names: Record<string, string>;
   colors: Record<string, string>;
+  /** Where the speed-limit boards stand (the card's corner badges) */
+  boards: [number, number][];
 };
 
 /** Time before the start (in rounds) for the lights */
 export const INTRO = 1;
-/** Playback speed: seconds of replay per round of the race */
-export const SECONDS_PER_ROUND = 3.2;
+/** Playback speed: seconds of replay per round on the smallest circuit; bigger ones take longer, so cars look as fast */
+const SECONDS_PER_ROUND = 3.2;
+/**
+ * The circuit is bigger than the card (the road and its bends together) and
+ * the cars smaller, so every car fits side by side, like on a real circuit:
+ * the more cars, the bigger the circuit. Never smaller than MIN_TRACK_SCALE.
+ */
+const MIN_TRACK_SCALE = 1.3;
+export const CAR_SCALE = 0.75;
+/** The car model is 16 × 9 drawing units (wheels included) before scaling */
+const CAR_SIZE = { length: 16 * CAR_SCALE, width: 9 * CAR_SCALE };
 
 const v = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
 
@@ -49,12 +60,13 @@ export function carPose({ path, motion }: Pick<Stage, "path" | "motion">, id: st
 }
 
 /** Fixed cameras beside each corner, then one at the finish line. */
-export function tracksideCameras({ layout, path }: Pick<Stage, "layout" | "path">) {
+export function tracksideCameras({ layout, path, boards }: Pick<Stage, "layout" | "path" | "boards">) {
   const cams = layout.corners.map((corner) => {
     const apex = path.arcOf(corner.before + 0.5);
     const outside = -Math.sign(path.curvature(apex)) || 1;
-    // Up on a tower behind the barriers
-    const p = besideLine(path, apex - 25, outside * (1 + 46 / path.halfWidth));
+    // Up on a tower behind the barriers, a little before the apex, and not right behind a speed-limit board
+    const spots = [-25, -45, -10, -65, 5].map((back) => besideLine(path, apex + back, outside * (1 + 46 / path.halfWidth)));
+    const p = spots.find((q) => boards.every(([x, z]) => Math.hypot(q.x - x, q.y - z) > 40)) ?? spots[0];
     return v(p.x, 15, p.y);
   });
   // Opposite the grandstand, looking back at the cars as they cross
@@ -110,7 +122,7 @@ export function planShots(stage: Stage): { shots: Shot[]; end: number } {
       .slice(0, -1)
       .map((c, index) => ({ index, d: dist(c, v(mid.x, 0, mid.z)) }))
       .sort((a, b) => a.d - b.d)[0];
-    if ((kind === "trackside" || beat?.kind === "spin") && nearest && nearest.d < 150) [kind, cam] = ["trackside", nearest.index];
+    if ((kind === "trackside" || beat?.kind === "spin") && nearest && nearest.d < 150 * stage.path.scale) [kind, cam] = ["trackside", nearest.index];
     else if (kind === "trackside") kind = "chase";
     if (kind === previous && kind !== "chase") kind = "chase";
     shots.push({ start: t, end: until, kind, subject, cam });
@@ -144,7 +156,7 @@ function onboard(stage: Stage, id: string, t: number): Omit<CameraPose, "label">
   const dz = car.dx * s + car.dz * c;
   return {
     // Just ahead of the helmet, at the driver's eye line
-    position: v(car.x + dx * 1.9, 3.9, car.z + dz * 1.9),
+    position: v(car.x + dx * 1.9 * CAR_SCALE, 3.9 * CAR_SCALE, car.z + dz * 1.9 * CAR_SCALE),
     target: v(car.x + dx * 40, 2.2, car.z + dz * 40),
     fov: 72,
     subject: id,
@@ -189,8 +201,10 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
     case "grid": {
       // Behind the grid, looking at the lights; the camera pushes in as they go out
       const k = Math.min(1, Math.max(0, (t + INTRO) / (INTRO + 0.2)));
-      const from = besideLine(stage.path, stage.path.arcOf(-6.5 + k * 1.5), 0);
-      const to = besideLine(stage.path, stage.path.arcOf(0.4), 0);
+      // Just behind the last car on the grid, however big the circuit is
+      const back = Math.min(...stage.motion.ids.map((id) => stage.path.arcOf(stage.motion.at(id, 0).pos)));
+      const from = besideLine(stage.path, back - 70 + k * 50, 0);
+      const to = besideLine(stage.path, 15, 0);
       return { position: v(from.x, lerp(15, 10, k), from.y), target: v(to.x, 6, to.y), fov: 46, subject: null, label: text.raceLog.grid };
     }
     case "trackside": {
@@ -243,11 +257,19 @@ export function captionAt(captions: Caption[], t: number) {
   return found;
 }
 
-export type Replay = { stage: Stage; shots: Shot[]; captions: Caption[]; start: number; end: number };
+export type Replay = {
+  stage: Stage;
+  shots: Shot[];
+  captions: Caption[];
+  start: number;
+  end: number;
+  /** Seconds of replay per round at normal speed */
+  secondsPerRound: number;
+};
 
 /** Length of the replay at normal speed, in milliseconds. */
 export function replayDuration(replay: Replay) {
-  return (replay.end - replay.start) * SECONDS_PER_ROUND * 1000;
+  return (replay.end - replay.start) * replay.secondsPerRound * 1000;
 }
 
 /** Everything the 3D replay plays from: the motion, the TV shots and the captions. */
@@ -258,18 +280,27 @@ export function prepareReplay(
   cars: { id: string; name: string; color: string }[],
   radio: Record<string, string>,
 ): Replay {
-  const path = trackPath(layout, geometry);
-  const motion = raceMotion(layout, path, rounds);
+  const scale = Math.max(MIN_TRACK_SCALE, roadHalfWidthFor(cars.length, CAR_SIZE) / geometry.halfWidth);
+  const path = trackPath(layout, geometry, scale);
+  const motion = raceMotion(layout, path, rounds, CAR_SIZE);
   const stage: Stage = {
     layout,
     path,
     motion,
     names: Object.fromEntries(cars.map((c) => [c.id, c.name])),
     colors: Object.fromEntries(cars.map((c) => [c.id, c.color])),
+    boards: geometry.badges.map(([x, z]) => [x * scale, z * scale]),
   };
   const { shots, end } = planShots(stage);
   const captions = planCaptions(stage, radio);
   // Let the last team radio message finish
   const lastRadio = Math.max(0, ...captions.filter((c) => c.radio).map((c) => c.end));
-  return { stage, shots, captions, start: -INTRO, end: Math.min(motion.end, Math.max(end, lastRadio + 0.1)) };
+  return {
+    stage,
+    shots,
+    captions,
+    start: -INTRO,
+    end: Math.min(motion.end, Math.max(end, lastRadio + 0.1)),
+    secondsPerRound: (SECONDS_PER_ROUND * scale) / MIN_TRACK_SCALE,
+  };
 }

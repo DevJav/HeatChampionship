@@ -1,11 +1,12 @@
-import { Award } from "lucide-react";
+import { Award, Lock } from "lucide-react";
+import { closeDriverOfTheDay } from "@/actions/driver-of-the-day";
 import type { RaceDetail } from "@/lib/data/races";
 import type { RaceResultDetail } from "@/lib/data/results";
 import { getDotdVotes } from "@/lib/data/driver-of-the-day";
 import { tallyVotes, votingClosesAt, votingPhase } from "@/lib/driver-of-the-day";
 import { formatDateTime } from "@/lib/format";
-import { getCurrentUser } from "@/lib/session";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui";
+import { getCurrentUser, isAdmin } from "@/lib/session";
+import { Card, CardBody, CardHeader, CardTitle, ConfirmButton } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { DotdVoteForm } from "./DotdVoteForm";
 import { t } from "@/i18n";
@@ -57,6 +58,19 @@ export async function DriverOfTheDayCard({ race, results }: { race: RaceDetail; 
           </>
         ) : (
           <p className="text-sm">{user ? t.dotd.onlyDrivers : t.dotd.logInToVote}</p>
+        )}
+        {isAdmin(user) && (
+          <form action={closeDriverOfTheDay.bind(null, race.id)} className="self-start">
+            <ConfirmButton
+              title={t.dotd.closeTitle}
+              description={t.dotd.closeDescription(votes.length, drivers.length)}
+              confirmLabel={t.dotd.close}
+              variant="secondary"
+              size="sm"
+            >
+              <Lock /> {t.dotd.close}
+            </ConfirmButton>
+          </form>
         )}
       </div>
     );

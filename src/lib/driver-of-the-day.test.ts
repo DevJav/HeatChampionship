@@ -16,6 +16,14 @@ describe("voting window", () => {
     expect(votingClosesAt({ status: "CLOSED", finalizedAt: null })).toBeNull();
     expect(votingPhase({ status: "CLOSED", finalizedAt: null }, day(1))).toBe("not-started");
   });
+
+  it("closes early when an admin closes it", () => {
+    const closedEarly = { ...race, dotdClosedAt: day(2) };
+    expect(votingClosesAt(closedEarly)).toEqual(day(2));
+    expect(votingPhase(closedEarly, day(1))).toBe("open");
+    expect(votingPhase(closedEarly, day(2))).toBe("closed");
+    expect(votingClosesAt({ ...race, dotdClosedAt: day(9) })).toEqual(day(7));
+  });
 });
 
 describe("checkVote", () => {

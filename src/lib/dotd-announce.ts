@@ -6,13 +6,18 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 /**
  * Announces Driver of the Day votes that have closed: a feed entry per
  * winner and a notification to each of the race's drivers. There's no
- * scheduler, so this runs after ordinary page loads (see `after()` callers);
+ * scheduler, so this runs after ordinary page loads (see `after()` callers)
+ * and when an admin closes a vote early;
  * claiming each race with `dotdAnnouncedAt` first makes it happen once, even
  * with requests racing. Closed votes without any votes are just marked.
  */
 export async function announceDriverOfTheDay(now = new Date()) {
   const races = await db.race.findMany({
-    where: { status: "FINISHED", dotdAnnouncedAt: null, finalizedAt: { lte: new Date(now.getTime() - DOTD_VOTING_DAYS * DAY_MS) } },
+    where: {
+      status: "FINISHED",
+      dotdAnnouncedAt: null,
+      OR: [{ finalizedAt: { lte: new Date(now.getTime() - DOTD_VOTING_DAYS * DAY_MS) } }, { dotdClosedAt: { lte: now } }],
+    },
     select: { id: true, dotdVotes: { select: { driverId: true } }, results: { select: { userId: true } } },
   });
 

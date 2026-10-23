@@ -42,7 +42,7 @@ export async function saveRaceResults(raceId: string, rows: ResultRow[]) {
 export async function clearRaceResults(raceId: string) {
   await db.$transaction(async (tx) => {
     await tx.raceResult.deleteMany({ where: { raceId } });
-    await tx.race.update({ where: { id: raceId }, data: { status: "CLOSED", finalizedAt: null } });
+    await tx.race.update({ where: { id: raceId }, data: { status: "CLOSED", finalizedAt: null, dotdClosedAt: null } });
     await unlogResultsPublished(tx, raceId);
   });
 }

@@ -27,7 +27,7 @@ export async function getRacePhotos(raceId: string) {
   return db.racePhoto.findMany({
     where: { raceId },
     orderBy: { createdAt: "asc" },
-    include: { uploadedBy: { select: { id: true, name: true } } },
+    include: { uploadedBy: { select: { id: true, name: true, username: true } } },
   });
 }
 

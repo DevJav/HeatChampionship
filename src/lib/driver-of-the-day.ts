@@ -1,7 +1,7 @@
 /**
  * Driver of the Day: after the results are published, the race's drivers
  * vote for someone else from that race. The tally stays hidden until voting
- * closes; then the most voted driver (ties share it) gets the award.
+ * closes (after a week, or earlier when an admin closes it); then the most voted driver (ties share it) gets the award.
  * Pure functions, unit-tested in driver-of-the-day.test.ts.
  */
 
@@ -10,11 +10,13 @@ import { t } from "@/i18n";
 export const DOTD_VOTING_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type DotdRace = { status: string; finalizedAt: Date | null };
+export type DotdRace = { status: string; finalizedAt: Date | null; dotdClosedAt?: Date | null };
 
 /** When voting closes, or null while the race has no published results. */
 export function votingClosesAt(race: DotdRace) {
-  return race.status === "FINISHED" && race.finalizedAt ? new Date(race.finalizedAt.getTime() + DOTD_VOTING_DAYS * DAY_MS) : null;
+  if (race.status !== "FINISHED" || !race.finalizedAt) return null;
+  const usual = new Date(race.finalizedAt.getTime() + DOTD_VOTING_DAYS * DAY_MS);
+  return race.dotdClosedAt && race.dotdClosedAt < usual ? race.dotdClosedAt : usual;
 }
 
 export function votingPhase(race: DotdRace, now: Date): "not-started" | "open" | "closed" {

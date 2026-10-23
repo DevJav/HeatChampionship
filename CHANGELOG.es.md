@@ -6,6 +6,18 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.7.0] - 2026-10-23
+
+### Nuevo
+- **Piloto del día:** los administradores pueden cerrar la votación antes de tiempo (por ejemplo, cuando ya han votado todos) y el ganador se anuncia en el momento.
+
+### Cambios
+- Las fotos de la carrera muestran quién subió cada una, y el pie de foto completo en vez de cortarlo.
+
+### Arreglos
+- **Radio del equipo:** ya no se corta la última letra del nombre de algunos pilotos, y los nombres largos tienen más sitio.
+- Los nombres largos ya no hacen que la clasificación de la portada se desplace de lado, y tu nombre en la barra de arriba ocupa una sola línea; ambos se acortan con "…".
+
 ## [1.6.1] - 2026-10-19
 
 ### Cambios
@@ -115,7 +127,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/DevJav/HeatChampionship/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/DevJav/HeatChampionship/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/DevJav/HeatChampionship/compare/v1.5.0...v1.5.1

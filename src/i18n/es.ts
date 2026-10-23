@@ -184,6 +184,7 @@ export const es = {
       delete: "Borrar foto",
       upload: "Subir",
       caption: "Pie de foto (opcional)",
+      uploadedBy: "Subida por",
     },
     share: {
       copyPrompt: "Copia el enlace:",
@@ -807,6 +808,10 @@ export const es = {
     logInToVote: "Entra para votar si corriste esta carrera.",
     winner: (votes: number) => (votes === 1 ? "1 voto" : `${votes} votos`),
     noVotes: "Nadie votó en esta carrera.",
+    close: "Cerrar votación",
+    closeTitle: "¿Cerrar la votación ya?",
+    closeDescription: (voted: number, total: number) =>
+      `Han votado ${voted} de ${total} pilotos. Nadie más podrá votar y el piloto del día se anuncia ahora.`,
     errors: {
       closed: "La votación no está abierta.",
       onlyDrivers: "Solo pueden votar los pilotos de esta carrera.",

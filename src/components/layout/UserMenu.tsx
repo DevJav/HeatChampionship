@@ -48,7 +48,8 @@ export async function UserMenu() {
         className="flex items-center gap-2 px-2 text-bar-fg hover:text-bar-fg/80"
       >
         <Avatar name={user.name} src={user.image} color={color} size="sm" />
-        <span className="hidden font-display font-bold uppercase italic tracking-wide xl:inline">
+        {/* One line; long names truncate (pr-1 keeps the italic last letter clear of the edge) */}
+        <span className="hidden max-w-40 truncate pr-1 font-display font-bold uppercase italic tracking-wide xl:block">
           {user.name}
         </span>
       </Link>

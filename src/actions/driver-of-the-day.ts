@@ -2,10 +2,11 @@
 
 import { refresh } from "next/cache";
 import { db } from "@/lib/db";
-import { checkVote, VoteError } from "@/lib/driver-of-the-day";
+import { announceDriverOfTheDay } from "@/lib/dotd-announce";
+import { checkVote, votingPhase, VoteError } from "@/lib/driver-of-the-day";
 import { t } from "@/i18n";
 import type { FormState } from "@/lib/forms";
-import { requireUser } from "@/lib/session";
+import { requireAdmin, requireUser } from "@/lib/session";
 
 /** Casts or changes the signed-in driver's Driver of the Day vote. */
 export async function voteDriverOfTheDay(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -15,7 +16,7 @@ export async function voteDriverOfTheDay(_prev: FormState, formData: FormData): 
 
   const race = await db.race.findUnique({
     where: { id: raceId },
-    select: { status: true, finalizedAt: true, results: { select: { userId: true } } },
+    select: { status: true, finalizedAt: true, dotdClosedAt: true, results: { select: { userId: true } } },
   });
   if (!race) return { error: t.dotd.errors.closed };
   try {
@@ -32,4 +33,15 @@ export async function voteDriverOfTheDay(_prev: FormState, formData: FormData): 
   });
   refresh();
   return {};
+}
+
+/** Admins close an open vote early (e.g. once everyone has voted) and the winner is announced right away. */
+export async function closeDriverOfTheDay(raceId: string) {
+  await requireAdmin(`/carreras/${raceId}`);
+  const race = await db.race.findUnique({ where: { id: raceId }, select: { status: true, finalizedAt: true, dotdClosedAt: true } });
+  if (!race || votingPhase(race, new Date()) !== "open") return;
+
+  await db.race.update({ where: { id: raceId }, data: { dotdClosedAt: new Date() } });
+  await announceDriverOfTheDay();
+  refresh();
 }

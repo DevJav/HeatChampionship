@@ -23,10 +23,13 @@ export async function TeamRadio({ raceId, results }: { raceId: string; results: 
             {lines.map((r) => (
               <li key={r.id} className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-4">
                 {/* Broadcast radio caption: team-colour bar with the name, then the line */}
-                <span className="flex shrink-0 items-center gap-2 surface-bar py-1 pr-3 pl-1 sm:w-40">
+                <span className="flex shrink-0 items-center gap-2 surface-bar py-1 pr-2 pl-1 sm:w-52">
                   <span aria-hidden className="h-5 w-1.5 shrink-0 ring-1 ring-white/40" style={{ background: r.carColor?.hex ?? r.user.favoriteColor?.hex ?? "var(--fg-subtle)" }} />
                   <Radio aria-hidden className="size-3.5 shrink-0 opacity-70" />
-                  <span className="truncate font-display text-sm font-bold uppercase italic">{r.user.name}</span>
+                  {/* pr-1 keeps the italic last letter clear of the truncation edge */}
+                  <span title={r.user.name} className="truncate pr-1 font-display text-sm font-bold uppercase italic">
+                    {r.user.name}
+                  </span>
                 </span>
                 <q className="text-lg italic">{r.radio}</q>
               </li>

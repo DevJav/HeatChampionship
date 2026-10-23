@@ -62,11 +62,13 @@ export function StandingsTable({ standings, limit, compact = false }: StandingsT
                   {row.movement != null && row.movement !== 0 && <PositionsGained value={row.movement} />}
                 </Td>
               )}
-              <Td>
+              {/* Compact: the name takes only the width left over and truncates, so the table never scrolls */}
+              <Td className={cn(compact && "w-full max-w-0")}>
                 <DriverName
                   name={driver?.name ?? "—"}
                   username={driver?.username}
                   color={driver?.favoriteColor?.hex}
+                  className={cn(compact && "flex")}
                 />
               </Td>
               <Td align="right" className="font-display text-lg font-bold italic">

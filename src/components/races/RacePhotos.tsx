@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Camera, X } from "lucide-react";
 import { deleteRacePhoto, uploadRacePhotos } from "@/actions/photos";
 import { getRacePhotos } from "@/lib/data/results";
@@ -44,11 +45,17 @@ export async function RacePhotos({ raceId, driverIds }: RacePhotosProps) {
                     className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
                   />
                 </a>
-                {(photo.caption || photo.uploadedBy) && (
-                  <p className="mt-1 truncate text-xs text-fg-muted">
-                    {photo.caption ?? ""}
-                    {photo.caption && photo.uploadedBy ? " · " : ""}
-                    {photo.uploadedBy?.name}
+                {photo.caption && <p className="mt-1 text-sm break-words">{photo.caption}</p>}
+                {photo.uploadedBy && (
+                  <p className="mt-0.5 truncate text-xs text-fg-muted">
+                    {t.races.photoList.uploadedBy}{" "}
+                    {photo.uploadedBy.username ? (
+                      <Link href={`/pilotos/${photo.uploadedBy.username}`} className="font-semibold hover:text-primary hover:underline">
+                        {photo.uploadedBy.name}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{photo.uploadedBy.name}</span>
+                    )}
                   </p>
                 )}
                 {canDelete && (

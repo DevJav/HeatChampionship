@@ -184,6 +184,7 @@ export const en: Dictionary = {
       delete: "Delete photo",
       upload: "Upload",
       caption: "Caption (optional)",
+      uploadedBy: "Uploaded by",
     },
     share: {
       copyPrompt: "Copy the link:",
@@ -792,6 +793,9 @@ export const en: Dictionary = {
     logInToVote: "Log in to vote if you raced in this one.",
     winner: (votes) => (votes === 1 ? "1 vote" : `${votes} votes`),
     noVotes: "Nobody voted in this race.",
+    close: "Close voting",
+    closeTitle: "Close voting now?",
+    closeDescription: (voted, total) => `${voted} of ${total} drivers have voted. Nobody else can vote, and Driver of the Day is announced now.`,
     errors: {
       closed: "Voting isn't open.",
       onlyDrivers: "Only this race's drivers can vote.",

@@ -6,10 +6,19 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
-## [1.6.1] - 2026-10-19
+## [1.7.0] - 2026-10-23
+
+### Added
+- **Driver of the Day:** admins can close the vote early (for example once everyone has voted), and the winner is announced straight away.
 
 ### Changed
-- **Podium prediction:** you make or change your pick in a pop-up, and everyone's picks are on the race page as soon as they're made, no longer hidden until the start.
+- Race photos show who uploaded each one, and the full caption instead of cutting it off.
+
+### Fixed
+- **Team radio:** the last letter of some drivers' names is no longer cut off, and longer names have more room.
+- Long driver names no longer make the standings on the home page scroll sideways, and your name in the top bar stays on one line; both are shortened with "…" instead.
+
+## [1.6.1] - 2026-10-19
 
 ### Changed
 - **Podium prediction:** you make or change your pick in a pop-up, and everyone's picks are on the race page as soon as they're made, no longer hidden until the start.
@@ -118,7 +127,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/DevJav/HeatChampionship/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/DevJav/HeatChampionship/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/DevJav/HeatChampionship/compare/v1.5.0...v1.5.1

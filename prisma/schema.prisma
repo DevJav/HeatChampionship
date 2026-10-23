@@ -217,6 +217,8 @@ model Race {
   status         RaceStatus @default(DRAFT)
   notes          String?
   finalizedAt    DateTime?
+  /// When an admin closed the Driver of the Day vote before its usual end
+  dotdClosedAt    DateTime?
   /// When the Driver of the Day result was announced (or the closed vote was checked), so it happens once
   dotdAnnouncedAt DateTime?
   createdAt      DateTime   @default(now())

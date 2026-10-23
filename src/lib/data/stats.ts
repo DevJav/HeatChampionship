@@ -38,15 +38,16 @@ export async function getStatsData({ seasonId, trackId }: { seasonId?: string | 
       log: { select: { data: true } },
       status: true,
       finalizedAt: true,
+      dotdClosedAt: true,
       dotdVotes: { select: { driverId: true } },
       predictions: { select: { userId: true, firstId: true, secondId: true, thirdId: true } },
     },
   });
   const now = new Date();
-  const statsRaces: StatsRace[] = races.map(({ log, status, finalizedAt, dotdVotes, predictions, ...race }) => ({
+  const statsRaces: StatsRace[] = races.map(({ log, status, finalizedAt, dotdClosedAt, dotdVotes, predictions, ...race }) => ({
     ...race,
     highlights: log && highlightsOf(log.data),
-    driverOfTheDay: votingPhase({ status, finalizedAt }, now) === "closed" ? tallyVotes(dotdVotes).winners : [],
+    driverOfTheDay: votingPhase({ status, finalizedAt, dotdClosedAt }, now) === "closed" ? tallyVotes(dotdVotes).winners : [],
     predictions: predictions.map((p) => ({ userId: p.userId, picks: [p.firstId, p.secondId, p.thirdId] as Picks })),
     results: race.results.map((result) => ({ ...result, upgrades: result.upgrades.map((u) => u.upgrade) })),
   }));

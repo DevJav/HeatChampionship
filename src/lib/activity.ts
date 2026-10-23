@@ -49,6 +49,8 @@ export function describeActivity(a: ActivityRecord): { subject: string | null; t
       return { subject, text: t.activity.photos(race), href: `${raceHref}#fotos` };
     case "SEASON_STARTED":
       return { subject: null, text: t.activity.seasonStarted(season), href: seasonHref };
+    case "DATE_POLL_OPENED":
+      return { subject: null, text: t.activity.datePollOpened, href: "/carreras/fecha" };
     case "SEASON_FINISHED": {
       return { subject: null, text: t.activity.seasonFinished(season, a.season?.champion ?? null), href: seasonHref };
     }

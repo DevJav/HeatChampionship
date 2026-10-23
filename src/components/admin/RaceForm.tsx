@@ -17,8 +17,11 @@ type RaceFormProps = {
   tracks: (Option & { defaultLaps: number | null })[];
   /** Existing race when editing */
   race?: Race;
-  /** Defaults when creating */
-  defaults?: { seasonId?: string; round?: number };
+  /**
+   * Defaults when creating. A date poll's "Schedule race" also passes the new date (and deadline)
+   * when editing; `datePollId` closes that poll once the race is saved.
+   */
+  defaults?: { seasonId?: string; round?: number; scheduledAt?: string; signupDeadline?: string; datePollId?: string };
 };
 
 const editableStatuses: RaceStatus[] = ["DRAFT", "UPCOMING", "OPEN", "CLOSED"];
@@ -29,6 +32,7 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
 
   return (
     <form action={formAction}>
+      {defaults?.datePollId && <input type="hidden" name="datePollId" value={defaults.datePollId} />}
       <FormLayout state={state} submitLabel={race ? t.admin.saveChanges : t.admin.racesAdmin.create} cancelHref="/admin/carreras">
         <SelectField
           name="seasonId"
@@ -70,7 +74,7 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
           label={t.admin.racesAdmin.dateTime}
           state={state}
           hint={t.admin.racesAdmin.timeZoneHint(siteConfig.timeZone.split("/").at(-1)!.replaceAll("_", " "))}
-          defaultValue={race ? toLocalInput(race.scheduledAt) : undefined}
+          defaultValue={defaults?.scheduledAt ?? (race ? toLocalInput(race.scheduledAt) : undefined)}
         />
         <DateTimeField
           name="signupDeadline"
@@ -78,7 +82,7 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
           clearable
           state={state}
           hint={t.admin.racesAdmin.signupDeadlineHint}
-          defaultValue={race?.signupDeadline ? toLocalInput(race.signupDeadline) : undefined}
+          defaultValue={defaults?.signupDeadline ?? (race?.signupDeadline ? toLocalInput(race.signupDeadline) : undefined)}
         />
         <TextField name="location" label={t.admin.racesAdmin.location} state={state} placeholder={t.admin.racesAdmin.locationPlaceholder} defaultValue={race?.location} />
         <TextField

@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import type { Prisma } from "@/generated/prisma/client";
+import { toLocalInput } from "../dates";
 import { db } from "../db";
 
 const entrantSelect = {
@@ -93,6 +94,16 @@ export async function listAllRaces() {
   });
 }
 
+/** Races not raced yet, drafts included, soonest first: the ones a date poll can move. */
+export async function listUnfinishedRaces() {
+  await connection();
+  return db.race.findMany({
+    where: { status: { not: "FINISHED" } },
+    orderBy: { scheduledAt: "asc" },
+    select: { id: true, round: true, scheduledAt: true, status: true, track: { select: { name: true } } },
+  });
+}
+
 /** Next free round number in a season. */
 export async function nextRoundNumber(seasonId: string) {
   await connection();
@@ -102,6 +113,13 @@ export async function nextRoundNumber(seasonId: string) {
     select: { round: true },
   });
   return (last?.round ?? 0) + 1;
+}
+
+/** Start time ("19:30") of the latest race, so a new one can default to the usual time. */
+export async function lastRaceTime() {
+  await connection();
+  const last = await db.race.findFirst({ orderBy: { scheduledAt: "desc" }, select: { scheduledAt: true } });
+  return last ? toLocalInput(last.scheduledAt).slice(11) : null;
 }
 
 /** The most recently finished race (for the home page). */

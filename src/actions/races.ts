@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 import { siteConfig } from "@/config/site";
+import type { Prisma } from "@/generated/prisma/client";
 import { fromLocalInput } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { isUniqueViolation } from "@/lib/db-errors";
@@ -86,6 +87,15 @@ const raceSchema = z
 
 const DUPLICATE_ROUND = t.admin.racesAdmin.duplicateRound;
 
+/** Saved from a date poll's "Schedule race" (hidden `datePollId`): that poll has done its job and now points at this race. */
+async function closeDatePoll(tx: Prisma.TransactionClient, formData: FormData, raceId: string) {
+  const datePollId = formData.get("datePollId");
+  if (typeof datePollId !== "string" || !datePollId) return;
+  // One poll per race: a race moved again by a later poll leaves the earlier one
+  await tx.datePoll.updateMany({ where: { raceId, id: { not: datePollId } }, data: { raceId: null } });
+  await tx.datePoll.updateMany({ where: { id: datePollId, closedAt: null }, data: { raceId, closedAt: new Date() } });
+}
+
 export async function createRace(_prev: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin();
   const parsed = parseForm(raceSchema, formData);
@@ -96,6 +106,7 @@ export async function createRace(_prev: FormState, formData: FormData): Promise<
     raceId = await db.$transaction(async (tx) => {
       const race = await tx.race.create({ data: { ...parsed.data, status: parsed.data.status ?? "DRAFT" } });
       await logRaceStatusChange(tx, race.id, null, race.status);
+      await closeDatePoll(tx, formData, race.id);
       return race.id;
     });
   } catch (error) {
@@ -123,6 +134,7 @@ export async function updateRace(raceId: string, _prev: FormState, formData: For
       const nextStatus = current.status === "FINISHED" ? "FINISHED" : (status ?? current.status);
       await tx.race.update({ where: { id: raceId }, data: { ...data, status: nextStatus } });
       await logRaceStatusChange(tx, raceId, current.status, nextStatus);
+      await closeDatePoll(tx, formData, raceId);
       opened = current.status !== "OPEN" && nextStatus === "OPEN";
       // Seats may have changed
       await rebalanceSeats(tx, raceId);

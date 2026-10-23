@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { CalendarDays } from "lucide-react";
-import { Container, EmptyState, PageHeader, Section, Skeleton, Tabs } from "@/components/ui";
+import { CalendarCheck, CalendarDays } from "lucide-react";
+import { ButtonLink, Container, EmptyState, PageHeader, Section, Skeleton, Tabs } from "@/components/ui";
 import { RaceCalendar } from "@/components/races/RaceCalendar";
 import { RaceRow } from "@/components/races/RaceRow";
 import { listPublishedRaces, type RaceListItem } from "@/lib/data/races";
@@ -85,7 +85,15 @@ function RaceSections({ upcoming, finished }: { upcoming: RaceListItem[]; finish
 export default function RacesPage() {
   return (
     <Container>
-      <PageHeader title={t.races.title} description={t.races.description} />
+      <PageHeader
+        title={t.races.title}
+        description={t.races.description}
+        actions={
+          <ButtonLink href="/carreras/fecha" variant="secondary" size="sm">
+            <CalendarCheck /> {t.datePoll.link}
+          </ButtonLink>
+        }
+      />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
         <RaceList />
       </Suspense>

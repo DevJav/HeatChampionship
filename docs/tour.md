@@ -38,6 +38,8 @@ The front page answers "what's next?" at a glance:
 
 Every race of every season, as a **list** (upcoming first, then past races grouped by season, each with its podium) or as a **month calendar**. The whole site works on phones too, as the race list on the right shows.
 
+**When do we race?** (`/carreras/fecha`, linked from the races page and from a banner on the home page while a poll is open) helps pick the next race's date. The organiser opens a poll over one to three months and blocks the days that don't work. Drivers pick *Can do*, *Maybe* or *Can't* and tap days, or fill in all their remaining days at once. Every tap saves straight away. Each day shows how many drivers can make it, and **Best days** ranks the days (a *maybe* counts as half) with who's in, who might be, who's out and who hasn't answered yet.
+
 ## Before a race
 
 ![Upcoming race page](screenshots/race-upcoming.png)
@@ -132,7 +134,7 @@ The organiser runs everything from **`/admin`** (shield icon in the header):
 |---|---|
 | **Overview** | Open or close registration for new players. |
 | **Drivers** | Rename players, reset forgotten passwords (it can generate an easy one to read out), give or remove the admin role. |
-| **Races** | Create a race with its season, track, date, place, seats and optional sign-up deadline. *Draft* hides it, *Sign-up open* lets players join, *Sign-up closed* stops new sign-ups. You can also add or remove drivers yourself, even when sign-up is closed. |
+| **Races** | Create a race with its season, track, date, place, seats and optional sign-up deadline. *Draft* hides it, *Sign-up open* lets players join, *Sign-up closed* stops new sign-ups. You can also add or remove drivers yourself, even when sign-up is closed. **Date poll** opens the date poll: on any of the best days, **Schedule race** creates a race on that date or moves one that's already scheduled there, and saving the race closes the poll. |
 | **News** | Write articles with a toolbar, drag-and-drop images and a live preview. |
 | **Seasons** | Seasons and their points table. Only one season can be in progress at a time. Changing the points table re-scores that season's finished races. |
 | **Tracks / Upgrades / Colours** | The catalogues: tracks (with country flag and default laps), upgrade cards and car colours. Anything already used can be deactivated but not deleted. |

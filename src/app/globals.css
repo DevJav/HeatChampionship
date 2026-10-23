@@ -120,6 +120,12 @@
   background-size: 0.75rem 0.75rem;
 }
 
+/* Hatched grey: a day taken out of a date poll */
+@utility blocked-day {
+  background-color: var(--surface-2);
+  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, var(--border) 6px 8px);
+}
+
 /* Diagonal racing stripes in the primary color */
 @utility speed-stripes {
   background-image: repeating-linear-gradient(

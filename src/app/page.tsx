@@ -3,6 +3,7 @@ import { siteConfig } from "@/config/site";
 import { Container, Skeleton } from "@/components/ui";
 import { RecentActivity } from "@/components/activity/RecentActivity";
 import { LatestNews } from "@/components/articles/LatestNews";
+import { DatePollBanner } from "@/components/date-poll/DatePollBanner";
 import { LastRaceCard } from "@/components/races/LastRaceCard";
 import { NextRaceCard } from "@/components/races/NextRaceCard";
 import { HomeStandings } from "@/components/standings/HomeStandings";
@@ -17,6 +18,9 @@ export default function HomePage() {
       <div className="flex min-w-0 flex-col gap-6">
         <Suspense fallback={<Skeleton className="h-14 w-full" />}>
           <SeasonStrip />
+        </Suspense>
+        <Suspense>
+          <DatePollBanner />
         </Suspense>
 
         {/* Side by side, except when the news column leaves too little room */}

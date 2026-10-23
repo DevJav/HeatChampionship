@@ -6,6 +6,12 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.8.0] - 2026-10-23
+
+### Nuevo
+- **¿Cuándo corremos?** Ayuda a elegir la fecha de la próxima carrera: cuando el organizador abra una encuesta, marca cada día como *Puedo*, *Quizá* o *No puedo* con un toque, o rellena de golpe todos los días que te falten. **Mejores días** muestra los días que más pilotos pueden y quién falta. Entra desde el aviso de la portada o desde **Elegir fecha** en Carreras; si recibes los correos de carreras, te llegará uno cuando se abra una encuesta.
+- Para administradores: abre una encuesta de uno a tres meses, bloquea los días que no puedas y pulsa **Programar carrera** en cualquier día para crear una carrera en esa fecha o mover allí una que ya esté programada (el plazo de inscripción se mueve con ella). Al guardar la carrera, se cierra la encuesta.
+
 ## [1.7.0] - 2026-10-23
 
 ### Nuevo
@@ -127,7 +133,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/DevJav/HeatChampionship/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/DevJav/HeatChampionship/compare/v1.5.1...v1.6.0

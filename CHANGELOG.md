@@ -6,6 +6,12 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-23
+
+### Added
+- **When do we race?** Help pick the date of the next race: when the organiser opens a poll, mark each day as *Can do*, *Maybe* or *Can't* with a tap, or fill in all your remaining days at once. **Best days** shows the days most drivers can make and who's missing. Open it from the banner on the home page or **Pick a date** on the Races page; if you get race emails, you'll get one when a poll opens.
+- For admins: open a poll over one to three months, block the days you can't do, and use **Schedule race** on any day to create a race on that date, or to move a race that's already scheduled there (its sign-up deadline moves with it). Saving the race closes the poll.
+
 ## [1.7.0] - 2026-10-23
 
 ### Added
@@ -127,7 +133,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/DevJav/HeatChampionship/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/DevJav/HeatChampionship/compare/v1.5.1...v1.6.0

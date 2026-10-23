@@ -647,6 +647,9 @@ export const es = {
     signupsOpenSeats: (seats: number, deadline: string | null) =>
       `Hay ${seats} plazas${deadline ? `; las inscripciones cierran el ${deadline}` : ""}. ¡Que no te la quiten!`,
     signUp: "Apuntarme",
+    datePollSubject: "¿Cuándo corremos la próxima carrera?",
+    datePollBody: "El organizador ha propuesto fechas. Entra y marca qué días puedes y cuáles no.",
+    datePollButton: "Marcar mis días",
     resultsSubject: (race: string) => `Resultados: ${race}`,
     resultsWinner: (winner: string) => `Victoria de ${winner}.`,
     resultsPodium: (names: string) => `Completan el podio ${names}.`,
@@ -689,6 +692,7 @@ export const es = {
     seasonStarted: (season: string) => `Arranca ${season}`,
     seasonFinished: (season: string, champion: string | null) =>
       `Termina ${season}${champion ? `: el título es para ${champion}` : ""}`,
+    datePollOpened: "Encuesta abierta: ¿qué día corremos la próxima carrera?",
   },
 
   radio: {
@@ -817,6 +821,75 @@ export const es = {
       onlyDrivers: "Solo pueden votar los pilotos de esta carrera.",
       notYourself: "No puedes votarte a ti mismo.",
       notInRace: "Ese piloto no corrió esta carrera.",
+    },
+  },
+
+  datePoll: {
+    title: "¿Cuándo corremos?",
+    description: "Marca qué días puedes para la próxima carrera y el organizador elegirá el que mejor venga a todos.",
+    link: "Elegir fecha",
+    answers: { YES: "Puedo", MAYBE: "Quizá", NO: "No puedo" },
+    block: "Bloquear",
+    tapHint: "Elige una respuesta y toca los días. Toca otra vez para borrarla.",
+    blockHint: "Toca un día para quitarlo de la encuesta, o para devolverlo.",
+    fillRest: "Rellenar el resto",
+    /** Tooltip of the fill button */
+    fillRestHint: (answer: string) => `Marca «${answer}» en todos los días que te faltan`,
+    logInToAnswer: "Entra para marcar tus días",
+    blocked: "No disponible",
+    best: "Mejor día",
+    /** Screen-reader label of a day: "sábado, 14 de noviembre. Tú: Puedo. 5 pueden, 1 quizá" */
+    dayLabel: (date: string, mine: string | null, yes: number, maybe: number) =>
+      `${date}. Tú: ${mine ?? "sin responder"}. ${yes} pueden, ${maybe} quizá`,
+    bestDays: "Mejores días",
+    bestDaysDescription: "Los días con más pilotos disponibles. «Quizá» cuenta como medio.",
+    noBestDays: "Todavía nadie ha marcado días disponibles.",
+    moreDays: (n: number) => (n === 1 ? "Ver 1 día más" : `Ver ${n} días más`),
+    unanswered: "Sin responder",
+    schedule: "Programar carrera",
+    scheduleTitle: (day: string) => `Carrera el ${day}`,
+    scheduleDescription: "Crea una carrera nueva ese día o mueve allí una que ya esté programada.",
+    newRace: "Nueva carrera",
+    moveRace: "Mover aquí",
+    /** "Ahora: sábado, 14 de noviembre, 18:00" */
+    currentDate: (when: string) => `Ahora: ${when}`,
+    movedNotice: (from: string, to: string) =>
+      `Fecha de la encuesta: ${to} (antes, ${from}). Revisa los datos y guarda para confirmarla; la encuesta se cerrará.`,
+    responses: "Respuestas",
+    responded: (n: number, total: number) => `Han respondido ${n} de ${total} pilotos`,
+    daysAnswered: (n: number) => (n === 1 ? "1 día" : `${n} días`),
+    pending: "Sin responder todavía",
+    none: "No hay ninguna encuesta abierta",
+    noneDescription: "Cuando el organizador proponga fechas para la próxima carrera, podrás marcar aquí tus días.",
+    decided: "Fecha elegida",
+    /** "La encuesta se cerró con Ronda 4 · Italia: sábado, 14 de noviembre, 18:00" */
+    decidedBody: (race: string, when: string) => `La encuesta se cerró con ${race}: ${when}.`,
+    decidedPending: "La encuesta se cerró al programar la carrera.",
+    seeRace: "Ver carrera",
+    banner: {
+      answered: (n: number) => (n === 1 ? "1 piloto ha marcado sus días." : `${n} pilotos han marcado sus días.`),
+      ask: "Marca qué días puedes para la próxima carrera.",
+      answer: "Marcar mis días",
+      see: "Ver estado actual",
+    },
+    admin: {
+      title: "Nueva encuesta de fecha",
+      description: "Elige entre qué meses podría ser la carrera. Después bloquea los días que no te vengan bien.",
+      from: "Desde",
+      to: "Hasta",
+      note: "Nota (opcional)",
+      notePlaceholder: "Por ejemplo: en mi casa, sobre las 18:00",
+      create: "Abrir encuesta",
+      delete: "Borrar encuesta",
+      deleteTitle: "¿Borrar la encuesta?",
+      deleteBody: "Se perderán las respuestas de todos los pilotos.",
+    },
+    errors: {
+      closed: "La encuesta ya está cerrada.",
+      month: "Elige un mes.",
+      toBeforeFrom: "Tiene que ser el mismo mes que «Desde» o uno posterior.",
+      tooLong: (months: number) => `Como mucho ${months} meses.`,
+      alreadyOpen: "Ya hay una encuesta abierta.",
     },
   },
 
@@ -1028,6 +1101,7 @@ export const es = {
     racesAdmin: {
       title: "Carreras",
       new: "Nueva carrera",
+      datePoll: "Encuesta de fecha",
       edit: "Editar carrera",
       create: "Crear carrera",
       empty: "Sin carreras",

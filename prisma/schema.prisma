@@ -64,6 +64,7 @@ model User {
   pickedFirst       Prediction[]         @relation("PickedFirst")
   pickedSecond      Prediction[]         @relation("PickedSecond")
   pickedThird       Prediction[]         @relation("PickedThird")
+  availability      DatePollAnswer[]
 
   @@map("user")
 }
@@ -235,6 +236,7 @@ model Race {
   articles      Article[]
   notifications Notification[]
   activity      Activity[]
+  datePoll      DatePoll?
 
   @@unique([seasonId, round])
   @@index([scheduledAt])
@@ -342,6 +344,48 @@ model Prediction {
   third  User @relation("PickedThird", fields: [thirdId], references: [id], onDelete: Cascade)
 
   @@id([raceId, userId])
+}
+
+/// "When do we race?": the admin offers a range of days and blocks the ones that don't suit;
+/// drivers answer the rest. Scheduling a race from it closes it (see src/lib/date-poll.ts).
+model DatePoll {
+  id          String    @id @default(cuid())
+  /// First and last day offered, "2026-11-01" (site time-zone days, as in src/lib/month-calendar.ts)
+  firstDay    String
+  lastDay     String
+  /// Days inside the range the admin can't do, ["2026-11-03", …]
+  blockedDays Json
+  /// Shown above the calendar, e.g. where or at what time
+  note        String?
+  /// The race scheduled from this poll; set when it closes
+  raceId      String?   @unique
+  closedAt    DateTime?
+  createdAt   DateTime  @default(now())
+
+  race    Race?            @relation(fields: [raceId], references: [id], onDelete: SetNull)
+  answers DatePollAnswer[]
+
+  @@index([closedAt])
+}
+
+enum Availability {
+  YES
+  MAYBE
+  NO
+}
+
+/// One driver's answer for one day of a date poll. No row = not answered.
+model DatePollAnswer {
+  pollId    String
+  userId    String
+  day       String
+  answer    Availability
+  updatedAt DateTime     @updatedAt
+
+  poll DatePoll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([pollId, userId, day])
 }
 
 model RacePhoto {
@@ -493,6 +537,8 @@ enum ActivityType {
   SEASON_FINISHED
   /// A driver was voted Driver of the Day (the actor)
   DRIVER_OF_THE_DAY
+  /// The admin opened a poll to pick the next race's date
+  DATE_POLL_OPENED
 }
 
 /** One line in the feed. The text is built when shown, from the linked driver, race or season (see src/lib/activity.ts). */

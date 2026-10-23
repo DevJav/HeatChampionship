@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarPlus, Camera, ClipboardPen, Flag, Rocket, Sparkles, Trophy, UserCheck, UserMinus, UserPlus } from "lucide-react";
+import { CalendarCheck, CalendarPlus, Camera, ClipboardPen, Flag, Rocket, Sparkles, Trophy, UserCheck, UserMinus, UserPlus } from "lucide-react";
 import type { ActivityItem } from "@/lib/data/activity";
 import { cn } from "@/lib/cn";
 import { dateParts, formatDate, formatRelative } from "@/lib/format";
@@ -17,6 +17,7 @@ const TYPE_ICON = {
   DRIVER_OF_THE_DAY: Sparkles,
   SEASON_STARTED: Rocket,
   SEASON_FINISHED: Trophy,
+  DATE_POLL_OPENED: CalendarCheck,
 } satisfies Record<ActivityItem["type"], unknown>;
 
 /** "hace 3 horas", or the time of day where entries are already grouped by day. */

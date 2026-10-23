@@ -64,6 +64,11 @@ const raceDayFormat = new Intl.DateTimeFormat(locale, {
 /** "sábado, 14 de noviembre, 18:00" */
 export const formatRaceDay = (date: Date) => raceDayFormat.format(date);
 
+const dayNameFormat = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone });
+
+/** "2026-11-14" → "sábado, 14 de noviembre" (a calendar day key, see month-calendar.ts) */
+export const formatDayName = (day: string) => dayNameFormat.format(new Date(`${day}T12:00:00Z`));
+
 const dayPartsFormat = new Intl.DateTimeFormat(locale, {
   weekday: "short",
   day: "numeric",

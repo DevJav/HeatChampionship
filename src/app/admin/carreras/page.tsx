@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, Plus } from "lucide-react";
+import { CalendarCheck, CalendarDays, Plus } from "lucide-react";
 import { ButtonLink, Card, EmptyState, Section, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
 import { listAllRaces } from "@/lib/data/races";
@@ -20,9 +20,14 @@ async function AdminRacesPageContent() {
     <Section
       title={t.admin.racesAdmin.title}
       actions={
-        <ButtonLink href="/admin/carreras/nueva" size="sm">
-          <Plus /> {t.admin.racesAdmin.new}
-        </ButtonLink>
+        <div className="flex gap-2">
+          <ButtonLink href="/carreras/fecha" size="sm" variant="secondary">
+            <CalendarCheck /> {t.admin.racesAdmin.datePoll}
+          </ButtonLink>
+          <ButtonLink href="/admin/carreras/nueva" size="sm">
+            <Plus /> {t.admin.racesAdmin.new}
+          </ButtonLink>
+        </div>
       }
     >
       {races.length === 0 ? (

@@ -31,6 +31,19 @@ export async function announceSignupsOpen(raceId: string) {
   });
 }
 
+/** A poll to pick the next race's date was opened. */
+export async function announceDatePoll(pollId: string) {
+  const poll = await db.datePoll.findUnique({ where: { id: pollId } });
+  if (!poll || poll.closedAt) return;
+
+  await sendToSubscribers(`date-poll:${pollId}`, "races", {
+    subject: t.email.datePollSubject,
+    heading: t.email.datePollSubject,
+    paragraphs: [t.email.datePollBody, ...(poll.note ? [poll.note] : [])],
+    button: { label: t.email.datePollButton, url: absoluteUrl("/carreras/fecha") },
+  });
+}
+
 /** A race's results were published. */
 export async function announceResults(raceId: string) {
   const race = await db.race.findUnique({

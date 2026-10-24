@@ -213,6 +213,7 @@ function useRoundEntry({ layout, geometry, log, setLog, cars }: PanelProps, zoom
       focus,
       reachable,
       blocked,
+      distances: true,
       onSpaceTap: active ? tap : undefined,
     },
     moved: (id: string) => draft.positions[id].pos - start[id].pos,

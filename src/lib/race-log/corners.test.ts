@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cornerAhead, cornerStats } from "./corners";
-import { cornerOf } from "./layout";
+import { franceLayout as france } from "./france";
+import { cornerOf, spacesToCorner } from "./layout";
 import type { LoggedRound } from "./rounds";
 import { usaLayout as usa } from "./usa";
 
@@ -14,6 +15,16 @@ describe("cornerOf / cornerAhead", () => {
     expect(cornerOf(usa, 5)).toBe(3); // finish straight
     expect(cornerAhead(usa, 32)).toBe(1);
     expect(cornerAhead(usa, 60)).toBe(0);
+  });
+});
+
+describe("spacesToCorner", () => {
+  it("matches the numbers printed beside the spaces on the France board", () => {
+    expect(spacesToCorner(france, 0)).toBe(11);
+    expect(spacesToCorner(france, 59)).toBe(12); // pole
+    expect(spacesToCorner(france, 11)).toBe(0);
+    expect(spacesToCorner(france, 12)).toBe(7);
+    expect(spacesToCorner(france, 47)).toBe(24);
   });
 });
 

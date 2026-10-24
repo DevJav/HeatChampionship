@@ -968,7 +968,7 @@ export const es = {
     led: "Líder",
     ledTitle: "Rondas como líder",
     noDrawing: "Este circuito aún no se puede anotar",
-    noDrawingDescription: "Falta dibujar su mapa de casillas. De momento solo está Estados Unidos.",
+    noDrawingDescription: "Falta dibujar su mapa de casillas. De momento están Estados Unidos y Francia.",
     notEnoughDrivers: "Faltan pilotos",
     notEnoughDriversDescription: "Hacen falta al menos dos pilotos confirmados para anotar la carrera.",
     goToEntrants: "Gestionar inscritos",

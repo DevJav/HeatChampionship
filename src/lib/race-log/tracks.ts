@@ -1,4 +1,5 @@
 import type { TrackGeometry, TrackLayout } from "./layout";
+import { franceGeometry, franceLayout } from "./france";
 import { parseRaceLog } from "./log";
 import { usaGeometry, usaLayout } from "./usa";
 
@@ -7,6 +8,9 @@ type TrackDrawing = { layout: TrackLayout; geometry: TrackGeometry };
 /** Tracks that can be logged round by round, by Track.slug. Add more as their cards are traced. */
 const drawings: Record<string, TrackDrawing> = {
   usa: { layout: usaLayout, geometry: usaGeometry },
+  // Spanish and English seed slugs
+  francia: { layout: franceLayout, geometry: franceGeometry },
+  france: { layout: franceLayout, geometry: franceGeometry },
 };
 
 export function hasTrackDrawing(slug: string) {

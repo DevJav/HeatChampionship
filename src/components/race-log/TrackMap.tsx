@@ -7,6 +7,7 @@ import {
   lapSpace,
   racingLineSide,
   spacePolygon,
+  spacesToCorner,
   type Point,
   type TrackGeometry,
   type TrackLayout,
@@ -37,6 +38,8 @@ type TrackMapProps = {
   blocked?: Set<number>;
   /** Fill and hover text per lap space, for heat maps */
   heat?: Map<number, { fill: string; title: string }>;
+  /** Print each space's distance to the next corner beside it, as on the board */
+  distances?: boolean;
   /** Width / height of the frame; defaults to the track card's. Squarer frames zoom in further on phones. */
   aspect?: number;
   onSpaceTap?: (space: number) => void;
@@ -87,6 +90,7 @@ export function TrackMap({
   reachable,
   blocked,
   heat,
+  distances,
   onSpaceTap,
   aspect: frameAspect,
   className,
@@ -132,6 +136,25 @@ export function TrackMap({
       }),
     [geometry, layout, n],
   );
+
+  // Distance labels go on the outside of the bend (opposite the racing line on straights), clear of the badges
+  const distanceLabels = useMemo(() => {
+    if (!distances) return [];
+    const turn = (s: number) => {
+      const a = geometry.spaces[(s + n) % n][2];
+      const b = geometry.spaces[(s + 1 + n) % n][2];
+      return ((b - a + 540) % 360) - 180;
+    };
+    return geometry.spaces.flatMap(([x, y, angle], s) => {
+      const bend = [-3, -2, -1, 0, 1, 2].reduce((sum, k) => sum + turn(s + k), 0);
+      const outside = Math.abs(bend) > 15 ? -Math.sign(bend) : racingLineSide(layout, s) === "right" ? -1 : 1;
+      const rad = (angle * Math.PI) / 180;
+      const r = halfWidth + 8;
+      const p = { x: x + Math.cos(rad) * r * outside, y: y + Math.sin(rad) * r * outside };
+      if (geometry.badges.some(([bx, by]) => Math.hypot(bx - p.x, by - p.y) < 22)) return [];
+      return [{ s, ...p, value: spacesToCorner(layout, s) }];
+    });
+  }, [distances, geometry, layout, halfWidth, n]);
 
   const finish = dividerEnds(geometry, 0);
 
@@ -205,6 +228,20 @@ export function TrackMap({
         strokeDasharray="3 3"
         pointerEvents="none"
       />
+
+      {distanceLabels.map(({ s, x, y, value }) => (
+        <text
+          key={s}
+          x={x}
+          y={y}
+          dy="0.35em"
+          textAnchor="middle"
+          className="fill-fg-muted font-display text-[10px] font-bold"
+          pointerEvents="none"
+        >
+          {value}
+        </text>
+      ))}
 
       {/* Speed limits */}
       {layout.corners.map((corner, i) => {

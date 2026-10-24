@@ -60,6 +60,15 @@ export function cornerOf(layout: TrackLayout, space: number) {
   return corners.length - 1;
 }
 
+/**
+ * The number printed beside a space on the board: how many spaces lie
+ * between it and the next corner line (0 on the space just before the line).
+ */
+export function spacesToCorner(layout: TrackLayout, space: number) {
+  const next = layout.corners.find((c) => c.before > space) ?? layout.corners[0];
+  return mod(next.before - space - 1, layout.spacesPerLap);
+}
+
 export function cornerBehind(layout: TrackLayout, space: number) {
   return layout.corners[cornerOf(layout, space)];
 }

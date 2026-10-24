@@ -6,6 +6,14 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-24
+
+### Added
+- **France** can now be recorded round by round, like the USA: its race page gets the lap chart, the replay and the race stats.
+
+### Changed
+- For admins recording a race: the map now shows, beside each space, how many spaces are left before the next corner, the same numbers as on the board, so it's easier to find where each car ended up.
+
 ## [1.9.0] - 2026-10-23
 
 ### Added
@@ -144,7 +152,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0

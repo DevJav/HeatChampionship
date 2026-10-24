@@ -274,3 +274,15 @@ export function smoke() {
     ctx.fillRect(0, 0, 64, 64);
   });
 }
+
+/** A soft round glow, white so a sprite's colour tints it */
+export function glow() {
+  return canvasTexture(64, 64, (ctx) => {
+    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(0.3, "rgba(255,255,255,0.5)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 64, 64);
+  });
+}

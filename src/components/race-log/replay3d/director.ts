@@ -35,6 +35,8 @@ export type Stage = {
 
 /** Time before the start (in rounds) for the lights */
 export const INTRO = 1;
+/** When each of the five start lights comes on; all go out at 0 */
+export const START_LIGHTS = [0, 1, 2, 3, 4].map((i) => -INTRO + (i * INTRO * 0.8) / 5);
 /** Playback speed: seconds of replay per round on the smallest circuit; bigger ones take longer, so cars look as fast */
 const SECONDS_PER_ROUND = 3.2;
 /**
@@ -186,7 +188,8 @@ function onboard(stage: Stage, id: string, t: number): Omit<CameraPose, "label">
     // Just ahead of the helmet, at the driver's eye line
     position: v(car.x - dx * EYE.back * CAR_SCALE, EYE.up * CAR_SCALE, car.z - dz * EYE.back * CAR_SCALE),
     target: v(car.x + dx * 40, 2.2, car.z + dz * 40),
-    fov: 72,
+    // Wide, so the cockpit and the cars around it fit in
+    fov: 85,
     subject: id,
   };
 }

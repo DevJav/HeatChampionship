@@ -915,6 +915,8 @@ export const en: Dictionary = {
       spins: (name) => `${name} spins!`,
       wins: (name) => `${name} wins the race!`,
       videoButton: "Record a video of the 3D replay to share",
+      mute: "Mute",
+      soundOn: "Sound on",
       script: {
         short: "Script",
         button: "See and change the broadcast script",

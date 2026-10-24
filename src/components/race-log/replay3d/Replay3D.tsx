@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Clapperboard, Download, ListVideo, Maximize, Minimize, Pause, Play, Share2 } from "lucide-react";
+import { Clapperboard, Download, ListVideo, Maximize, Minimize, Pause, Play, Share2, Volume2, VolumeX } from "lucide-react";
 import { Button, buttonVariants, Card, CardBody, Modal, Select, Spinner } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { LoggedRound } from "@/lib/race-log/rounds";
 import { trackDrawing } from "@/lib/race-log/tracks";
 import { slugify } from "@/lib/slug";
 import { videoMimeType } from "../replay-video";
+import { createRaceAudio, type RaceAudio } from "./audio";
 import { cameraPose, prepareReplay, replayDuration, type CameraMode } from "./director";
 import { drawHud, readHudStyle, type HudStyle } from "./hud";
 import { ShotScript, useShotScript } from "./ShotScript";
@@ -57,6 +58,8 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   const [follow, setFollow] = useState(replay.stage.motion.official[0]);
   const [fullscreen, setFullscreen] = useState(false);
   const [showScript, setShowScript] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const audio = useRef<RaceAudio | null>(null);
   const [recording, setRecording] = useState<Recording>({ step: "idle" });
   const abort = useRef<AbortController | null>(null);
   const canRecord = useSyncExternalStore(
@@ -90,6 +93,15 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
     };
   }, [replay, drawing, cars, debug]);
 
+  // Sound starts with the first tap on play (browsers keep it off until then)
+  useEffect(
+    () => () => {
+      audio.current?.dispose();
+      audio.current = null;
+    },
+    [replay],
+  );
+
   // Keep the canvases the size of the view
   const size = useRef({ width: 0, height: 0 });
   useEffect(() => {
@@ -119,6 +131,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   const style = useRef<HudStyle | null>(null);
   const recordingNow = recording.step === "recording";
   useEffect(() => {
+    if (!playing || recordingNow) audio.current?.silence();
     if (status !== "ready" || recordingNow) return;
     dirty.current = true;
     let raf = 0;
@@ -136,6 +149,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
         dirty.current = false;
         const camera = cameraPose(replay.stage, shots, mode, follow, clock.current);
         world.current.render(clock.current, camera);
+        if (playing) audio.current?.update(clock.current, camera);
         const hud = hudCanvas.current!;
         const ctx = hud.getContext("2d")!;
         style.current ??= readHudStyle();
@@ -167,6 +181,16 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
 
   function togglePlay() {
     if (!playing && clock.current >= replay.end) seek(replay.start);
+    if (!playing) {
+      try {
+        audio.current ??= createRaceAudio(replay);
+        audio.current.setMuted(muted);
+        void audio.current.resume();
+      } catch (error) {
+        // No Web Audio: the replay plays without sound
+        console.error(error);
+      }
+    }
     setPlaying(!playing);
   }
 
@@ -287,6 +311,19 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
                 onClick={() => setShowScript(!showScript)}
               >
                 <ListVideo /> {r.script.short}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                aria-label={muted ? r.soundOn : r.mute}
+                title={muted ? r.soundOn : r.mute}
+                aria-pressed={muted}
+                onClick={() => {
+                  audio.current?.setMuted(!muted);
+                  setMuted(!muted);
+                }}
+              >
+                {muted ? <VolumeX /> : <Volume2 />}
               </Button>
               <Button size="sm" variant="ghost" title={r.speed} onClick={() => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])}>
                 <span className="tabular-nums">{speed}×</span>

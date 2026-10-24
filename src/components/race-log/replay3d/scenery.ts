@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { siteConfig } from "@/config/site";
 import type { TrackGeometry } from "@/lib/race-log/layout";
 import { besideLine, type TrackPath } from "@/lib/race-log/track-path";
-import { CAR_SCALE, cameraSightLines, INTRO, tracksideCameras, type Stage } from "./director";
+import { CAR_SCALE, cameraSightLines, START_LIGHTS, tracksideCameras, type Stage } from "./director";
 import * as tex from "./textures";
 
 /**
@@ -378,13 +378,21 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
   const panel = new THREE.Mesh(new THREE.BoxGeometry(0.6, 2.2, 14), standard({ color: "#0b0b0c", roughness: 0.6 }));
   panel.position.set(-1.2, 17, 0);
   gantry.add(beam, panel);
+  // Pure red and not too bright: tone mapping turns a very bright red yellow. A halo makes up the glow
   const lights: THREE.MeshStandardMaterial[] = [];
+  const halos: THREE.SpriteMaterial[] = [];
+  const glow = tex.glow();
   for (let i = 0; i < 5; i++) {
-    const mat = standard({ color: "#200000", emissive: "#ff1a00", emissiveIntensity: 0, roughness: 0.3 });
+    const mat = standard({ color: "#200000", emissive: "#ff0000", emissiveIntensity: 0, roughness: 0.3 });
     const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.8, 14, 10), mat);
     bulb.position.set(-1.6, 17, (i - 2) * 2.5);
-    gantry.add(bulb);
+    const halo = new THREE.SpriteMaterial({ map: glow, color: "#ff1000", blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 });
+    const sprite = new THREE.Sprite(halo);
+    sprite.position.set(-2.3, 17, (i - 2) * 2.5);
+    sprite.scale.setScalar(4.2);
+    gantry.add(bulb, sprite);
     lights.push(mat);
+    halos.push(halo);
   }
   const line = path.at(0);
   gantry.position.set(line.x, 0, line.y);
@@ -469,10 +477,10 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
       lights.forEach((mat, i) => (lights[i] = swap(mat)));
     },
     setLights(t: number) {
-      // One light a fifth of the intro apart, all out at the start
       lights.forEach((mat, i) => {
-        const on = t < 0 && t >= -INTRO + (i * INTRO * 0.8) / 5;
-        mat.emissiveIntensity = on ? 30 : 0;
+        const on = t < 0 && t >= START_LIGHTS[i];
+        mat.emissiveIntensity = on ? 3 : 0;
+        halos[i].opacity = on ? 0.9 : 0;
       });
     },
   };

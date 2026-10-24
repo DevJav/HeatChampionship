@@ -938,6 +938,8 @@ export const es = {
       spins: (name: string) => `¡Trompo de ${name}!`,
       wins: (name: string) => `¡${name} gana la carrera!`,
       videoButton: "Grabar un vídeo de la repetición 3D para compartir",
+      mute: "Silenciar",
+      soundOn: "Activar el sonido",
       script: {
         short: "Guion",
         button: "Ver y cambiar el guion de la realización",

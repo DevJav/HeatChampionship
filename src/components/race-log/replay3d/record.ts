@@ -1,8 +1,15 @@
 import type { TrackGeometry } from "@/lib/race-log/layout";
-import { videoMimeType } from "../replay-video";
+import { createRaceAudio, type RaceAudio } from "./audio";
 import { cameraPose, replayDuration, type Replay } from "./director";
 import { drawHud, readHudStyle } from "./hud";
 import { createWorld, type WorldCar } from "./world";
+
+/** Formats with sound first; video only as a last resort */
+function mimeType() {
+  if (typeof MediaRecorder === "undefined") return null;
+  const types = ["video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/mp4", "video/webm"];
+  return types.find((type) => MediaRecorder.isTypeSupported(type)) ?? null;
+}
 
 const W = 1280;
 const H = 720;
@@ -20,8 +27,8 @@ export async function recordReplay3d(
   onProgress: (share: number) => void,
   signal?: AbortSignal,
 ): Promise<Blob> {
-  const mimeType = videoMimeType();
-  if (!mimeType) throw new Error("MediaRecorder unavailable");
+  const type = mimeType();
+  if (!type) throw new Error("MediaRecorder unavailable");
 
   const glCanvas = document.createElement("canvas");
   const world = await createWorld(glCanvas, replay.stage, geometry, cars, { preserve: true });
@@ -36,19 +43,28 @@ export async function recordReplay3d(
   const hudCtx = hud.getContext("2d")!;
   const style = readHudStyle();
   const duration = replayDuration(replay);
+  let audio: RaceAudio | null = null;
+  try {
+    audio = createRaceAudio(replay, { record: true });
+    await audio.resume();
+  } catch (error) {
+    // No Web Audio: a silent video
+    console.error(error);
+  }
 
   const frame = (ms: number) => {
     const t = replay.start + ms / 1000 / replay.secondsPerRound;
     const camera = cameraPose(replay.stage, replay.shots, "tv", "", t);
     world.render(t, camera);
+    audio?.update(t, camera);
     drawHud(hudCtx, W, H, replay.stage, t, style, { title, camera, captions: replay.captions });
     ctx.drawImage(glCanvas, 0, 0);
     ctx.drawImage(hud, 0, 0);
   };
   frame(0);
 
-  const stream = canvas.captureStream(30);
-  const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 });
+  const stream = new MediaStream([...canvas.captureStream(30).getVideoTracks(), ...(audio?.stream?.getAudioTracks() ?? [])]);
+  const recorder = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 8_000_000 });
   const chunks: Blob[] = [];
   recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
 
@@ -59,13 +75,14 @@ export async function recordReplay3d(
       if (recorder.state !== "inactive") recorder.stop();
       stream.getTracks().forEach((track) => track.stop());
       world.dispose();
+      audio?.dispose();
     };
     signal?.addEventListener("abort", () => {
       stop();
       reject(new DOMException("Aborted", "AbortError"));
     });
     recorder.onstop = () => {
-      if (!signal?.aborted) resolve(new Blob(chunks, { type: mimeType.split(";")[0] }));
+      if (!signal?.aborted) resolve(new Blob(chunks, { type: type.split(";")[0] }));
     };
     recorder.onerror = () => {
       stop();

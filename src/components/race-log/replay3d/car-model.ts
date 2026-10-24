@@ -72,6 +72,8 @@ export type CarPose = {
   distance: number;
   /** Cornering force for the driver to lean against, −1 … 1, positive pushing right */
   lean: number;
+  /** Arms up in celebration, 0 (hands on the wheel) … 1 (straight up) */
+  cheer?: number;
 };
 
 export type CarRig = {
@@ -162,6 +164,8 @@ export function carFactory(template: THREE.Group, scale: number) {
       const shoulder = new THREE.Vector3();
       const from = new THREE.Vector3();
       const to = new THREE.Vector3();
+      const chest = new THREE.Vector3();
+      const raised = new THREE.Vector3();
       const parentQ = new THREE.Quaternion();
       const swing = new THREE.Quaternion();
 
@@ -169,7 +173,7 @@ export function carFactory(template: THREE.Group, scale: number) {
         root,
         spinner,
         chassis,
-        pose({ steer, distance, lean }) {
+        pose({ steer, distance, lean, cheer = 0 }) {
           const angle = THREE.MathUtils.clamp(steer, -MAX_STEER, MAX_STEER);
           for (const upright of uprights) upright.set(Z, angle);
           // Rolling forward turns the wheels about +y (pointing left) so their tops go forward
@@ -182,11 +186,18 @@ export function carFactory(template: THREE.Group, scale: number) {
           // Arms: swing each from the shoulder so the glove reaches its grip on the turned rim
           for (const arm of arms) arm.upper.reset();
           root.updateMatrixWorld(true);
+          torso.object.getWorldPosition(chest);
           for (const arm of arms) {
             arm.upper.object.getWorldPosition(shoulder);
             from.copy(arm.hand.getWorldPosition(to)).sub(shoulder).normalize();
             to.copy(arm.grip);
             steeringWheel.object.localToWorld(to).sub(shoulder).normalize();
+            if (cheer > 0) {
+              // Up and a little out to the side
+              raised.set(shoulder.x - chest.x, 0, shoulder.z - chest.z).normalize().multiplyScalar(0.45);
+              raised.y = 1;
+              to.lerp(raised.normalize(), Math.min(1, cheer)).normalize();
+            }
             swing.setFromUnitVectors(from, to);
             // Into the shoulder's parent frame
             arm.upper.object.parent!.getWorldQuaternion(parentQ);

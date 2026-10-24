@@ -4,11 +4,11 @@ import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { RotateCcw, Scissors, Trash2 } from "lucide-react";
 import { Button, Select } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { fitShots, nearestCorner, readScript, shotAt, SHOT_KINDS, type Replay, type Shot, type ShotKind } from "./director";
+import { fitShots, nearestCorner, readScript, REPLAY_VIEWS, shotAt, SHOT_KINDS, type Replay, type ReplayView, type Shot, type ShotKind } from "./director";
 import { t } from "@/i18n";
 
 /** Kinds that film one car you can pick; the others choose for themselves */
-const WITH_SUBJECT: ShotKind[] = ["chase", "onboard", "heli", "trackside", "outro"];
+const WITH_SUBJECT: ShotKind[] = ["chase", "onboard", "heli", "trackside", "replay", "outro"];
 
 const listeners = new Set<() => void>();
 const subscribe = (listener: () => void) => {
@@ -26,7 +26,7 @@ function readLocal(key: string) {
 
 function writeLocal(key: string, shots: Shot[] | null) {
   try {
-    if (shots) localStorage.setItem(key, JSON.stringify(shots.map(({ start, kind, subject, cam }) => ({ start, kind, subject, cam }))));
+    if (shots) localStorage.setItem(key, JSON.stringify(shots.map(({ start, kind, subject, cam, of, view }) => ({ start, kind, subject, cam, of, view }))));
     else localStorage.removeItem(key);
   } catch {}
   listeners.forEach((listener) => listener());
@@ -157,6 +157,15 @@ export function ShotScript({ replay, shots, edited, time, onSave, onReset, onSee
                 </Select>
               ) : (
                 <span className="text-sm text-fg-muted">{shot.kind === "finish" ? s.nextToCross : ""}</span>
+              )}
+              {shot.kind === "replay" && (
+                <Select value={shot.view} onChange={(e) => change(i, { view: e.target.value as ReplayView })} aria-label={s.view} className="h-8 w-auto text-sm">
+                  {REPLAY_VIEWS.map((view) => (
+                    <option key={view} value={view}>
+                      {s.views[view]}
+                    </option>
+                  ))}
+                </Select>
               )}
               {shot.kind === "trackside" && (
                 <Select value={shot.cam} onChange={(e) => change(i, { cam: Number(e.target.value) })} aria-label={s.corner} className="h-8 w-auto text-sm">

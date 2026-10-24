@@ -31,6 +31,8 @@ export type CarMotion = {
 export type MotionEvent =
   | { kind: "pass"; t: number; id: string; other: string; lead: boolean }
   | { kind: "spin"; t: number; end: number; id: string }
+  /** The last stretch of a move, tucked in behind another car */
+  | { kind: "slipstream"; t: number; end: number; id: string }
   | { kind: "finish"; t: number; id: string; position: number };
 
 export type RaceMotion = {
@@ -399,6 +401,9 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
   // Story beats for the director and the captions
   const events: MotionEvent[] = [];
   for (const s of spins) events.push({ kind: "spin", t: s.round - 0.55, end: s.round - 0.05, id: s.id });
+  rounds.forEach((round, i) => {
+    for (const id of ids) if (i > 0 && round.flags[id]?.slipstream) events.push({ kind: "slipstream", t: i - 0.4, end: i - 0.02, id });
+  });
   official.forEach((id, i) => {
     const t = finishedAt[id];
     if (t !== null) events.push({ kind: "finish", t, id, position: i + 1 });

@@ -10,6 +10,7 @@ import { besideLine } from "@/lib/race-log/track-path";
 import { carFactory, loadCarModel, REAR_AXLE, REAR_TRACK, WHEELBASE, type CarRig } from "./car-model";
 import { CAR_SCALE, carPose, type CameraPose, type Stage } from "./director";
 import { DistanceBlurPass } from "./distance-blur";
+import { buildPodium } from "./podium";
 import { buildScenery } from "./scenery";
 import { smoke } from "./textures";
 import { outlineMaterial, toonify } from "./toon";
@@ -122,6 +123,79 @@ function buildDebug(scene: THREE.Scene, stage: Stage, rigs: Map<string, CarRig>)
   }
   return (t: number) => {
     for (const [id, disc] of discs) disc.material = motion.laneAt(id, t) === null ? onLine : inLane;
+  };
+}
+
+/**
+ * Trails of air off the sides of a car riding another's slipstream, for the
+ * stretch of the round it was tucked in: thin, following the line the car
+ * actually drove, fading out behind it. Each trail is a flat ribbon and an
+ * upright one, so it shows from above, behind and the side.
+ */
+function buildSlipstreams(scene: THREE.Scene, stage: Stage) {
+  /** Points along each trail, and how far back in time (rounds) between them */
+  const POINTS = 10;
+  const STEP = 0.0028;
+  const SIDES = [-3.5, 3.5];
+  const HEIGHT = 2.2;
+  const windows = new Map<string, [number, number][]>();
+  for (const e of stage.motion.events) if (e.kind === "slipstream") windows.set(e.id, [...(windows.get(e.id) ?? []), [e.t, e.end]]);
+  const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+
+  const cars = [...windows].map(([id, spans]) => {
+    // Per trail and orientation, two vertices per point
+    const ribbons = SIDES.length * 2;
+    const vertices = ribbons * POINTS * 2;
+    const position = new THREE.BufferAttribute(new Float32Array(vertices * 3), 3);
+    const color = new THREE.BufferAttribute(new Float32Array(vertices * 4), 4);
+    const index: number[] = [];
+    for (let r = 0; r < ribbons; r++) {
+      for (let k = 0; k < POINTS - 1; k++) {
+        const a = (r * POINTS + k) * 2;
+        index.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", position);
+    geometry.setAttribute("color", color);
+    geometry.setIndex(index);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    mesh.visible = false;
+    mesh.userData.flat = true;
+    scene.add(mesh);
+    return { id, spans, mesh, position, color };
+  });
+
+  return (t: number) => {
+    for (const car of cars) {
+      const strength = Math.max(0, ...car.spans.map(([a, b]) => Math.min(1, (t - a) / 0.06, (b - t) / 0.06)));
+      car.mesh.visible = strength > 0;
+      if (!car.mesh.visible) continue;
+      for (let k = 0; k < POINTS; k++) {
+        const p = carPose(stage, car.id, Math.max(0, t - k * STEP));
+        const len = Math.hypot(p.dx, p.dz) || 1;
+        const [fx, fz] = [p.dx / len, p.dz / len];
+        // Thinning and fading towards the tail
+        const tail = k / (POINTS - 1);
+        const half = 0.22 * (1 - tail * 0.8);
+        const alpha = strength * (1 - tail) ** 1.5 * 0.75;
+        SIDES.forEach((side, si) => {
+          // Starting at the back of the car
+          const cx = p.x - fx * 4 + -fz * side;
+          const cz = p.z - fz * 4 + fx * side;
+          const flat = ((si * 2) * POINTS + k) * 2;
+          const up = ((si * 2 + 1) * POINTS + k) * 2;
+          car.position.setXYZ(flat, cx + fz * half, HEIGHT, cz - fx * half);
+          car.position.setXYZ(flat + 1, cx - fz * half, HEIGHT, cz + fx * half);
+          car.position.setXYZ(up, cx, HEIGHT + half, cz);
+          car.position.setXYZ(up + 1, cx, HEIGHT - half, cz);
+          for (const v of [flat, flat + 1, up, up + 1]) car.color.setXYZW(v, 1, 1, 1, alpha);
+        });
+      }
+      car.position.needsUpdate = true;
+      car.color.needsUpdate = true;
+    }
   };
 }
 
@@ -260,6 +334,8 @@ export async function createWorld(
   for (const rig of rigs.values()) scene.add(rig.root);
   const updateDebug = options.debug ? buildDebug(scene, stage, rigs) : null;
   const updateSpins = buildSpins(scene, stage);
+  const updateSlipstreams = buildSlipstreams(scene, stage);
+  const podium = buildPodium(scene, stage);
   const outline = CEL_SHADED ? outlineMaterial() : null;
   const toon = outline ? toonify(scene, outline.material) : null;
   if (toon) {
@@ -377,7 +453,10 @@ export async function createWorld(
     const time = Math.max(0, t);
     updateDebug?.(time);
     placeCars(time);
+    podium?.place(rigs, time);
+    podium?.update(time);
     updateSpins(time);
+    updateSlipstreams(time);
     aimShadows(pose);
 
     camera.position.set(pose.position.x, pose.position.y, pose.position.z);

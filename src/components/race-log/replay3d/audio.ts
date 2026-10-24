@@ -9,12 +9,13 @@ import { carPose, START_LIGHTS, type CameraPose, type Replay } from "./director"
  * on board.
  *
  * Everything but the beeps is worked out from the replay time, so seeking
- * sounds right straight away.
+ * sounds right straight away. The same sound can be rendered offline for a
+ * video (renderRaceAudio), faster than real time and frame-exact.
  */
 
 export type RaceAudio = {
-  /** Call every frame while playing */
-  update(t: number, camera: CameraPose): void;
+  /** Call every frame while playing; `at` is the clock in seconds (the wall clock unless rendering offline) */
+  update(t: number, camera: CameraPose, at?: number): void;
   /** Fade out: paused, scrubbing or recording elsewhere */
   silence(): void;
   setMuted(muted: boolean): void;
@@ -94,10 +95,12 @@ function distortion(amount: number) {
   return curve;
 }
 
-export function createRaceAudio(replay: Replay, { record = false } = {}): RaceAudio {
+export function createRaceAudio(replay: Replay, { record = false, context }: { record?: boolean; context?: BaseAudioContext } = {}): RaceAudio {
   const { stage } = replay;
   const { motion } = stage;
-  const ctx = new AudioContext();
+  const ctx = context ?? new AudioContext();
+  // Offline (for a video) there's nothing to pause or resume
+  const live = ctx instanceof AudioContext ? ctx : null;
   const now = () => ctx.currentTime;
 
   const compressor = ctx.createDynamicsCompressor();
@@ -106,7 +109,7 @@ export function createRaceAudio(replay: Replay, { record = false } = {}): RaceAu
   const master = ctx.createGain();
   master.gain.value = 0;
   master.connect(compressor);
-  const recording = record ? ctx.createMediaStreamDestination() : null;
+  const recording = record && live ? live.createMediaStreamDestination() : null;
   compressor.connect(recording ?? ctx.destination);
   const noise = noiseBuffer(ctx);
   const loop = () => {
@@ -271,7 +274,7 @@ export function createRaceAudio(replay: Replay, { record = false } = {}): RaceAu
   return {
     stream: recording?.stream ?? null,
     async resume() {
-      if (ctx.state === "suspended") await ctx.resume();
+      if (live?.state === "suspended") await live.resume();
     },
     setMuted(value) {
       muted = value;
@@ -282,11 +285,10 @@ export function createRaceAudio(replay: Replay, { record = false } = {}): RaceAu
       last = null;
       master.gain.setTargetAtTime(0, now(), 0.06);
       clearTimeout(sleep);
-      sleep = setTimeout(() => void ctx.suspend(), 400);
+      if (live) sleep = setTimeout(() => void live.suspend(), 400);
       for (const engine of engines) engine.distance = null;
     },
-    update(t, camera) {
-      const at = performance.now() / 1000;
+    update(t, camera, at = performance.now() / 1000) {
       // Real seconds since the last frame, unless the replay jumped (a seek)
       const dt = last && t > last.t && t - last.t < 0.2 ? at - last.at : 0;
       if (last && dt > 0) for (const lit of START_LIGHTS) if (last.t < lit && t >= lit) beep();
@@ -294,7 +296,7 @@ export function createRaceAudio(replay: Replay, { record = false } = {}): RaceAu
       if (silent) {
         silent = false;
         clearTimeout(sleep);
-        if (ctx.state === "suspended") void ctx.resume();
+        if (live?.state === "suspended") void live.resume();
         master.gain.setTargetAtTime(muted ? 0 : VOLUME, now(), 0.08);
       }
 
@@ -367,7 +369,33 @@ export function createRaceAudio(replay: Replay, { record = false } = {}): RaceAu
       for (const engine of engines) for (const source of engine.sources) source.stop();
       for (const source of [squealNoise, crowdNoise, windNoise]) source.stop();
       recording?.stream.getTracks().forEach((track) => track.stop());
-      void ctx.close();
+      void live?.close();
     },
   };
+}
+
+const SAMPLE_RATE = 48000;
+/** How often the engines are updated while rendering offline: like a frame at 60 fps */
+const OFFLINE_STEP = 1 / 60;
+
+/**
+ * The whole soundtrack of a video, rendered offline: `frame(second)` says
+ * what's on screen at each moment (the race time and the camera), exactly as
+ * the pictures will show it.
+ */
+export async function renderRaceAudio(replay: Replay, duration: number, frame: (second: number) => { time: number; camera: CameraPose }) {
+  const ctx = new OfflineAudioContext(2, Math.ceil(duration * SAMPLE_RATE), SAMPLE_RATE);
+  const audio = createRaceAudio(replay, { context: ctx });
+  // Stop at every step, move the engines on, carry on rendering
+  for (let step = 1; step * OFFLINE_STEP < duration; step++) {
+    const second = step * OFFLINE_STEP;
+    ctx.suspend(second).then(() => {
+      const { time, camera } = frame(second);
+      audio.update(time, camera, second);
+      void ctx.resume();
+    });
+  }
+  const first = frame(0);
+  audio.update(first.time, first.camera, 0);
+  return ctx.startRendering();
 }

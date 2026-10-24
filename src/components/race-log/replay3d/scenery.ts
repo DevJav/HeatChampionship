@@ -177,6 +177,8 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
       const k = Math.min(1, Math.max(0, ((x - a.x) * dx + (z - a.z) * dz) / (dx * dx + dz * dz)));
       return Math.hypot(a.x + dx * k - x, a.z + dz * k - z) < radius;
     });
+  // Nothing in the way of the podium either
+  const byPodium = (x: number, z: number, radius: number) => stage.podium !== null && Math.hypot(x - stage.podium.x, z - stage.podium.z) < radius;
   const size = { x: geometry.width * s, z: geometry.height * s };
   const add = <T extends THREE.Object3D>(object: T) => {
     scene.add(object);
@@ -344,7 +346,7 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
     for (let arc = 30; arc < path.length; arc += 48) {
       if (inCorner(arc) || inCorner(arc + 8) || inCorner(arc - 8)) continue;
       const p = besideLine(path, arc, (side * (hw + 29)) / hw);
-      if (near(p.x, p.y) < hw + 27 || inView(p.x, p.y, 9)) continue;
+      if (near(p.x, p.y) < hw + 27 || inView(p.x, p.y, 9) || byPodium(p.x, p.y, 50)) continue;
       const mesh = new THREE.Mesh(boardGeo, advertMats[board++ % advertMats.length]);
       mesh.position.set(p.x, 1.6, p.y);
       // Face the track
@@ -358,7 +360,7 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
   const towers: THREE.Vector3[] = [];
   for (let arc = 80 * s, side = -1; arc < path.length - 270 * s; arc += 65 * s, side = -side) {
     const p = besideLine(path, arc, (side * (hw + 36)) / hw);
-    if (near(p.x, p.y) < hw + 34 || inView(p.x, p.y, 8)) continue;
+    if (near(p.x, p.y) < hw + 34 || inView(p.x, p.y, 8) || byPodium(p.x, p.y, 40)) continue;
     towers.push(new THREE.Vector3(p.x, 0, p.y));
   }
   const TOWER = 26;
@@ -499,7 +501,7 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
     // Clumps: some places are woods, others open grass
     const wood = Math.sin(x / 90) * Math.cos(z / 110) + Math.sin((x + z) / 60) * 0.5;
     if (wood < 0.2 && rand() > 0.15) continue;
-    if (near(x, z) < hw + 48 || cams.some((c) => Math.hypot(c.x - x, c.z - z) < 45) || inView(x, z, 10)) continue;
+    if (near(x, z) < hw + 48 || cams.some((c) => Math.hypot(c.x - x, c.z - z) < 45) || inView(x, z, 10) || byPodium(x, z, 40)) continue;
     (rand() < 0.55 ? pines : broad).push([x, z, 0.7 + rand() * 0.9]);
   }
   const trunkMat = standard({ color: "#5b4030" });

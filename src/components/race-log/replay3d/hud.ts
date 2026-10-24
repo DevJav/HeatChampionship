@@ -48,6 +48,8 @@ export function drawHud(ctx: CanvasRenderingContext2D, width: number, height: nu
   const r = text.raceLog.replay3d;
   ctx.clearRect(0, 0, width, height);
   ctx.textBaseline = "middle";
+  const replay = options.camera.replay;
+  if (replay) return drawReplay(ctx, width, height, t, replay, s, font, style, options.camera.label);
 
   const order = motion.order(Math.max(0, t));
   const leader = motion.at(order[0], Math.max(0, t));
@@ -55,79 +57,85 @@ export function drawHud(ctx: CanvasRenderingContext2D, width: number, height: nu
   const lap = Math.min(layout.laps, Math.floor(Math.max(0, leader.pos) / layout.spacesPerLap) + 1);
   const raceOver = order.every(finished);
 
-  // Timing tower, top left
-  const x = 18 * s;
-  let y = 18 * s;
-  const w = 270 * s;
-  const row = 27 * s;
-  // Header: lap or chequered flag
-  ctx.fillStyle = style.bar;
-  ctx.globalAlpha = 0.92;
-  ctx.fillRect(x, y, w, 34 * s);
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = style.primary;
-  ctx.fillRect(x, y, 5 * s, 34 * s);
-  ctx.fillStyle = style.barFg;
-  ctx.font = font(800, 17, true);
-  ctx.textAlign = "left";
-  const header = t < 0 ? text.raceLog.grid : leader.pos >= finishLine(layout) ? text.raceLog.finish : text.raceLog.lap(lap, layout.laps);
-  ctx.fillText(header.toUpperCase(), x + 14 * s, y + 17 * s);
-  if (t >= 0 && t <= motion.lastRound) {
-    ctx.textAlign = "right";
-    ctx.font = font(600, 13);
-    ctx.globalAlpha = 0.75;
-    ctx.fillText(text.raceLog.round(Math.min(motion.lastRound, Math.floor(t) + 1)), x + w - 10 * s, y + 17 * s);
-    ctx.globalAlpha = 1;
-  }
-  y += 38 * s;
-
-  order.forEach((id, i) => {
-    const top = y + i * row;
+  // Timing tower, top left (not on the podium, where the three on it say it all)
+  if (!options.camera.clean) {
+    const x = 18 * s;
+    let y = 18 * s;
+    const w = 270 * s;
+    const row = 27 * s;
+    // Header: lap or chequered flag
     ctx.fillStyle = style.bar;
-    ctx.globalAlpha = 0.82;
-    ctx.fillRect(x, top, w, row - 2 * s);
+    ctx.globalAlpha = 0.92;
+    ctx.fillRect(x, y, w, 34 * s);
     ctx.globalAlpha = 1;
-    ctx.fillStyle = raceOver && i < 3 ? style.accent : style.barFg;
-    ctx.font = font(800, 15);
-    ctx.textAlign = "center";
-    ctx.fillText(String(i + 1), x + 16 * s, top + row / 2 - s);
-    ctx.fillStyle = colors[id];
-    ctx.fillRect(x + 32 * s, top + 5 * s, 5 * s, row - 12 * s);
-    ctx.strokeStyle = "rgb(255 255 255 / 0.45)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 32 * s, top + 5 * s, 5 * s, row - 12 * s);
+    ctx.fillStyle = style.primary;
+    ctx.fillRect(x, y, 5 * s, 34 * s);
     ctx.fillStyle = style.barFg;
+    ctx.font = font(800, 17, true);
     ctx.textAlign = "left";
-    ctx.font = font(600, 15);
-    ctx.fillText(fitText(ctx, names[id], 150 * s), x + 45 * s, top + row / 2 - s);
-
-    // Gap to the leader, a spin or the flag
-    ctx.textAlign = "right";
-    ctx.font = font(600, 13);
-    const spinning = motion.at(id, Math.max(0, t)).spin > 0 && motion.at(id, Math.max(0, t)).spin < Math.PI * 2;
-    const gap = t > 0.15 ? motion.gap(id, t) : null;
-    let right = i === 0 && t > 0 ? r.leader : gap !== null ? `+${gapFormat.format(gap * RACE_SECONDS_PER_ROUND)}` : "";
-    ctx.fillStyle = style.barFg;
-    if (spinning) {
-      right = r.spin.toUpperCase();
-      ctx.fillStyle = "#ff5a4f";
+    const header = t < 0 ? text.raceLog.grid : leader.pos >= finishLine(layout) ? text.raceLog.finish : text.raceLog.lap(lap, layout.laps);
+    ctx.fillText(header.toUpperCase(), x + 14 * s, y + 17 * s);
+    if (t >= 0 && t <= motion.lastRound) {
+      ctx.textAlign = "right";
+      ctx.font = font(600, 13);
+      ctx.globalAlpha = 0.75;
+      ctx.fillText(text.raceLog.round(Math.min(motion.lastRound, Math.floor(t) + 1)), x + w - 10 * s, y + 17 * s);
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = spinning ? 1 : 0.8;
-    ctx.fillText(right, x + w - (finished(id) ? 30 : 10) * s, top + row / 2 - s);
-    ctx.globalAlpha = 1;
-    if (finished(id)) {
-      // Tiny chequered flag
-      const fx = x + w - 24 * s;
-      const fy = top + 7 * s;
-      const cell = 3 * s;
-      for (let cx = 0; cx < 4; cx++) {
-        for (let cy = 0; cy < 4; cy++) {
-          ctx.fillStyle = (cx + cy) % 2 ? "#111" : "#fff";
-          ctx.fillRect(fx + cx * cell, fy + cy * cell, cell, cell);
+    y += 38 * s;
+
+    order.forEach((id, i) => {
+      const top = y + i * row;
+      ctx.fillStyle = style.bar;
+      ctx.globalAlpha = 0.82;
+      ctx.fillRect(x, top, w, row - 2 * s);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = raceOver && i < 3 ? style.accent : style.barFg;
+      ctx.font = font(800, 15);
+      ctx.textAlign = "center";
+      ctx.fillText(String(i + 1), x + 16 * s, top + row / 2 - s);
+      ctx.fillStyle = colors[id];
+      ctx.fillRect(x + 32 * s, top + 5 * s, 5 * s, row - 12 * s);
+      ctx.strokeStyle = "rgb(255 255 255 / 0.45)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 32 * s, top + 5 * s, 5 * s, row - 12 * s);
+      ctx.fillStyle = style.barFg;
+      ctx.textAlign = "left";
+      ctx.font = font(600, 15);
+      ctx.fillText(fitText(ctx, names[id], 150 * s), x + 45 * s, top + row / 2 - s);
+
+      // Gap to the leader, a spin or the flag
+      ctx.textAlign = "right";
+      ctx.font = font(600, 13);
+      const spinning = motion.at(id, Math.max(0, t)).spin > 0 && motion.at(id, Math.max(0, t)).spin < Math.PI * 2;
+      const slipstreaming = motion.events.some((e) => e.kind === "slipstream" && e.id === id && t >= e.t && t < e.end);
+      const gap = t > 0.15 ? motion.gap(id, t) : null;
+      let right = i === 0 && t > 0 ? r.leader : gap !== null ? `+${gapFormat.format(gap * RACE_SECONDS_PER_ROUND)}` : "";
+      ctx.fillStyle = style.barFg;
+      if (spinning) {
+        right = r.spin.toUpperCase();
+        ctx.fillStyle = "#ff5a4f";
+      } else if (slipstreaming) {
+        right = r.slipstream.toUpperCase();
+        ctx.fillStyle = "#7cc8ff";
+      }
+      ctx.globalAlpha = spinning || slipstreaming ? 1 : 0.8;
+      ctx.fillText(right, x + w - (finished(id) ? 30 : 10) * s, top + row / 2 - s);
+      ctx.globalAlpha = 1;
+      if (finished(id)) {
+        // Tiny chequered flag
+        const fx = x + w - 24 * s;
+        const fy = top + 7 * s;
+        const cell = 3 * s;
+        for (let cx = 0; cx < 4; cx++) {
+          for (let cy = 0; cy < 4; cy++) {
+            ctx.fillStyle = (cx + cy) % 2 ? "#111" : "#fff";
+            ctx.fillRect(fx + cx * cell, fy + cy * cell, cell, cell);
+          }
         }
       }
-    }
-  });
+    });
+  }
 
   // Title, top right
   const tx = width - 18 * s;
@@ -190,4 +198,70 @@ export function drawHud(ctx: CanvasRenderingContext2D, width: number, height: nu
     ctx.fillText(value, cx + 24 * s, cy + 23 * s);
     ctx.globalAlpha = 1;
   }
+}
+
+/**
+ * An instant replay: no timing tower or captions, a "REPLAY" badge in the
+ * corner and a red band sweeping across the picture going in and coming out.
+ */
+function drawReplay(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  t: number,
+  replay: { from: number; to: number },
+  s: number,
+  font: (weight: number, size: number, italic?: boolean) => string,
+  style: HudStyle,
+  label: string,
+) {
+  const r = text.raceLog.replay3d;
+  ctx.font = font(800, 20, true);
+  const badge = r.replay.toUpperCase();
+  const bw = ctx.measureText(badge).width + 56 * s;
+  ctx.fillStyle = style.bar;
+  ctx.globalAlpha = 0.9;
+  ctx.fillRect(18 * s, 18 * s, bw, 38 * s);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = style.primary;
+  ctx.fillRect(18 * s, 18 * s, 6 * s, 38 * s);
+  // Rewind mark
+  ctx.beginPath();
+  for (const dx of [0, 9]) {
+    ctx.moveTo(36 * s + dx * s, 37 * s);
+    ctx.lineTo(45 * s + dx * s, 30 * s);
+    ctx.lineTo(45 * s + dx * s, 44 * s);
+    ctx.closePath();
+  }
+  ctx.fill();
+  ctx.fillStyle = style.barFg;
+  ctx.textAlign = "left";
+  ctx.fillText(badge, 62 * s, 37 * s);
+  ctx.textAlign = "right";
+  ctx.font = font(700, 13, true);
+  ctx.shadowColor = "rgb(0 0 0 / 0.6)";
+  ctx.shadowBlur = 4 * s;
+  ctx.fillText(label.toUpperCase(), width - 18 * s, height - 22 * s);
+  ctx.shadowBlur = 0;
+
+  // The wipe: a slanted band crossing the screen at the start and the end
+  const WIPE = 0.07;
+  const k = t - replay.from < WIPE ? (t - replay.from) / WIPE : replay.to - t < WIPE ? 1 - (replay.to - t) / WIPE : null;
+  if (k === null) return;
+  const band = width * 0.35;
+  const x = -band + k * (width + band * 2);
+  ctx.save();
+  ctx.fillStyle = style.primary;
+  ctx.beginPath();
+  ctx.moveTo(x - band / 2, height);
+  ctx.lineTo(x + band / 4, 0);
+  ctx.lineTo(x + band, 0);
+  ctx.lineTo(x + band / 4, height);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = style.barFg;
+  ctx.font = font(900, 46, true);
+  ctx.textAlign = "center";
+  ctx.fillText(badge, x + band / 3, height / 2);
+  ctx.restore();
 }

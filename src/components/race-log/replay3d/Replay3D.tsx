@@ -66,7 +66,8 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   const abort = useRef<AbortController | null>(null);
   const canRecord = useSyncExternalStore(
     () => () => {},
-    () => videoMimeType() != null,
+    // Frame by frame where the browser can encode video, otherwise filmed in real time
+    () => typeof VideoEncoder !== "undefined" || videoMimeType() != null,
     () => false,
   );
 
@@ -156,8 +157,10 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
       if (dirty.current && world.current && size.current.width > 0) {
         dirty.current = false;
         const camera = cameraPose(replay.stage, shots, mode, follow, clock.current);
-        world.current.render(clock.current, camera);
-        if (playing) audio.current?.update(clock.current, camera);
+        // An instant replay shows an earlier moment of the race than the clock
+        const shown = camera.time ?? clock.current;
+        world.current.render(shown, camera);
+        if (playing) audio.current?.update(shown, camera);
         const hud = hudCanvas.current!;
         const ctx = hud.getContext("2d")!;
         style.current ??= readHudStyle();
@@ -209,15 +212,15 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
     setRecording({ step: "recording", progress: 0 });
     try {
       const { recordReplay3d } = await import("./record");
-      const blob = await recordReplay3d(
-        { ...replay, shots },
-        drawing.geometry,
+      const blob = await recordReplay3d({
+        replay: { ...replay, shots },
+        geometry: drawing.geometry,
         cars,
         title,
         timeOfDay,
-        (progress) => setRecording({ step: "recording", progress }),
-        controller.signal,
-      );
+        onProgress: (progress) => setRecording({ step: "recording", progress }),
+        signal: controller.signal,
+      });
       const ext = blob.type.includes("mp4") ? "mp4" : "webm";
       const file = new File([blob], `${slugify(title)}-3d.${ext}`, { type: blob.type });
       setRecording({ step: "ready", file, url: URL.createObjectURL(file) });
@@ -246,7 +249,6 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   const r = t.raceLog.replay3d;
   const roundShown = time < 0 ? t.raceLog.grid : t.raceLog.round(Math.min(replay.stage.motion.lastRound, Math.floor(time) + 1));
   const canShare = recording.step === "ready" && navigator.canShare?.({ files: [recording.file] });
-  const seconds = Math.round(replayDuration(replay) / 1000);
   const byOrder = replay.stage.motion.official.map((id) => cars.find((c) => c.id === id)!);
 
   return (
@@ -391,7 +393,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
         open={recording.step !== "idle"}
         onClose={closeRecording}
         title={t.raceLog.video.title}
-        description={recording.step === "recording" ? t.raceLog.video.recording(seconds) : undefined}
+        description={recording.step === "recording" ? r.videoProgress(Math.round(replayDuration(replay) / 1000)) : undefined}
         footer={
           recording.step === "ready" && (
             <>

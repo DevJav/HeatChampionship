@@ -939,6 +939,8 @@ export const es = {
       wins: (name: string) => `¡${name} gana la carrera!`,
       videoButton: "Grabar un vídeo de la repetición 3D para compartir",
       mute: "Silenciar",
+      timeOfDay: "Hora del día",
+      times: { day: "Día", sunset: "Atardecer", night: "Noche" },
       soundOn: "Activar el sonido",
       script: {
         short: "Guion",

@@ -214,6 +214,44 @@ function trackside(stage: Stage, cam: Vec3, id: string, t: number): Omit<CameraP
   return { position: cam, target, fov, subject: id };
 }
 
+/**
+ * The finish-line camera: framing the cars about to cross, weighted by how
+ * soon each one does, so its aim glides from car to car (and takes in a
+ * bunch crossing together) instead of jumping between them.
+ */
+function finishLine3d(stage: Stage, cam: Vec3, t: number): Omit<CameraPose, "label"> {
+  const { motion, path } = stage;
+  const line = path.arcOf(finishLine(stage.layout));
+  const crossing = motion.official.filter((id) => motion.finishedAt[id] !== null);
+  // Mostly the next one over the line: each eases in as it nears the line and out after crossing
+  const fit = crossing.map((id) => {
+    const until = motion.finishedAt[id]! - t + 0.02;
+    return -((until / (until > 0 ? 0.2 : 0.18)) ** 2);
+  });
+  const top = Math.max(...fit);
+  // Every car counts, however little, so none pops in or out of the framing
+  const reach = 8 * path.scale;
+  const points = crossing.map((id, i) => {
+    const car = carPose(stage, id, t);
+    // Along the track from the line, negative still to come; a car past the line holds just beyond it
+    const along = ((car.arc - line + path.length * 1.5) % path.length) - path.length / 2;
+    return { id, w: Math.exp(fit[i] - top), along: Math.min(reach, along), lat: motion.at(id, t).lat };
+  });
+  const total = points.reduce((sum, p) => sum + p.w, 0);
+  // The aim moves along the track, never far past the line, so it can't swing round
+  // after a car running past the camera
+  const along = points.reduce((sum, p) => sum + p.along * p.w, 0) / total;
+  const lat = points.reduce((sum, p) => sum + p.lat * p.w, 0) / total;
+  const aim = besideLine(path, line + along + 6, lat);
+  const target = v(aim.x, 1.5, aim.y);
+  // Zoom out to take in the cars that count: how spread out they are, by their weight
+  const spread = 1.6 * Math.sqrt(points.reduce((sum, p) => sum + p.w * (p.along - along) ** 2, 0) / total);
+  const d = dist(cam, target);
+  const fov = Math.min(50, Math.max(9, ((2 * Math.atan((26 + spread) / d)) * 180) / Math.PI));
+  const lead = points.reduce((a, b) => (b.w > a.w ? b : a)).id;
+  return { position: cam, target, fov, subject: lead };
+}
+
 /** The corner camera nearest a car halfway through a shot. */
 export function nearestCorner(stage: Stage, subject: string, t: number) {
   const car = carPose(stage, subject, t);
@@ -261,6 +299,13 @@ export function shotAt(shots: Shot[], t: number) {
   return shots.find((s) => t < s.end) ?? shots[shots.length - 1];
 }
 
+/** Rounds the finish camera stays on a car after it crosses */
+const FINISH_HOLD = 0.12;
+/** Rounds before a car crosses that the finish camera takes over from a chase */
+const FINISH_APPROACH = 0.3;
+/** Shortest chase worth cutting to while waiting for the next finisher */
+const MIN_CHASE = 0.3;
+
 /** The camera for the TV mode (following the plan) or for one of the follow-a-car modes. */
 export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow: string, t: number): CameraPose {
   const name = (id: string) => stage.names[id] ?? "";
@@ -286,13 +331,18 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
       return { ...trackside(stage, cams[shot.cam!], shot.subject, t), label: text.raceLog.corner(shot.cam! + 1, corner.limit) };
     }
     case "finish": {
-      // Whoever crosses the line next, or the last one that did
-      const next =
-        stage.motion.official.find((id) => (stage.motion.finishedAt[id] ?? Infinity) > t - 0.12) ?? stage.motion.official.at(-1)!;
-      // Still far round the lap: ride along with it until it nears the line
-      const toLine = stage.path.arcOf(finishLine(stage.layout)) - stage.path.arcOf(stage.motion.at(next, t).pos);
-      if (toLine > 110 * stage.path.scale) return { ...chase(stage, next, t), label: `${labels.chase} · ${name(next)}` };
-      return { ...trackside(stage, cams[cams.length - 1], next, t), label: text.raceLog.replay3d.finishLine };
+      // The next car still far round the lap: ride along with it until it nears the line,
+      // but only when that's long enough to be a shot, not a flash between two finishers
+      const { finishedAt } = stage.motion;
+      const finishers = stage.motion.official.filter((id) => finishedAt[id] !== null);
+      const index = finishers.findIndex((id) => finishedAt[id]! > t - FINISH_HOLD);
+      if (index >= 0) {
+        const next = finishers[index];
+        const from = Math.max(shot.start, index > 0 ? finishedAt[finishers[index - 1]]! + FINISH_HOLD : -Infinity);
+        const until = finishedAt[next]! - FINISH_APPROACH;
+        if (t >= from && t < until && until - from >= MIN_CHASE) return { ...chase(stage, next, t), label: `${labels.chase} · ${name(next)}` };
+      }
+      return { ...finishLine3d(stage, cams[cams.length - 1], t), label: text.raceLog.replay3d.finishLine };
     }
     case "outro":
       return { ...heli(stage, shot.subject, t, 190, 90), label: labels.heli };

@@ -12,7 +12,7 @@ import { createRaceAudio, type RaceAudio } from "./audio";
 import { cameraPose, prepareReplay, replayDuration, type CameraMode } from "./director";
 import { drawHud, readHudStyle, type HudStyle } from "./hud";
 import { ShotScript, useShotScript } from "./ShotScript";
-import type { World } from "./world";
+import type { TimeOfDay, World } from "./world";
 import { t } from "@/i18n";
 
 export type Replay3DCar = { id: string; name: string; color: string };
@@ -34,6 +34,7 @@ type Recording = { step: "idle" } | { step: "recording"; progress: number } | { 
 
 const MODES: CameraMode[] = ["tv", "chase", "onboard", "heli"];
 const SPEEDS = [1, 2, 0.5];
+const TIMES: TimeOfDay[] = ["day", "sunset", "night"];
 
 /** The logged race as a 3D broadcast: TV cameras or follow one car, plus a video to share. */
 export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debug = false }: Replay3DProps) {
@@ -59,6 +60,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   const [fullscreen, setFullscreen] = useState(false);
   const [showScript, setShowScript] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
   const audio = useRef<RaceAudio | null>(null);
   const [recording, setRecording] = useState<Recording>({ step: "idle" });
   const abort = useRef<AbortController | null>(null);
@@ -92,6 +94,12 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
       world.current = null;
     };
   }, [replay, drawing, cars, debug]);
+
+  useEffect(() => {
+    if (status !== "ready") return;
+    world.current?.setTimeOfDay(timeOfDay);
+    dirty.current = true;
+  }, [timeOfDay, status]);
 
   // Sound starts with the first tap on play (browsers keep it off until then)
   useEffect(
@@ -206,6 +214,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
         drawing.geometry,
         cars,
         title,
+        timeOfDay,
         (progress) => setRecording({ step: "recording", progress }),
         controller.signal,
       );
@@ -302,7 +311,20 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
                 ))}
               </Select>
             )}
-            <div className="ml-auto flex gap-1">
+            <div className="ml-auto flex flex-wrap items-center gap-1">
+              <Select
+                value={timeOfDay}
+                onChange={(e) => setTimeOfDay(e.target.value as TimeOfDay)}
+                aria-label={r.timeOfDay}
+                title={r.timeOfDay}
+                className="h-8 w-auto text-sm"
+              >
+                {TIMES.map((time) => (
+                  <option key={time} value={time}>
+                    {r.times[time]}
+                  </option>
+                ))}
+              </Select>
               <Button
                 size="sm"
                 variant={showScript ? "secondary" : "ghost"}

@@ -9,6 +9,7 @@ import type { TrackGeometry } from "@/lib/race-log/layout";
 import { besideLine } from "@/lib/race-log/track-path";
 import { carFactory, loadCarModel, REAR_AXLE, REAR_TRACK, WHEELBASE, type CarRig } from "./car-model";
 import { CAR_SCALE, carPose, type CameraPose, type Stage } from "./director";
+import { DistanceBlurPass } from "./distance-blur";
 import { buildScenery } from "./scenery";
 import { smoke } from "./textures";
 import { outlineMaterial, toonify } from "./toon";
@@ -23,6 +24,8 @@ import { outlineMaterial, toonify } from "./toon";
  */
 
 export type WorldCar = { id: string; color: string };
+export const TIMES_OF_DAY = ["day", "sunset", "night"] as const;
+export type TimeOfDay = (typeof TIMES_OF_DAY)[number];
 /** "high" for computers and recordings, "low" keeps phones smooth */
 export type Quality = "high" | "low";
 
@@ -30,6 +33,7 @@ export type World = {
   canvas: HTMLCanvasElement;
   setSize(width: number, height: number, pixelRatio: number): void;
   render(t: number, camera: CameraPose): void;
+  setTimeOfDay(time: TimeOfDay): void;
   dispose(): void;
 };
 
@@ -41,9 +45,44 @@ const LIGHTING = CEL_SHADED
   ? { exposure: 0.8, sun: 3.2, fill: 2.2, sky: 0 }
   : { exposure: 0.5, sun: 5.5, fill: 0.5, sky: 0.35 };
 
-/** Where the sun is: high enough for crisp shadows, low enough to model the cars */
-const SUN = { elevation: 38, azimuth: 215 };
-const HORIZON = "#c7d6e3";
+type Look = {
+  /** At night the "sun" is the floodlights together: high, white and cool */
+  sun: { elevation: number; azimuth: number; color: string; intensity: number };
+  fill: { sky: string; ground: string; intensity: number };
+  /** The physical sky, or a plain dark one with stars */
+  sky: { turbidity: number; rayleigh: number; mie: number } | { night: string };
+  fog: { color: string; near: number; far: number };
+  exposure: number;
+};
+
+/** The light at each time of day, for the cel-shaded look (the realistic one scales them) */
+const LOOKS: Record<TimeOfDay, Look> = {
+  // Sun high enough for crisp shadows, low enough to model the cars
+  day: {
+    sun: { elevation: 38, azimuth: 215, color: "#fff1dc", intensity: 3.2 },
+    fill: { sky: "#cfe3ff", ground: "#3d5a2a", intensity: 2.2 },
+    sky: { turbidity: 3.5, rayleigh: 1.4, mie: 0.004 },
+    fog: { color: "#c7d6e3", near: 0.9, far: 5 },
+    exposure: 0.8,
+  },
+  // Low and golden, long shadows, a hazy orange sky
+  sunset: {
+    // Warm light, cool shadows
+    sun: { elevation: 12, azimuth: 250, color: "#ffbd7a", intensity: 3.4 },
+    fill: { sky: "#b9b6dc", ground: "#3a3128", intensity: 2.1 },
+    sky: { turbidity: 12, rayleigh: 3.4, mie: 0.02 },
+    fog: { color: "#eaa878", near: 0.6, far: 3.5 },
+    exposure: 0.85,
+  },
+  night: {
+    sun: { elevation: 64, azimuth: 180, color: "#dfe8ff", intensity: 1.9 },
+    fill: { sky: "#3a4f86", ground: "#05080a", intensity: 0.55 },
+    sky: { night: "#070b16" },
+    // Thick dark fog: the circuit fades into the night a little way off
+    fog: { color: "#070b16", near: 0.12, far: 0.9 },
+    exposure: 0.8,
+  },
+};
 
 /** A phone or small tablet: keep the frame rate up */
 export function detectQuality(): Quality {
@@ -157,7 +196,7 @@ export async function createWorld(
   stage: Stage,
   geometry: TrackGeometry,
   cars: WorldCar[],
-  options: { preserve?: boolean; debug?: boolean; quality?: Quality } = {},
+  options: { preserve?: boolean; debug?: boolean; quality?: Quality; timeOfDay?: TimeOfDay } = {},
 ): Promise<World> {
   const carModel = await loadCarModel();
   const quality = options.quality ?? "high";
@@ -165,8 +204,6 @@ export async function createWorld(
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !high, preserveDrawingBuffer: options.preserve ?? false, powerPreference: "high-performance" });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  // The physical sky is bright: expose for it and light the scene to match
-  renderer.toneMappingExposure = LIGHTING.exposure;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -175,20 +212,11 @@ export async function createWorld(
   const span = Math.max(geometry.width, geometry.height) * s;
 
   // Sky, and the same sky (without the sun disc) as the light reflected in every surface
-  const sunDir = new THREE.Vector3().setFromSphericalCoords(
-    1,
-    THREE.MathUtils.degToRad(90 - SUN.elevation),
-    THREE.MathUtils.degToRad(SUN.azimuth),
-  );
+  const sunDir = new THREE.Vector3();
   const makeSky = () => {
     const sky = new Sky();
     sky.scale.setScalar(span * 8);
-    const u = sky.material.uniforms;
-    u.turbidity.value = 3.5;
-    u.rayleigh.value = 1.4;
-    u.mieCoefficient.value = 0.004;
-    u.mieDirectionalG.value = 0.85;
-    u.sunPosition.value.copy(sunDir);
+    sky.material.uniforms.mieDirectionalG.value = 0.85;
     return sky;
   };
   const sky = makeSky();
@@ -198,13 +226,24 @@ export async function createWorld(
   const envSky = makeSky();
   envSky.material.uniforms.showSunDisc.value = false;
   envScene.add(envSky);
-  const environment = pmrem.fromScene(envScene, 0, 1, span * 10).texture;
-  scene.environment = environment;
+  let environment: THREE.Texture | null = null;
   scene.environmentIntensity = LIGHTING.sky;
-  scene.fog = new THREE.Fog(HORIZON, span * 0.9, span * 5);
+  scene.fog = new THREE.Fog("#ffffff", 1, 2);
 
-  scene.add(new THREE.HemisphereLight("#cfe3ff", "#3d5a2a", LIGHTING.fill));
-  const sun = new THREE.DirectionalLight("#fff1dc", LIGHTING.sun);
+  // Stars for the night sky
+  const starPositions: number[] = [];
+  for (let i = 0; i < 1500; i++) {
+    const dir = new THREE.Vector3().setFromSphericalCoords(span * 6, Math.acos(Math.random() * 0.95), Math.random() * Math.PI * 2);
+    starPositions.push(dir.x, dir.y, dir.z);
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute("position", new THREE.Float32BufferAttribute(starPositions, 3));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: "#dfe8ff", size: 1.6, sizeAttenuation: false, fog: false }));
+  scene.add(stars);
+
+  const fill = new THREE.HemisphereLight();
+  scene.add(fill);
+  const sun = new THREE.DirectionalLight();
   sun.castShadow = true;
   const shadowSize = high ? 4096 : 1536;
   sun.shadow.mapSize.set(shadowSize, shadowSize);
@@ -229,14 +268,54 @@ export async function createWorld(
 
   const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, span * 12);
 
+  function setTimeOfDay(time: TimeOfDay) {
+    const look = LOOKS[time];
+    // The realistic look takes the same light, scaled to its own levels
+    renderer.toneMappingExposure = look.exposure * (LIGHTING.exposure / 0.8);
+    sunDir.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - look.sun.elevation), THREE.MathUtils.degToRad(look.sun.azimuth));
+    sun.color.set(look.sun.color);
+    sun.intensity = look.sun.intensity * (LIGHTING.sun / 3.2);
+    fill.color.set(look.fill.sky);
+    fill.groundColor.set(look.fill.ground);
+    fill.intensity = look.fill.intensity * (LIGHTING.fill / 2.2);
+    const fog = scene.fog as THREE.Fog;
+    fog.color.set(look.fog.color);
+    fog.near = span * look.fog.near;
+    fog.far = span * look.fog.far;
+    const night = "night" in look.sky;
+    sky.visible = !night;
+    stars.visible = night;
+    scene.background = "night" in look.sky ? new THREE.Color(look.sky.night) : null;
+    if (!("night" in look.sky)) {
+      for (const u of [sky.material.uniforms, envSky.material.uniforms]) {
+        u.turbidity.value = look.sky.turbidity;
+        u.rayleigh.value = look.sky.rayleigh;
+        u.mieCoefficient.value = look.sky.mie;
+        u.sunPosition.value.copy(sunDir);
+      }
+    }
+    // Reflections of the sky only matter in the realistic look
+    if (LIGHTING.sky > 0) {
+      environment?.dispose();
+      environment = night ? null : pmrem.fromScene(envScene, 0, 1, span * 10).texture;
+      scene.environment = environment;
+    }
+    track.setNight(night);
+    shadowRadius = 0;
+  }
+
   // Post-processing on high quality: ambient occlusion where things meet, a soft glow on lights and glints
   let composer: EffectComposer | null = null;
   let gtao: GTAOPass | null = null;
   let bloom: UnrealBloomPass | null = null;
+  let distanceBlur: DistanceBlurPass | null = null;
   if (high) {
-    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+    // With its depth, for the distance blur
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4, depthTexture: new THREE.DepthTexture(1, 1) });
     composer = new EffectComposer(renderer, target);
     composer.addPass(new RenderPass(scene, camera));
+    distanceBlur = new DistanceBlurPass(camera);
+    composer.addPass(distanceBlur);
     // Soft occlusion would fight the flat bands of the cel-shaded look
     if (!CEL_SHADED) {
       gtao = new GTAOPass(scene, camera, 1, 1);
@@ -252,6 +331,7 @@ export async function createWorld(
 
   const shadowCam = sun.shadow.camera;
   let shadowRadius = 0;
+  setTimeOfDay(options.timeOfDay ?? "day");
 
   /** The sun's shadows cover the area the camera is looking at, snapped to texels so they don't shimmer */
   function aimShadows(pose: CameraPose) {
@@ -304,6 +384,10 @@ export async function createWorld(
     camera.fov = pose.fov;
     camera.updateProjectionMatrix();
     camera.lookAt(pose.target.x, pose.target.y, pose.target.z);
+    // In focus well past what the camera films; the hills beyond go soft
+    const focus = Math.hypot(pose.position.x - pose.target.x, pose.position.y - pose.target.y, pose.position.z - pose.target.z);
+    const sharp = Math.max(focus * 3, 320 * s);
+    distanceBlur?.setFocus(sharp, sharp + 900 * s);
     if (composer) composer.render();
     else renderer.render(scene, camera);
   }
@@ -321,9 +405,10 @@ export async function createWorld(
       camera.updateProjectionMatrix();
     },
     render,
+    setTimeOfDay,
     dispose() {
       scene.traverse((o) => {
-        if (o instanceof THREE.Mesh || o instanceof THREE.Sprite || o instanceof THREE.InstancedMesh) {
+        if (o instanceof THREE.Mesh || o instanceof THREE.Sprite || o instanceof THREE.Points) {
           if (!sharedGeometry.has(o.geometry)) o.geometry?.dispose();
           const mats = Array.isArray(o.material) ? o.material : [o.material];
           for (const mat of mats) {
@@ -337,10 +422,11 @@ export async function createWorld(
       outline?.material.dispose();
       envSky.geometry.dispose();
       envSky.material.dispose();
-      environment.dispose();
+      environment?.dispose();
       pmrem.dispose();
       gtao?.dispose();
       bloom?.dispose();
+      distanceBlur?.dispose();
       composer?.dispose();
       renderer.dispose();
     },

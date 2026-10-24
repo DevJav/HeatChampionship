@@ -2,7 +2,7 @@ import type { TrackGeometry } from "@/lib/race-log/layout";
 import { createRaceAudio, type RaceAudio } from "./audio";
 import { cameraPose, replayDuration, type Replay } from "./director";
 import { drawHud, readHudStyle } from "./hud";
-import { createWorld, type WorldCar } from "./world";
+import { createWorld, type TimeOfDay, type WorldCar } from "./world";
 
 /** Formats with sound first; video only as a last resort */
 function mimeType() {
@@ -24,6 +24,7 @@ export async function recordReplay3d(
   geometry: TrackGeometry,
   cars: WorldCar[],
   title: string,
+  timeOfDay: TimeOfDay,
   onProgress: (share: number) => void,
   signal?: AbortSignal,
 ): Promise<Blob> {
@@ -31,7 +32,7 @@ export async function recordReplay3d(
   if (!type) throw new Error("MediaRecorder unavailable");
 
   const glCanvas = document.createElement("canvas");
-  const world = await createWorld(glCanvas, replay.stage, geometry, cars, { preserve: true });
+  const world = await createWorld(glCanvas, replay.stage, geometry, cars, { preserve: true, timeOfDay });
   world.setSize(W, H, 1);
   const canvas = document.createElement("canvas");
   canvas.width = W;

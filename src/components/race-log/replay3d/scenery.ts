@@ -107,22 +107,57 @@ function cornerStretches(path: TrackPath) {
 
 const heading = (dx: number, dy: number) => Math.atan2(-dy, dx);
 
-/** Grass with mowing stripes and large-scale patches, by world position so they don't repeat. */
+/**
+ * Grass by world position, so it never repeats: mowing stripes and soft
+ * patches of lighter and yellower grass on the flat ground by the track,
+ * and on the hills a patchwork of fields (greens, olive, the odd field of
+ * wheat) parted by darker hedgerows.
+ */
 function grassMaterial(surface: tex.Surface) {
   // The sky's blue would tint the grass: keep its reflected light low
   const material = new THREE.MeshStandardMaterial({ ...surface, roughness: 1, envMapIntensity: 0.35, normalScale: new THREE.Vector2(0.5, 0.5) });
   material.onBeforeCompile = (shader) => {
     shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", "#include <common>\nvarying vec2 vGround;")
-      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvGround = (modelMatrix * vec4(transformed, 1.0)).xz;");
+      .replace("#include <common>", "#include <common>\nvarying vec3 vGround;")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvGround = (modelMatrix * vec4(transformed, 1.0)).xyz;");
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", "#include <common>\nvarying vec2 vGround;")
+      .replace(
+        "#include <common>",
+        `#include <common>
+        varying vec3 vGround;
+        float fieldHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`,
+      )
       .replace(
         "#include <map_fragment>",
         `#include <map_fragment>
-        float stripe = step(0.5, fract((vGround.x + vGround.y) / 70.0));
-        float mottle = texture2D(map, vGround / 900.0).g;
-        diffuseColor.rgb *= mix(0.9, 1.07, stripe) * (0.8 + 0.45 * mottle);`,
+        vec2 ground = vGround.xz;
+        // The fine texture only as a hint of blades: the look is flat colour
+        float blades = dot(diffuseColor.rgb, vec3(0.3, 0.6, 0.1));
+        vec3 lawn = vec3(0.04, 0.14, 0.022) * (0.85 + blades * 1.5);
+        // Soft patches: some lighter, some yellower
+        float patchy = clamp((texture2D(map, ground / 1400.0).g - 0.18) * 8.0, -0.6, 0.6);
+        float dry = smoothstep(0.35, 0.75, texture2D(map, ground / 620.0 + 0.37).g * 3.2);
+        lawn *= 0.88 + 0.28 * patchy;
+        lawn = mix(lawn, vec3(0.12, 0.16, 0.035), dry * 0.25);
+        // Mowing stripes, crisp-edged for the cel look
+        float stripe = smoothstep(0.45, 0.55, abs(fract((ground.x + ground.y) / 64.0) - 0.5) * 2.0);
+        lawn *= mix(0.86, 1.08, stripe);
+
+        // Fields on the hills, in a grid turned off the axes
+        vec2 q = mat2(0.88, -0.47, 0.47, 0.88) * ground / vec2(240.0, 170.0);
+        vec2 cell = floor(q);
+        vec2 inside = fract(q);
+        float pick = fieldHash(cell);
+        vec3 field = pick < 0.1 ? vec3(0.36, 0.28, 0.07)
+          : pick < 0.3 ? vec3(0.13, 0.16, 0.035)
+          : pick < 0.55 ? vec3(0.1, 0.24, 0.05)
+          : pick < 0.8 ? vec3(0.05, 0.15, 0.03)
+          : vec3(0.075, 0.2, 0.04);
+        field *= 0.9 + blades * 0.6;
+        float hedge = smoothstep(0.035, 0.015, min(min(inside.x, 1.0 - inside.x), min(inside.y, 1.0 - inside.y)));
+        field = mix(field, vec3(0.025, 0.07, 0.02), hedge);
+        float hill = smoothstep(4.0, 35.0, vGround.y);
+        diffuseColor.rgb = mix(lawn, field, hill);`,
       );
   };
   return material;
@@ -319,6 +354,34 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
     }
   }
 
+  // Floodlight towers, either side in turn, clear of the start straight's buildings. Lit only at night
+  const towers: THREE.Vector3[] = [];
+  for (let arc = 80 * s, side = -1; arc < path.length - 270 * s; arc += 65 * s, side = -side) {
+    const p = besideLine(path, arc, (side * (hw + 36)) / hw);
+    if (near(p.x, p.y) < hw + 34 || inView(p.x, p.y, 8)) continue;
+    towers.push(new THREE.Vector3(p.x, 0, p.y));
+  }
+  const TOWER = 26;
+  const poles = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.35, 0.55, TOWER, 6).translate(0, TOWER / 2, 0), standard({ color: "#8a929c", roughness: 0.6, metalness: 0.4 }), towers.length);
+  // Lamp panels: plain grey by day, far brighter than anything else at night so they glow
+  const lampMat = new THREE.MeshBasicMaterial({ color: "#9aa3ad" });
+  const lamps = new THREE.InstancedMesh(new THREE.BoxGeometry(5, 2.6, 5), lampMat, towers.length);
+  const matrix = new THREE.Matrix4();
+  towers.forEach((at, i) => {
+    poles.setMatrixAt(i, matrix.makeTranslation(at.x, 0, at.z));
+    lamps.setMatrixAt(i, matrix.makeTranslation(at.x, TOWER + 1.3, at.z));
+  });
+  poles.castShadow = true;
+  add(poles);
+  add(lamps);
+  const glowGeo = new THREE.BufferGeometry().setFromPoints(towers.map((at) => new THREE.Vector3(at.x, TOWER + 1.3, at.z)));
+  const floodGlow = new THREE.Points(
+    glowGeo,
+    new THREE.PointsMaterial({ map: tex.glow(), color: "#fff2d6", size: 26, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false }),
+  );
+  floodGlow.visible = false;
+  add(floodGlow);
+
   // Grandstand along the start straight, outside; pit building inside
   const seatMat = standard({ map: tex.crowd(5), roughness: 1 });
   const concrete = standard({ color: "#cfd3d8", roughness: 0.85 });
@@ -472,6 +535,12 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
   forest(broad, ball, 10, 0.24);
 
   return {
+    /** Floodlights on or off */
+    setNight(night: boolean) {
+      if (night) lampMat.color.setRGB(14, 13.5, 12);
+      else lampMat.color.set("#9aa3ad");
+      floodGlow.visible = night;
+    },
     /** Follows the start lights when their materials are swapped (cel shading) */
     relink(swap: <M extends THREE.Material>(material: M) => M) {
       lights.forEach((mat, i) => (lights[i] = swap(mat)));

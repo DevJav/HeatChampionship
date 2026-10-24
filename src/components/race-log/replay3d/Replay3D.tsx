@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Clapperboard, Download, Maximize, Minimize, Pause, Play, Share2 } from "lucide-react";
+import { Clapperboard, Download, ListVideo, Maximize, Minimize, Pause, Play, Share2 } from "lucide-react";
 import { Button, buttonVariants, Card, CardBody, Modal, Select, Spinner } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { LoggedRound } from "@/lib/race-log/rounds";
@@ -10,12 +10,14 @@ import { slugify } from "@/lib/slug";
 import { videoMimeType } from "../replay-video";
 import { cameraPose, prepareReplay, replayDuration, type CameraMode } from "./director";
 import { drawHud, readHudStyle, type HudStyle } from "./hud";
+import { ShotScript, useShotScript } from "./ShotScript";
 import type { World } from "./world";
 import { t } from "@/i18n";
 
 export type Replay3DCar = { id: string; name: string; color: string };
 
 type Replay3DProps = {
+  raceId: string;
   track: string;
   laps: number;
   cars: Replay3DCar[];
@@ -33,9 +35,11 @@ const MODES: CameraMode[] = ["tv", "chase", "onboard", "heli"];
 const SPEEDS = [1, 2, 0.5];
 
 /** The logged race as a 3D broadcast: TV cameras or follow one car, plus a video to share. */
-export function Replay3D({ track, laps, cars, rounds, title, radio, debug = false }: Replay3DProps) {
+export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debug = false }: Replay3DProps) {
   const drawing = useMemo(() => trackDrawing(track, laps)!, [track, laps]);
   const replay = useMemo(() => prepareReplay(drawing.layout, drawing.geometry, rounds, cars, radio), [drawing, rounds, cars, radio]);
+  const script = useShotScript(replay, raceId);
+  const shots = script.shots;
 
   const frame = useRef<HTMLDivElement>(null);
   const view = useRef<HTMLDivElement>(null);
@@ -52,6 +56,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
   const [mode, setMode] = useState<CameraMode>("tv");
   const [follow, setFollow] = useState(replay.stage.motion.official[0]);
   const [fullscreen, setFullscreen] = useState(false);
+  const [showScript, setShowScript] = useState(false);
   const [recording, setRecording] = useState<Recording>({ step: "idle" });
   const abort = useRef<AbortController | null>(null);
   const canRecord = useSyncExternalStore(
@@ -65,10 +70,12 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
     let cancelled = false;
     let created: World | null = null;
     import("./world")
-      .then(({ createWorld }) => {
+      .then(async ({ createWorld, detectQuality }) => {
         if (cancelled || !glCanvas.current) return;
-        created = createWorld(glCanvas.current, replay.stage, drawing.geometry, cars, { debug });
-        world.current = created;
+        const next = await createWorld(glCanvas.current, replay.stage, drawing.geometry, cars, { debug, quality: detectQuality() });
+        if (cancelled) return next.dispose();
+        created = next;
+        world.current = next;
         dirty.current = true;
         setStatus("ready");
       })
@@ -127,7 +134,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
       }
       if (dirty.current && world.current && size.current.width > 0) {
         dirty.current = false;
-        const camera = cameraPose(replay.stage, replay.shots, mode, follow, clock.current);
+        const camera = cameraPose(replay.stage, shots, mode, follow, clock.current);
         world.current.render(clock.current, camera);
         const hud = hudCanvas.current!;
         const ctx = hud.getContext("2d")!;
@@ -150,7 +157,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [status, playing, speed, mode, follow, replay, title, recordingNow]);
+  }, [status, playing, speed, mode, follow, replay, shots, title, recordingNow]);
 
   function seek(value: number) {
     clock.current = value;
@@ -171,7 +178,7 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
     try {
       const { recordReplay3d } = await import("./record");
       const blob = await recordReplay3d(
-        replay,
+        { ...replay, shots },
         drawing.geometry,
         cars,
         title,
@@ -272,6 +279,15 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
               </Select>
             )}
             <div className="ml-auto flex gap-1">
+              <Button
+                size="sm"
+                variant={showScript ? "secondary" : "ghost"}
+                title={r.script.button}
+                aria-pressed={showScript}
+                onClick={() => setShowScript(!showScript)}
+              >
+                <ListVideo /> {r.script.short}
+              </Button>
               <Button size="sm" variant="ghost" title={r.speed} onClick={() => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])}>
                 <span className="tabular-nums">{speed}×</span>
               </Button>
@@ -291,6 +307,24 @@ export function Replay3D({ track, laps, cars, rounds, title, radio, debug = fals
               </Button>
             </div>
           </div>
+          {showScript && !fullscreen && (
+            <ShotScript
+              replay={replay}
+              shots={shots}
+              edited={script.edited}
+              time={time}
+              onSave={(next) => {
+                // Edits are for the TV camera: show it
+                setMode("tv");
+                script.save(next);
+              }}
+              onReset={script.reset}
+              onSeek={(at) => {
+                setMode("tv");
+                seek(at);
+              }}
+            />
+          )}
         </CardBody>
       </div>
 

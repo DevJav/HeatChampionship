@@ -34,6 +34,8 @@ export type TrackPath = {
 
 const STEP = 1;
 const SMOOTH = 30;
+/** How much the traced line is evened out, in drawing units */
+const EVEN_OUT = 18;
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
@@ -86,6 +88,34 @@ function resample(points: [number, number][]) {
   return { xs, ys, length };
 }
 
+/**
+ * Smooths a closed line sampled every unit with a few passes of a moving
+ * average (close to a Gaussian), keeping bends where they are: tight
+ * hairpins only lose a unit or two of radius.
+ */
+function evenOut({ xs, ys }: { xs: Float64Array; ys: Float64Array }, radius: number): [number, number][] {
+  const n = xs.length;
+  const r = Math.max(1, Math.round(radius));
+  let [ax, ay] = [xs, ys];
+  for (let pass = 0; pass < 3; pass++) {
+    const [bx, by] = [new Float64Array(n), new Float64Array(n)];
+    // Running sums round the loop
+    let [sx, sy] = [0, 0];
+    for (let k = -r; k <= r; k++) {
+      sx += ax[mod(k, n)];
+      sy += ay[mod(k, n)];
+    }
+    for (let i = 0; i < n; i++) {
+      bx[i] = sx / (2 * r + 1);
+      by[i] = sy / (2 * r + 1);
+      sx += ax[mod(i + r + 1, n)] - ax[mod(i - r, n)];
+      sy += ay[mod(i + r + 1, n)] - ay[mod(i - r, n)];
+    }
+    [ax, ay] = [bx, by];
+  }
+  return Array.from({ length: n }, (_, i) => [ax[i], ay[i]]);
+}
+
 function nearestIndex(xs: Float64Array, ys: Float64Array, x: number, y: number) {
   let best = 0;
   let bestDist = Infinity;
@@ -99,7 +129,8 @@ function nearestIndex(xs: Float64Array, ys: Float64Array, x: number, y: number) 
 /** `scale` enlarges the whole circuit (road included); the 3D replay uses it to fit every car side by side. */
 export function trackPath(layout: TrackLayout, geometry: TrackGeometry, scale = 1): TrackPath {
   const halfWidth = geometry.halfWidth * scale;
-  const loop = resample(smoothLoop(parsePath(geometry.path, scale)));
+  // The trace follows the card by hand, a little unevenly: even it out so cars don't wobble on it
+  const loop = resample(evenOut(resample(smoothLoop(parsePath(geometry.path, scale))), EVEN_OUT * scale));
   const { length } = loop;
   let { xs, ys } = loop;
   const count = xs.length;

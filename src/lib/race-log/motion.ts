@@ -23,6 +23,9 @@ export type CarMotion = {
   heading: number;
   /** Extra rotation from a spin-out, radians */
   spin: number;
+  /** Smoothed speed (spaces per round) and acceleration (spaces per round²), for the suspension and brake lights */
+  speed: number;
+  accel: number;
 };
 
 export type MotionEvent =
@@ -331,6 +334,10 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
   // Smooth the simulated lanes so cars glide across instead of twitching from step to step,
   // then point each car the way it is actually going: along the track, turned by its lane change
   const headingSamples = new Map<string, Float64Array>();
+  const speedSamples = new Map<string, Float64Array>();
+  const accelSamples = new Map<string, Float64Array>();
+  const derivative = (values: Float64Array) =>
+    values.map((_, k) => (values[Math.min(count - 1, k + 1)] - values[Math.max(0, k - 1)]) / ((Math.min(count - 1, k + 1) - Math.max(0, k - 1)) * dt));
   for (const id of ids) {
     const lats = smooth(smooth(latSamples.get(id)!, 6), 6);
     latSamples.set(id, lats);
@@ -344,6 +351,10 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
       heading[k] = clamp(Math.atan(sideways / Math.max(Math.abs(forward), 4)), -0.35, 0.35);
     }
     headingSamples.set(id, smooth(heading, 4));
+    // Speeds from the sampled positions, smoothed, so braking reads as one dip rather than jitter
+    const speed = smooth(smooth(derivative(pos), 4), 4);
+    speedSamples.set(id, speed);
+    accelSamples.set(id, smooth(smooth(derivative(speed), 6), 6));
   }
 
   const sampleAt = (arr: Float64Array, t: number) => {
@@ -418,6 +429,8 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
         pos: progress.get(id)!(t),
         lat: sampleAt(latSamples.get(id)!, t),
         heading: sampleAt(headingSamples.get(id)!, t),
+        speed: sampleAt(speedSamples.get(id)!, t),
+        accel: sampleAt(accelSamples.get(id)!, t),
         spin: spinOf(id, t)?.angle ?? 0,
       };
     },

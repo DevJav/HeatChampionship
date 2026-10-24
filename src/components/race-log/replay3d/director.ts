@@ -1,4 +1,4 @@
-import type { TrackGeometry, TrackLayout } from "@/lib/race-log/layout";
+import { finishLine, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
 import { raceMotion, roadHalfWidthFor, type RaceMotion } from "@/lib/race-log/motion";
 import type { LoggedRound } from "@/lib/race-log/rounds";
 import { besideLine, trackPath, type TrackPath } from "@/lib/race-log/track-path";
@@ -17,7 +17,8 @@ export type Vec3 = { x: number; y: number; z: number };
 export type CameraPose = { position: Vec3; target: Vec3; fov: number; label: string; subject: string | null };
 export type CameraMode = "tv" | "chase" | "onboard" | "heli";
 
-type ShotKind = "grid" | "chase" | "onboard" | "heli" | "trackside" | "finish" | "outro";
+export const SHOT_KINDS = ["grid", "chase", "onboard", "heli", "trackside", "finish", "outro"] as const;
+export type ShotKind = (typeof SHOT_KINDS)[number];
 export type Shot = { start: number; end: number; kind: ShotKind; subject: string; cam?: number };
 
 export type Caption = { start: number; end: number; text: string; color?: string; radio?: boolean };
@@ -42,9 +43,11 @@ const SECONDS_PER_ROUND = 3.2;
  * the more cars, the bigger the circuit. Never smaller than MIN_TRACK_SCALE.
  */
 const MIN_TRACK_SCALE = 1.3;
-export const CAR_SCALE = 0.75;
-/** The car model is 16 × 9 drawing units (wheels included) before scaling */
-const CAR_SIZE = { length: 16 * CAR_SCALE, width: 9 * CAR_SCALE };
+export const CAR_SCALE = 0.7;
+/** The car model is 16 × 10.5 drawing units over the wheels before scaling (CAR_WIDTH in car-model.ts) */
+const CAR_SIZE = { length: 16 * CAR_SCALE, width: 10.5 * CAR_SCALE };
+/** Onboard camera on the model: just above the driver's helmet (DRIVER_EYE in car-model.ts) */
+const EYE = { back: 0.82, up: 5.43 };
 
 const v = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
 
@@ -69,10 +72,35 @@ export function tracksideCameras({ layout, path, boards }: Pick<Stage, "layout" 
     const p = spots.find((q) => boards.every(([x, z]) => Math.hypot(q.x - x, q.y - z) > 40)) ?? spots[0];
     return v(p.x, 15, p.y);
   });
-  // Opposite the grandstand, looking back at the cars as they cross
-  const line = besideLine(path, 10, 1 + 44 / path.halfWidth);
-  cams.push(v(line.x, 12, line.y));
+  // Just past the line, on the inside between the track and the barrier, looking back at the cars as they cross
+  const line = besideLine(path, FINISH_CAM_PAST * path.scale, 1 + 14 / path.halfWidth);
+  cams.push(v(line.x, 7, line.y));
   return cams;
+}
+
+const FINISH_CAM_PAST = 30;
+
+/**
+ * What each trackside camera films, as lines from the camera to the track:
+ * the stretch round each corner's apex, and the run up to the finish line.
+ * Tall scenery is kept off these lines so nothing gets in the way.
+ */
+export function cameraSightLines(stage: Pick<Stage, "layout" | "path" | "boards">) {
+  const { layout, path } = stage;
+  const cams = tracksideCameras(stage);
+  const watched = [
+    ...layout.corners.map((corner) => {
+      const apex = path.arcOf(corner.before + 0.5);
+      return [-90, -45, 0, 45, 90].map((d) => apex + d * path.scale);
+    }),
+    [-110, -70, -35, 0, 20].map((d) => d * path.scale),
+  ];
+  return cams.flatMap((cam, i) =>
+    watched[i].map((arc) => {
+      const p = path.at(arc);
+      return [cam, v(p.x, 0, p.y)] as [Vec3, Vec3];
+    }),
+  );
 }
 
 const dist = (a: Vec3, b: Vec3) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -156,7 +184,7 @@ function onboard(stage: Stage, id: string, t: number): Omit<CameraPose, "label">
   const dz = car.dx * s + car.dz * c;
   return {
     // Just ahead of the helmet, at the driver's eye line
-    position: v(car.x + dx * 1.9 * CAR_SCALE, 3.9 * CAR_SCALE, car.z + dz * 1.9 * CAR_SCALE),
+    position: v(car.x - dx * EYE.back * CAR_SCALE, EYE.up * CAR_SCALE, car.z - dz * EYE.back * CAR_SCALE),
     target: v(car.x + dx * 40, 2.2, car.z + dz * 40),
     fov: 72,
     subject: id,
@@ -181,6 +209,49 @@ function trackside(stage: Stage, cam: Vec3, id: string, t: number): Omit<CameraP
   const d = dist(cam, target);
   const fov = Math.min(50, Math.max(9, ((2 * Math.atan(26 / d)) * 180) / Math.PI));
   return { position: cam, target, fov, subject: id };
+}
+
+/** The corner camera nearest a car halfway through a shot. */
+export function nearestCorner(stage: Stage, subject: string, t: number) {
+  const car = carPose(stage, subject, t);
+  const cams = tracksideCameras(stage).slice(0, -1);
+  let best = 0;
+  cams.forEach((c, i) => {
+    if (dist(c, v(car.x, 0, car.z)) < dist(cams[best], v(car.x, 0, car.z))) best = i;
+  });
+  return best;
+}
+
+/**
+ * A script edited by hand, made playable: in time order, back to back from
+ * the start of the replay to its end, and every shot with what it needs.
+ */
+export function fitShots(stage: Stage, shots: Shot[], start: number, end: number): Shot[] {
+  const sorted = shots.filter((s) => s.start < end).sort((a, b) => a.start - b.start);
+  if (!sorted.length) return [];
+  sorted[0] = { ...sorted[0], start };
+  return sorted.map((shot, i) => {
+    const until = sorted[i + 1]?.start ?? end;
+    const subject = stage.motion.ids.includes(shot.subject) ? shot.subject : stage.motion.official[0];
+    const fitted: Shot = { start: shot.start, end: until, kind: shot.kind, subject };
+    if (shot.kind === "trackside") {
+      const valid = shot.cam !== undefined && shot.cam >= 0 && shot.cam < stage.layout.corners.length;
+      fitted.cam = valid ? shot.cam : nearestCorner(stage, subject, (shot.start + until) / 2);
+    }
+    if (shot.kind === "finish") fitted.cam = stage.layout.corners.length;
+    return fitted;
+  });
+}
+
+/** A script saved on this device, if it still fits this race; otherwise null. */
+export function readScript(stage: Stage, saved: unknown, start: number, end: number): Shot[] | null {
+  if (!Array.isArray(saved) || !saved.length) return null;
+  const shots: Shot[] = [];
+  for (const s of saved) {
+    if (typeof s?.start !== "number" || !SHOT_KINDS.includes(s.kind) || typeof s.subject !== "string") return null;
+    shots.push({ start: s.start, end: s.start, kind: s.kind, subject: s.subject, cam: typeof s.cam === "number" ? s.cam : undefined });
+  }
+  return fitShots(stage, shots, start, end);
 }
 
 export function shotAt(shots: Shot[], t: number) {
@@ -215,6 +286,9 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
       // Whoever crosses the line next, or the last one that did
       const next =
         stage.motion.official.find((id) => (stage.motion.finishedAt[id] ?? Infinity) > t - 0.12) ?? stage.motion.official.at(-1)!;
+      // Still far round the lap: ride along with it until it nears the line
+      const toLine = stage.path.arcOf(finishLine(stage.layout)) - stage.path.arcOf(stage.motion.at(next, t).pos);
+      if (toLine > 110 * stage.path.scale) return { ...chase(stage, next, t), label: `${labels.chase} · ${name(next)}` };
       return { ...trackside(stage, cams[cams.length - 1], next, t), label: text.raceLog.replay3d.finishLine };
     }
     case "outro":

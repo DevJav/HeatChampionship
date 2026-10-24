@@ -12,7 +12,7 @@ const H = 720;
  * records it, graphics included. Like the 2D video, nothing leaves the
  * device and the tab must stay visible.
  */
-export function recordReplay3d(
+export async function recordReplay3d(
   replay: Replay,
   geometry: TrackGeometry,
   cars: WorldCar[],
@@ -21,10 +21,10 @@ export function recordReplay3d(
   signal?: AbortSignal,
 ): Promise<Blob> {
   const mimeType = videoMimeType();
-  if (!mimeType) return Promise.reject(new Error("MediaRecorder unavailable"));
+  if (!mimeType) throw new Error("MediaRecorder unavailable");
 
   const glCanvas = document.createElement("canvas");
-  const world = createWorld(glCanvas, replay.stage, geometry, cars, { preserve: true });
+  const world = await createWorld(glCanvas, replay.stage, geometry, cars, { preserve: true });
   world.setSize(W, H, 1);
   const canvas = document.createElement("canvas");
   canvas.width = W;

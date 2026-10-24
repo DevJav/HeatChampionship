@@ -41,7 +41,7 @@ async function Replay3DContent({ params, searchParams }: PageProps<"/carreras/[i
           <ArrowLeft /> {t.raceLog.backToRace}
         </ButtonLink>
       </div>
-      <Replay3D track={log.track} laps={log.laps} cars={cars} rounds={log.rounds} title={title} radio={radio} debug={debug} />
+      <Replay3D raceId={race.id} track={log.track} laps={log.laps} cars={cars} rounds={log.rounds} title={title} radio={radio} debug={debug} />
     </div>
   );
 }

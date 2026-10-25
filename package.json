@@ -26,6 +26,7 @@
     "db:reset": "prisma migrate reset",
     "test": "vitest run",
     "test:watch": "vitest",
+    "backup": "node scripts/backup.mjs",
     "db:seed:sample": "tsx prisma/seed-sample.ts",
     "db:showcase:en": "rm -f data/heat-en.db && APP_LOCALE=en DATABASE_URL=file:./data/heat-en.db sh -c 'prisma migrate deploy && tsx prisma/seed.ts --demo && tsx prisma/seed-sample.ts'",
     "dev:en": "APP_LOCALE=en DATABASE_URL=file:./data/heat-en.db next dev"

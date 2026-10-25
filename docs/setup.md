@@ -27,6 +27,7 @@ Copy `.env.example` to `.env` and fill it in:
 | `UPLOAD_DIR` | Where photos are stored, `./data/uploads` by default. |
 | `SITE_URL` | Optional. Address used in shared links if it differs from `BETTER_AUTH_URL`. |
 | `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_REPLY_TO` | Optional. Turn on [emails](#emails) to drivers. |
+| `BACKUP_REMOTE`, `BACKUP_DIR`, `BACKUP_KEEP_DAYS` | Optional. Where nightly [back-ups](#back-ups) are uploaded, kept and for how long. |
 
 `APP_LOCALE` and `APP_TIME_ZONE` are read when the site is built, so rebuild (or restart `npm run dev`) after changing them.
 
@@ -86,7 +87,42 @@ pm2 restart heat
 
 ## Back-ups
 
-Everything lives in the `data/` folder: the database and the uploaded photos (resized to WebP in `data/uploads/`, or wherever `UPLOAD_DIR` points). Copy that folder to back it up.
+Everything lives in the `data/` folder: the database and the uploaded photos (resized to WebP in `data/uploads/`, or wherever `UPLOAD_DIR` points).
+
+`npm run backup` packs both into `backups/heat-YYYY-MM-DD_HHMM.tar.gz`. It copies the database safely while the site is running and checks the copy before archiving it. Archives older than `BACKUP_KEEP_DAYS` (14 by default) are deleted. With pm2, the `heat-backup` process in [`ecosystem.config.cjs`](../ecosystem.config.cjs) runs it every night at 04:30, and once when pm2 starts. `pm2 logs heat-backup` shows how it went.
+
+### Off the machine (Google Drive)
+
+A back-up on the same disk won't survive that disk. To also upload every archive, install [rclone](https://rclone.org/install/) on the server and add a remote:
+
+```bash
+rclone config        # n (new remote) → name: gdrive → storage: drive → defaults for the rest
+```
+
+On a server without a browser, answer **n** to "Use web browser to automatically authenticate?", run the `rclone authorize "drive" ...` command it prints on a computer that has one, and paste the result back. Then set the folder in `.env` and test it:
+
+```bash
+BACKUP_REMOTE="gdrive:heat-backups"
+```
+
+```bash
+npm run backup                 # should end with "Uploaded to gdrive:heat-backups"
+rclone ls gdrive:heat-backups
+```
+
+Old archives on Drive are deleted after `BACKUP_KEEP_DAYS` too. Any other [rclone remote](https://rclone.org/overview/) (Dropbox, S3, another machine over SFTP) works the same way.
+
+### Restoring
+
+```bash
+pm2 stop heat
+rclone copy gdrive:heat-backups/heat-2026-10-25_0430.tar.gz .   # or pick one from backups/
+mv data data.old
+mkdir data && tar -xzf heat-2026-10-25_0430.tar.gz -C data      # gives data/heat.db and data/uploads/
+pm2 start heat
+```
+
+Once the site looks right, delete `data.old`.
 
 ## Languages
 
@@ -112,6 +148,7 @@ To translate the site into another language, see [Translations](development.md#t
 | `db:studio` | Browse the database in Prisma Studio |
 | `db:reset` | Wipe the database and re-seed |
 | `test` / `test:watch` | Unit tests (Vitest) |
+| `backup` | Archive the database and photos into `backups/`, and upload it if `BACKUP_REMOTE` is set ([Back-ups](#back-ups)) |
 | `lint` | ESLint |
 
 Only one `next dev` can run per project folder, so stop `dev` before starting `dev:en` and vice versa.

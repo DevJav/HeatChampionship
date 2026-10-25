@@ -6,6 +6,8 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.11.0] - 2026-10-25
+
 ### Nuevo
 - Cada circuito tiene su propia página: cuántas carreras se han corrido allí, el rey del circuito, cuántas veces gana el que sale primero, la mayor remontada, el historial de cada piloto en él, todas las carreras disputadas y las próximas que hay en ese circuito. Están todos en **Circuitos**, en la página de Carreras, o tocando el nombre del circuito en una carrera o en la tabla de circuitos de Estadísticas.
 
@@ -165,7 +167,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0

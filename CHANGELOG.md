@@ -6,6 +6,8 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-10-25
+
 ### Added
 - Every circuit has its own page: how many races it has hosted, the king of the track, how often the pole sitter wins, the biggest comeback, every driver's record there, the full race history and the next races booked on it. Find them all under **Circuits** on the Races page, or tap a track's name on a race page or in the Stats tracks table.
 
@@ -165,7 +167,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0

@@ -35,7 +35,7 @@ describe("raceDossier", () => {
 
   it("warns when the log and the official results disagree on the winner", () => {
     const log: NonNullable<DossierInput["log"]> = {
-      rounds: 2, winner: "Leo", officialWinner: "Ana", wireToWire: false, lastGasp: false, moment: null, rivalry: null, drivers: [], corners: [],
+      rounds: 2, winner: "Leo", officialWinner: "Ana", wireToWire: false, lastGasp: false, moment: null, rivalry: null, drivers: [],
       order: [{ driver: "Ana", ranks: [1, 2, 2] }],
     };
     expect(raceDossier({ ...base, log })).toContain("disagrees with the official results (official winner: Ana)");

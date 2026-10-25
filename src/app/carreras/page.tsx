@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { CalendarCheck, CalendarDays } from "lucide-react";
+import { CalendarCheck, CalendarDays, MapPinned } from "lucide-react";
 import { ButtonLink, Container, EmptyState, PageHeader, Section, Skeleton, Tabs } from "@/components/ui";
 import { RaceCalendar } from "@/components/races/RaceCalendar";
 import { RaceRow } from "@/components/races/RaceRow";
@@ -89,9 +89,14 @@ export default function RacesPage() {
         title={t.races.title}
         description={t.races.description}
         actions={
-          <ButtonLink href="/carreras/fecha" variant="secondary" size="sm">
-            <CalendarCheck /> {t.datePoll.link}
-          </ButtonLink>
+          <>
+            <ButtonLink href="/circuitos" variant="secondary" size="sm">
+              <MapPinned /> {t.tracks.title}
+            </ButtonLink>
+            <ButtonLink href="/carreras/fecha" variant="secondary" size="sm">
+              <CalendarCheck /> {t.datePoll.link}
+            </ButtonLink>
+          </>
         }
       />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>

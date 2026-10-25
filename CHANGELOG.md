@@ -6,6 +6,19 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Added
+- Every circuit has its own page: how many races it has hosted, the king of the track, how often the pole sitter wins, the biggest comeback, every driver's record there, the full race history and the next races booked on it. Find them all under **Circuits** on the Races page, or tap a track's name on a race page or in the Stats tracks table.
+
+### Changed
+- The **Pass.** column in a recorded race's data now counts every car a driver passes, even if they're passed back later in the same round. Before, it counted the places gained each round, so passing two cars and then losing one place counted as one.
+
+### Removed
+- The **Corners** card of recorded races: crediting every pass to a whole corner-to-corner stretch didn't say much about where the overtakes really happen.
+
+### Fixed
+- On the track maps (recorder and replay), the spaces now bend with the track instead of cutting straight across the curves, which left dark gaps in tight corners.
+- On phones, the track section of an upcoming race no longer makes the whole page scroll sideways.
+
 ## [1.10.0] - 2026-10-24
 
 ### Added

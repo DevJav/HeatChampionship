@@ -6,6 +6,19 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+### Nuevo
+- Cada circuito tiene su propia página: cuántas carreras se han corrido allí, el rey del circuito, cuántas veces gana el que sale primero, la mayor remontada, el historial de cada piloto en él, todas las carreras disputadas y las próximas que hay en ese circuito. Están todos en **Circuitos**, en la página de Carreras, o tocando el nombre del circuito en una carrera o en la tabla de circuitos de Estadísticas.
+
+### Cambios
+- La columna **Adel.** de los datos de una carrera anotada cuenta ahora cada coche que adelanta un piloto, aunque luego le vuelvan a pasar en la misma ronda. Antes contaba las posiciones ganadas en cada ronda, así que adelantar a dos y perder un puesto contaba como uno.
+
+### Eliminado
+- La tarjeta **Curvas** de las carreras anotadas: apuntar cada adelantamiento a todo el tramo entre dos curvas no decía gran cosa de dónde se adelanta de verdad.
+
+### Arreglos
+- En los mapas del circuito (anotar y repetición), las casillas ahora siguen la curva de la pista en vez de cortarla en línea recta, lo que dejaba huecos oscuros en las curvas cerradas.
+- En el móvil, la sección del circuito de una carrera próxima ya no hace que toda la página se desplace de lado.
+
 ## [1.10.0] - 2026-10-24
 
 ### Nuevo

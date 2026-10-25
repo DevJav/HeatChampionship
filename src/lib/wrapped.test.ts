@@ -25,7 +25,7 @@ const race = (results: StatsResult[], track = "italia", extra: Partial<StatsRace
     round: day,
     scheduledAt: new Date(Date.UTC(2026, 0, day)),
     season: { id: "s1", name: "2026" },
-    track: { id: track, name: track },
+    track: { id: track, slug: track, name: track },
     results,
     ...extra,
   };

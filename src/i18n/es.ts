@@ -361,6 +361,20 @@ export const es = {
     },
   },
 
+  tracks: {
+    title: "Circuitos",
+    description: "Dónde hemos corrido y quién manda en cada uno.",
+    fallbackTitle: "Circuito",
+    empty: "Todavía no hay circuitos",
+    seeTrack: "Ver circuito",
+    races: (n: number) => (n === 1 ? "1 carrera" : `${n} carreras`),
+    noRacesYet: "Sin carreras todavía",
+    lastWinner: (name: string) => `Último ganador: ${name}`,
+    upcoming: "Próximas carreras aquí",
+    drivers: "Pilotos",
+    driversDescription: (track: string) => `Todos los que han corrido en ${track}, de mejor a peor media de llegada.`,
+  },
+
   stats: {
     title: "Estadísticas",
     description: "Récords, cara a cara, parrilla, circuitos, coches y mejoras.",
@@ -898,13 +912,6 @@ export const es = {
 
   raceLog: {
     momentTitle: "Momento de la carrera",
-    cornersTitle: "Curvas",
-    cornersHint: "Adelantamientos completados en cada tramo, de una curva a la siguiente.",
-    corner: (n: number, limit: number) => `Curva ${n} · ${limit}`,
-    passes: "Adelant.",
-    fewerPasses: "Menos adelantamientos",
-    morePasses: "Más",
-    cornerTooltip: (n: number, passes: number, spins: number) => `Curva ${n}: ${passes} adelantamientos, ${spins} trompos`,
     video: {
       button: "Crear un vídeo de la repetición para compartir",
       short: "Vídeo",
@@ -958,7 +965,7 @@ export const es = {
     raceData: "Datos de la carrera",
     driver: "Piloto",
     overtakes: "Adel.",
-    overtakesTitle: "Posiciones ganadas, contando cada adelantamiento",
+    overtakesTitle: "Coches adelantados, contando cada adelantamiento",
     slipstreams: "Rebufos",
     spins: "Trompos",
     average: "Media",

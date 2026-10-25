@@ -20,7 +20,7 @@ const race = (order: string[], track = "italia"): StatsRace => {
     round: day,
     scheduledAt: new Date(Date.UTC(2026, 0, day)),
     season: { id: "s1", name: "s1" },
-    track: { id: track, name: track },
+    track: { id: track, slug: track, name: track },
     results: order.map((id, i) => r(id, i + 1)),
   };
 };

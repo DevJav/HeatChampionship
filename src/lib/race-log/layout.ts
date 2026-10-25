@@ -120,7 +120,40 @@ export function dividerEnds(geometry: TrackGeometry, index: number): [Point, Poi
   return [offset(anchor, -geometry.halfWidth), offset(anchor, geometry.halfWidth)];
 }
 
-/** The four corners of a space, for hit areas and highlights */
+/** Control point that makes a quadratic curve from `a` to `b` pass through `mid` halfway along. */
+function through(a: Point, mid: Point, b: Point): Point {
+  return { x: 2 * mid.x - (a.x + b.x) / 2, y: 2 * mid.y - (a.y + b.y) / 2 };
+}
+
+/**
+ * One edge of a space (−1 left of travel, 1 right) as the start, control
+ * point and end of a curve through the space's centre anchor, so it bends
+ * with the track instead of cutting across the bend.
+ */
+export function spaceEdge(geometry: TrackGeometry, space: number, side: -1 | 1): [Point, Point, Point] {
+  const next = (space + 1) % geometry.dividers.length;
+  const a = offset(geometry.dividers[space], side * geometry.halfWidth);
+  const b = offset(geometry.dividers[next], side * geometry.halfWidth);
+  return [a, through(a, offset(geometry.spaces[space], side * geometry.halfWidth), b), b];
+}
+
+// Rounded so the server and the browser write the same path (their trigonometry can differ in the last digits)
+const coord = (p: Point) => `${Math.round(p.x * 100) / 100} ${Math.round(p.y * 100) / 100}`;
+
+/** A space's outline as an SVG path: straight across at the dividers, curved along the edges. */
+export function spacePath(geometry: TrackGeometry, space: number) {
+  const [a1, c1, b1] = spaceEdge(geometry, space, -1);
+  const [a2, c2, b2] = spaceEdge(geometry, space, 1);
+  return `M${coord(a1)}Q${coord(c1)} ${coord(b1)}L${coord(b2)}Q${coord(c2)} ${coord(a2)}Z`;
+}
+
+/** One edge of a space as an open SVG path, for drawing borders along it */
+export function spaceEdgePath(geometry: TrackGeometry, space: number, side: -1 | 1) {
+  const [a, c, b] = spaceEdge(geometry, space, side);
+  return `M${coord(a)}Q${coord(c)} ${coord(b)}`;
+}
+
+/** The four corners of a space, for fitting it in view */
 export function spacePolygon(geometry: TrackGeometry, space: number): Point[] {
   const next = (space + 1) % geometry.dividers.length;
   const [a1, a2] = dividerEnds(geometry, space);

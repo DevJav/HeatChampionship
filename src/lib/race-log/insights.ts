@@ -11,7 +11,7 @@ export function rankHistory(layout: TrackLayout, rounds: LoggedRound[]) {
 
 export type DriverInsight = {
   id: string;
-  /** Places gained over the race, counting every pass (not just net) */
+  /** Cars passed over the race, every pass counted (being passed back doesn't cancel it) */
   overtakes: number;
   slipstreams: number;
   spins: number;
@@ -38,7 +38,15 @@ export function driverInsights(layout: TrackLayout, rounds: LoggedRound[]): Driv
       const flags = rounds[r].flags[id];
       if (flags?.slipstream) s.slipstreams++;
       if (flags?.spun) s.spins++;
-      s.overtakes += Math.max(0, ranks[r - 1][id] - ranks[r][id]);
+      // One per car passed, counted the same way as the overtake map (overtakes.ts)
+      if (!isFinished(layout, rounds[r - 1].positions[id])) {
+        s.overtakes += ids.filter(
+          (other) =>
+            !isFinished(layout, rounds[r - 1].positions[other]) &&
+            ranks[r - 1][other] < ranks[r - 1][id] &&
+            ranks[r][other] > ranks[r][id],
+        ).length;
+      }
       if (ranks[r][id] === 1) s.roundsLed++;
       if (!finishedAt.has(id)) {
         moved.get(id)!.push(delta[id]);

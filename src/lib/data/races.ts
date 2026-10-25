@@ -72,6 +72,16 @@ export async function listPublishedRaces() {
   });
 }
 
+/** Published races at a track that haven't been raced yet, soonest first. */
+export async function listUpcomingRacesAt(trackId: string) {
+  await connection();
+  return db.race.findMany({
+    where: { trackId, status: { in: ["UPCOMING", "OPEN", "CLOSED"] } },
+    orderBy: { scheduledAt: "asc" },
+    include: raceListInclude,
+  });
+}
+
 /** The next published race that hasn't been raced yet. */
 export async function getNextRace() {
   await connection();

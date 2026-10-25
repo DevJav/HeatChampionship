@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CalendarCheck, FileText, Flag, NotebookPen, Pencil } from "lucide-react";
@@ -80,7 +81,11 @@ function RaceHero({ race, admin, results }: { race: RaceDetail; admin: boolean; 
           <Badge tone="bar">{race.season.name}</Badge>
           <RaceStatusBadge race={race} />
         </div>
-        <h1 className="text-5xl [text-shadow:0_2px_12px_rgb(0_0_0/0.5)] sm:text-7xl">{race.track.name}</h1>
+        <h1 className="text-5xl [text-shadow:0_2px_12px_rgb(0_0_0/0.5)] sm:text-7xl">
+          <Link href={`/circuitos/${race.track.slug}`} title={t.tracks.seeTrack} className="decoration-primary decoration-4 underline-offset-8 hover:underline">
+            {race.track.name}
+          </Link>
+        </h1>
         <RaceMeta race={race} className="text-bar-fg/80" />
         {race.status !== "DRAFT" && (
           <div className="flex flex-wrap gap-2">

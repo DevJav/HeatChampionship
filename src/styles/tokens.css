@@ -87,11 +87,6 @@
   --track-line: rgb(255 255 255 / 0.55);
   --track-highlight: rgb(242 169 0 / 0.35);
   --track-blocked: rgb(209 5 0 / 0.35);
-  /* Corner heat map on the asphalt: one hue, dark → bright (validated against --track-asphalt) */
-  --heat-1: #8f4614;
-  --heat-2: #c0600f;
-  --heat-3: #ec8714;
-  --heat-4: #ffbb55;
 
   /* LED countdown board (seven-segment digits) */
   --led-on: #ff2b1c;

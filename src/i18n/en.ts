@@ -355,6 +355,20 @@ export const en: Dictionary = {
     },
   },
 
+  tracks: {
+    title: "Circuits",
+    description: "Where we've raced and who rules each one.",
+    fallbackTitle: "Circuit",
+    empty: "No circuits yet",
+    seeTrack: "See circuit",
+    races: (n) => (n === 1 ? "1 race" : `${n} races`),
+    noRacesYet: "No races yet",
+    lastWinner: (name) => `Last winner: ${name}`,
+    upcoming: "Coming up here",
+    drivers: "Drivers",
+    driversDescription: (track) => `Everyone who has raced at ${track}, best average finish first.`,
+  },
+
   stats: {
     title: "Stats",
     description: "Records, head-to-head, grid, tracks, cars and upgrades.",
@@ -875,13 +889,6 @@ export const en: Dictionary = {
 
   raceLog: {
     momentTitle: "Moment of the race",
-    cornersTitle: "Corners",
-    cornersHint: "Passes completed on each stretch, from one corner to the next.",
-    corner: (n, limit) => `Corner ${n} · ${limit}`,
-    passes: "Passes",
-    fewerPasses: "Fewer passes",
-    morePasses: "More",
-    cornerTooltip: (n, passes, spins) => `Corner ${n}: ${passes} passes, ${spins} spins`,
     video: {
       button: "Make a video of the replay to share",
       short: "Video",
@@ -934,7 +941,7 @@ export const en: Dictionary = {
     raceData: "Race data",
     driver: "Driver",
     overtakes: "Pass.",
-    overtakesTitle: "Places gained, counting every pass",
+    overtakesTitle: "Cars passed, counting every pass",
     slipstreams: "Slipstreams",
     spins: "Spins",
     average: "Avg.",

@@ -39,7 +39,7 @@ const race = (results: StatsResult[], track = "italia"): StatsRace => {
     round: day,
     scheduledAt: new Date(Date.UTC(2026, 0, day)),
     season: { id: "s1", name: "Temporada 1" },
-    track: { id: track, name: track === "italia" ? "Italia" : "Francia" },
+    track: { id: track, slug: track, name: track === "italia" ? "Italia" : "Francia" },
     results,
   };
 };

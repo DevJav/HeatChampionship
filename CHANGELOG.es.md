@@ -6,6 +6,8 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.11.1] - 2026-10-26
+
 ### Cambios
 - En la tabla de la **Clasificación**, cada columna de carrera muestra ahora la bandera del circuito junto a R1, R2…, para ver de un vistazo dónde se corrió cada carrera (pasa el ratón por encima para ver el nombre del circuito). Unas líneas finas separan ahora los puntos, la diferencia/victorias/podios y las carreras, y ya no salen las flechas de puestos ganados o perdidos desde la última carrera.
 - En móviles y tablets, la tabla de la **Clasificación** muestra ahora también cada carrera: desliza la tabla hacia los lados para verlas.
@@ -171,7 +173,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...HEAD
+[1.11.1]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0

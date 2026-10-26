@@ -6,6 +6,8 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-10-26
+
 ### Changed
 - In the **Standings** table, each race column now shows the circuit's flag next to R1, R2…, so you can tell at a glance where each race was run (hover it for the circuit's name). Thin lines now separate the points, the gap/wins/podiums and the races, and the arrows with places gained or lost since the last race are gone.
 - On phones and tablets, the **Standings** table now shows every race too: swipe it sideways to see them.
@@ -171,7 +173,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...HEAD
+[1.11.1]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0

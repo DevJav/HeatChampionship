@@ -18,7 +18,6 @@ export const es = {
     namesAndMore: (names: string[], more: number) => `${names.join(", ")} y ${more} más`,
     columns: {
       position: "Pos.",
-      movement: "Movimiento",
       driver: "Piloto",
       points: "Pts",
       gap: "Dif.",

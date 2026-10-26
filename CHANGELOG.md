@@ -6,6 +6,10 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Changed
+- In the **Standings** table, each race column now shows the circuit's flag next to R1, R2…, so you can tell at a glance where each race was run (hover it for the circuit's name). Thin lines now separate the points, the gap/wins/podiums and the races, and the arrows with places gained or lost since the last race are gone.
+- On phones and tablets, the **Standings** table now shows every race too: swipe it sideways to see them.
+
 ## [1.11.0] - 2026-10-25
 
 ### Added

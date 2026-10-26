@@ -23,7 +23,6 @@ export const en: Dictionary = {
     namesAndMore: (names, more) => `${names.join(", ")} and ${more} more`,
     columns: {
       position: "Pos.",
-      movement: "Movement",
       driver: "Driver",
       points: "Pts",
       gap: "Gap",

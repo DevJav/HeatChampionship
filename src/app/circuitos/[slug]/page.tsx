@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Badge, ChequeredStrip, Container, Section, Skeleton, SpeedStripes } from "@/components/ui";
 import { FlagBackdrop } from "@/components/domain/CountryFlag";
+import { TrackPlan } from "@/components/race-log/TrackPlan";
 import { RaceRow } from "@/components/races/RaceRow";
 import { TrackDriversTable, TrackHistoryCard, TrackStatCards } from "@/components/tracks/TrackRecords";
 import { countryName } from "@/lib/countries";
@@ -94,6 +95,7 @@ async function TrackView({ params }: { params: PageProps<"/circuitos/[slug]">["p
   return (
     <div className="flex flex-col gap-8">
       <TrackHero track={track} />
+      <TrackPlan track={track.slug} />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
         <TrackRecords track={track} />
       </Suspense>

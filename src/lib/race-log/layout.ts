@@ -83,9 +83,13 @@ export function finishLine(layout: TrackLayout) {
   return layout.laps * layout.spacesPerLap;
 }
 
-function offset([x, y, angle]: Anchor, distance: number): Point {
+/** A point along an anchor's normal. Rounded so the server and the browser draw the same numbers (their trigonometry can differ in the last digits). */
+export function offset([x, y, angle]: Anchor, distance: number): Point {
   const rad = (angle * Math.PI) / 180;
-  return { x: x + Math.cos(rad) * distance, y: y + Math.sin(rad) * distance };
+  return {
+    x: Math.round((x + Math.cos(rad) * distance) * 1000) / 1000,
+    y: Math.round((y + Math.sin(rad) * distance) * 1000) / 1000,
+  };
 }
 
 /** Offset from the centre line, as a share of the lane: spot 0 on the racing-line side, spot 1 opposite */
@@ -137,7 +141,6 @@ export function spaceEdge(geometry: TrackGeometry, space: number, side: -1 | 1):
   return [a, through(a, offset(geometry.spaces[space], side * geometry.halfWidth), b), b];
 }
 
-// Rounded so the server and the browser write the same path (their trigonometry can differ in the last digits)
 const coord = (p: Point) => `${Math.round(p.x * 100) / 100} ${Math.round(p.y * 100) / 100}`;
 
 /** A space's outline as an SVG path: straight across at the dividers, curved along the edges. */

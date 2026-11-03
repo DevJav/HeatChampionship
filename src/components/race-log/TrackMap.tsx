@@ -5,6 +5,7 @@ import {
   carPoint,
   dividerEnds,
   lapSpace,
+  offset,
   racingLineSide,
   spaceEdgePath,
   spacePath,
@@ -137,12 +138,10 @@ export function TrackMap({
       const b = geometry.spaces[(s + 1 + n) % n][2];
       return ((b - a + 540) % 360) - 180;
     };
-    return geometry.spaces.flatMap(([x, y, angle], s) => {
+    return geometry.spaces.flatMap((space, s) => {
       const bend = [-3, -2, -1, 0, 1, 2].reduce((sum, k) => sum + turn(s + k), 0);
       const outside = Math.abs(bend) > 15 ? -Math.sign(bend) : racingLineSide(layout, s) === "right" ? -1 : 1;
-      const rad = (angle * Math.PI) / 180;
-      const r = halfWidth + 8;
-      const p = { x: x + Math.cos(rad) * r * outside, y: y + Math.sin(rad) * r * outside };
+      const p = offset(space, (halfWidth + 8) * outside);
       if (geometry.badges.some(([bx, by]) => Math.hypot(bx - p.x, by - p.y) < 22)) return [];
       return [{ s, ...p, value: spacesToCorner(layout, s) }];
     });

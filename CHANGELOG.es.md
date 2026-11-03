@@ -6,6 +6,9 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+### Nuevo
+- Las páginas de circuito muestran ahora el **Mapa del circuito** cuando lo tiene (de momento, Estados Unidos y Francia): el mismo dibujo que al anotar las carreras, con sus curvas, sus límites de velocidad y las casillas que faltan hasta cada curva.
+
 ## [1.11.1] - 2026-10-26
 
 ### Cambios

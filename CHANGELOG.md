@@ -6,6 +6,9 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Added
+- Circuit pages now show the **Track map** when the circuit has one (USA and France for now): the same drawing as the recorder, with its corners, speed limits and the spaces left to each corner.
+
 ## [1.11.1] - 2026-10-26
 
 ### Changed

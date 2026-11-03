@@ -6,6 +6,8 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-11-03
+
 ### Added
 - Circuit pages now show the **Track map** when the circuit has one (USA and France for now): the same drawing as the recorder, with its corners, speed limits and the spaces left to each corner.
 
@@ -176,7 +178,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0

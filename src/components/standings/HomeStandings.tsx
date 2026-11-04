@@ -5,7 +5,7 @@ import { t } from "@/i18n";
 import { ButtonLink, Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { StandingsTable } from "./StandingsTable";
 
-/** Top five of the current season. Reads the DB: render inside <Suspense>. */
+/** Top six of the current season. Reads the DB: render inside <Suspense>. */
 export async function HomeStandings() {
   const season = await getCurrentSeason();
   const standings = season ? await getSeasonStandings(season.id) : null;
@@ -20,7 +20,7 @@ export async function HomeStandings() {
       </CardHeader>
       {standings && standings.rows.length > 0 ? (
         <>
-          <StandingsTable standings={standings} limit={5} compact />
+          <StandingsTable standings={standings} limit={6} compact />
           <CardFooter>
             <ButtonLink href="/clasificacion" variant="secondary" size="sm">
               {t.standings.fullStandings} <ChevronRight />

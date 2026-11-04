@@ -36,17 +36,16 @@ export function TitleFightCard({ fight, drivers, total, nextRace }: { fight: Tit
           <Swords aria-hidden className="size-5 shrink-0 text-primary" />
           {headline}
         </p>
-        <ul className="grid gap-2 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {fight.contenders.map((c) => {
             const driver = drivers.get(c.userId);
+            const detail = [c.gap > 0 ? `−${c.gap}` : null, t.titleFight.max(c.maxPoints)].filter(Boolean).join(" · ");
             return (
               <li key={c.userId} className="flex items-center gap-3 bg-surface-2 px-3 py-2">
-                <DriverName name={driver?.name ?? "—"} username={driver?.username} color={driver?.favoriteColor?.hex} className="flex-1" />
-                <span className="font-display font-bold italic tabular-nums">
+                <DriverName name={driver?.name ?? "—"} username={driver?.username} color={driver?.favoriteColor?.hex} detail={detail} className="flex-1" />
+                <span className="shrink-0 font-display font-bold italic tabular-nums">
                   {c.points} {t.common.pts}
                 </span>
-                <span className="w-16 text-right text-xs tabular-nums text-fg-muted">{c.gap > 0 ? `−${c.gap}` : ""}</span>
-                <span className="w-16 text-right text-xs tabular-nums text-fg-subtle">{t.titleFight.max(c.maxPoints)}</span>
               </li>
             );
           })}

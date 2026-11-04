@@ -6,6 +6,14 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.12.1] - 2026-11-04
+
+### Arreglos
+- En el móvil, la tarjeta **Lucha por el título** de la página de **Clasificación** ya no se sale de la pantalla ni hace que toda la página se desplace de lado: la diferencia y el máximo de puntos de cada piloto aparecen ahora bajo su nombre.
+- En los móviles más estrechos, la cabecera ya no hace que todas las páginas se desplacen de lado cuando has iniciado sesión: el nombre de la web pasa a dos líneas cuando hace falta.
+- En el móvil, las páginas de **Estadísticas** y **Pilotos** tampoco se desplazan ya de lado.
+- En el móvil, la tarjeta **Líder** de la página de **Clasificación** ocupa ahora todo el ancho, así que los nombres largos ya no se cortan.
+
 ## [1.12.0] - 2026-11-03
 
 ### Nuevo

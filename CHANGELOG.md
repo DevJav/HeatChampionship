@@ -6,6 +6,14 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.12.1] - 2026-11-04
+
+### Fixed
+- On phones, the **Title fight** card on the **Standings** page no longer runs off the screen and makes the whole page slide sideways: each driver's gap and maximum points now sit under their name.
+- On narrower phones, the header no longer makes every page slide sideways when you're logged in: the site name now wraps onto two lines when it needs to.
+- On phones, the **Stats** and **Drivers** pages no longer slide sideways either.
+- On phones, the **Leader** card on the **Standings** page now takes the full width, so long names are no longer cut off.
+
 ## [1.12.0] - 2026-11-03
 
 ### Added

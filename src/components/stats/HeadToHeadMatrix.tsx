@@ -83,7 +83,7 @@ export function HeadToHeadMatrix({ drivers, duels }: HeadToHeadMatrixProps) {
         tabIndex={0}
         role="group"
         aria-label={t.stats.matrix.label}
-        className="overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="relative overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onKeyDown={onKeyDown}
         onFocus={(e) => e.target === e.currentTarget && !active && activate(0, 1)}
         onBlur={() => setActive(null)}

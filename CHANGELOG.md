@@ -6,6 +6,11 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.13.1] - 2026-11-05
+
+### Added
+- **Spain** can now be recorded round by round too: its one long lap, tunnels included, gets the lap chart, the replay and the race stats, and its circuit page shows the **Track map**.
+
 ## [1.13.0] - 2026-11-05
 
 ### Added
@@ -194,7 +199,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...HEAD
+[1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0
 [1.12.1]: https://github.com/DevJav/HeatChampionship/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...v1.12.0

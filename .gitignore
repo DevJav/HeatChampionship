@@ -45,6 +45,11 @@ next-env.d.ts
 
 # local database & uploads
 /data/
+/backups/
 
 # generated Prisma client
 /src/generated/
+
+# 3D models and archives
+*.stl
+*.zip

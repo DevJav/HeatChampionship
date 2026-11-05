@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { TrackStats } from "@/lib/stats";
 import type { StatsDriver } from "@/lib/data/stats";
 import { formatDecimal } from "@/lib/format";
@@ -39,7 +40,11 @@ export function TrackStatsTable({ rows, drivers }: TrackStatsTableProps) {
       <TBody>
         {rows.map((track) => (
           <Tr key={track.trackId}>
-            <Td className="font-display text-base font-bold uppercase italic">{track.trackName}</Td>
+            <Td className="font-display text-base font-bold uppercase italic">
+              <Link href={`/circuitos/${track.trackSlug}`} className="hover:text-primary hover:underline">
+                {track.trackName}
+              </Link>
+            </Td>
             <Td align="center">{track.races}</Td>
             <Td>
               {track.topWinners ? (

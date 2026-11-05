@@ -7,7 +7,6 @@ import { formatDecimal } from "@/lib/format";
 import { driverInsights, rankHistory } from "@/lib/race-log/insights";
 import { finishLine, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
 import { classification, isFinished, turnOrder, type LoggedRound } from "@/lib/race-log/rounds";
-import { CornerHeatMap } from "./CornerHeatMap";
 import { LapChart } from "./LapChart";
 import { TrackMap } from "./TrackMap";
 import { useCarAnimation } from "./useCarAnimation";
@@ -160,8 +159,6 @@ export function RaceReplay({ layout, geometry, cars, rounds }: RaceReplayProps) 
           />
         </CardBody>
       </Card>
-
-      <CornerHeatMap layout={layout} geometry={geometry} rounds={rounds} />
 
       <Card>
         <CardHeader>

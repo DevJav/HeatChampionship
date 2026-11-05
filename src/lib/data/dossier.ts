@@ -8,7 +8,6 @@ import type { DossierInput } from "../dossier";
 import { tallyVotes, votingClosesAt, votingPhase } from "../driver-of-the-day";
 import { formatDate, formatDateTime, formatRaceDate } from "../format";
 import { podiumOf, scorePicks } from "../predictions";
-import { cornerStats } from "../race-log/corners";
 import { momentOfTheRace, pairDuels, raceHighlights, rivalryOfTheRace } from "../race-log/highlights";
 import { driverInsights, rankHistory } from "../race-log/insights";
 import { trackDrawing } from "../race-log/tracks";
@@ -78,7 +77,6 @@ export async function getDossierInput(raceId: string): Promise<DossierInput | nu
       moment: moment && { driver: name(moment.userId), round: moment.round, from: moment.from, to: moment.to },
       rivalry: rivalry && { a: name(rivalry.a), b: name(rivalry.b), swaps: rivalry.swaps, close: rivalry.close },
       drivers: driverInsights(layout, rounds).map(({ id, ...s }) => ({ driver: name(id), ...s })),
-      corners: cornerStats(layout, rounds).map((c, i) => ({ corner: i + 1, limit: layout.corners[i].limit, ...c })),
       order: saved.log.cars.map((car) => ({ driver: name(car.userId), ranks: ranks.map((r) => r[car.userId]) })),
     };
   }

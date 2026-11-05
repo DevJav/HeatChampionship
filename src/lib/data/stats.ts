@@ -23,7 +23,7 @@ export async function getStatsData({ seasonId, trackId }: { seasonId?: string | 
       round: true,
       scheduledAt: true,
       season: { select: { id: true, name: true } },
-      track: { select: { id: true, name: true } },
+      track: { select: { id: true, slug: true, name: true } },
       results: {
         select: {
           userId: true,

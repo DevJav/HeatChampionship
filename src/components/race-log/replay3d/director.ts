@@ -548,7 +548,7 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
     }
     case "trackside": {
       const corner = stage.layout.corners[shot.cam!];
-      return { ...trackside(stage, cams[shot.cam!], shot.subject, t), label: text.raceLog.corner(shot.cam! + 1, corner.limit) };
+      return { ...trackside(stage, cams[shot.cam!], shot.subject, t), label: text.raceLog.replay3d.corner(shot.cam! + 1, corner.limit) };
     }
     case "finish": {
       // The next car still far round the lap: ride along with it until it nears the line,

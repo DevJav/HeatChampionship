@@ -1,33 +1,17 @@
-import Link from "next/link";
-import { Crown, Flag, Rocket, TrendingUp } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { RaceDetail } from "@/lib/data/races";
 import { countryName } from "@/lib/countries";
 import { getStatsData } from "@/lib/data/stats";
-import { formatDate, formatDecimal, formatNames, formatPercent } from "@/lib/format";
-import { championshipRecords, entrantRecords, gridStats, raceHistory } from "@/lib/stats";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Section,
-  StatCard,
-  Table,
-  TBody,
-  Td,
-  Th,
-  THead,
-  Tr,
-} from "@/components/ui";
-import { DriverName } from "@/components/domain/DriverName";
-import { PositionBadge } from "@/components/domain/PositionBadge";
+import { entrantRecords } from "@/lib/stats";
+import { ButtonLink, Section } from "@/components/ui";
+import { TrackDriversTable, TrackHistoryCard, TrackStatCards } from "@/components/tracks/TrackRecords";
 import { t } from "@/i18n";
 
 const HISTORY_LIMIT = 6;
 
 /**
  * Pre-race look at the track: what has happened here before and how each
- * entrant has done on it.
+ * entrant has done on it. The whole story is on the track's page.
  */
 export async function TrackPreview({ race }: { race: RaceDetail }) {
   const { track } = race;
@@ -37,16 +21,17 @@ export async function TrackPreview({ race }: { race: RaceDetail }) {
   const nameOf = (userId: string) => drivers.get(userId)?.name ?? entrants.get(userId)?.user.name ?? "—";
   const country = countryName(track.countryCode);
   const facts = [country !== track.name && country, track.expansion].filter(Boolean).join(" · ");
-
-  const records = championshipRecords(races);
-  const pole = gridStats(races)[0];
-  const kings = records.mostWins;
-  const comeback = records.biggestComeback?.holders[0];
-  const history = raceHistory(races);
   const rows = entrantRecords(races, [...entrants.keys()]);
 
   return (
-    <Section title={t.races.track.title(track.name)}>
+    <Section
+      title={t.races.track.title(track.name)}
+      actions={
+        <ButtonLink href={`/circuitos/${track.slug}`} variant="secondary" size="sm">
+          {t.tracks.seeTrack} <ChevronRight />
+        </ButtonLink>
+      }
+    >
       {(track.description || facts) && (
         <div className="flex flex-col gap-1 text-sm text-fg-muted">
           {facts && <p className="font-display text-xs font-bold uppercase tracking-wider">{facts}</p>}
@@ -54,165 +39,35 @@ export async function TrackPreview({ race }: { race: RaceDetail }) {
         </div>
       )}
 
-      {races.length === 0 ? (
-        <Card className="border-l-4 border-primary p-5">
-          <p className="font-display text-xl font-bold uppercase italic">{t.races.track.firstVisit}</p>
-          <p className="text-sm text-fg-muted">{t.races.track.firstVisitBody}</p>
-        </Card>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard
-              label={t.races.track.racesHere}
-              value={races.length}
-              hint={t.races.track.lastRace(formatDate(races[races.length - 1].scheduledAt))}
-              icon={<Flag />}
-            />
-            <StatCard
-              label={t.races.track.king}
-              value={!kings ? "—" : kings.holders.length === 1 ? nameOf(kings.holders[0].userId) : t.common.tie}
-              hint={
-                !kings
-                  ? t.races.track.nobodyWon
-                  : kings.holders.length === 1
-                    ? t.common.wins(kings.value)
-                    : t.races.track.winsEach(formatNames(kings.holders.map((h) => nameOf(h.userId))), t.common.wins(kings.value))
-              }
-              icon={<Crown />}
-            />
-            <StatCard
-              label={t.races.track.poleWins}
-              value={pole?.uses ? formatPercent(pole.winRate) : "—"}
-              hint={pole?.uses ? t.races.track.poleHint(pole.wins, pole.uses) : t.races.track.noGrids}
-              icon={<Rocket />}
-            />
-            <StatCard
-              label={t.races.track.comeback}
-              value={records.biggestComeback ? `+${records.biggestComeback.value}` : "—"}
-              hint={
-                comeback
-                  ? `${nameOf(comeback.userId)} · ${comeback.detail}`
-                  : t.races.track.noComeback
-              }
-              icon={<TrendingUp />}
-            />
-          </div>
+      <TrackStatCards races={races} nameOf={nameOf} />
 
-          <div className="grid items-start gap-6 lg:grid-cols-3">
-            {rows.length > 0 && (
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <div>
-                    <CardTitle>{t.races.track.entrants}</CardTitle>
-                    <CardDescription>{t.races.track.entrantsDescription(track.name)}</CardDescription>
-                  </div>
-                </CardHeader>
-                <Table>
-                  <THead>
-                    <tr>
-                      <Th>{t.common.columns.driver}</Th>
-                      <Th align="center" title={t.races.track.racesAtTrack}>
-                        {t.races.track.racesShort}
-                      </Th>
-                      <Th align="center" title={t.common.columns.wins}>
-                        {t.common.columns.winsShort}
-                      </Th>
-                      <Th align="center" title={t.common.columns.podiums}>
-                        {t.common.columns.podiumsShort}
-                      </Th>
-                      <Th align="center" title={t.races.track.best}>
-                        {t.races.track.bestShort}
-                      </Th>
-                      <Th align="right" className="max-sm:hidden" title={t.races.track.average}>
-                        {t.races.track.averageShort}
-                      </Th>
-                      <Th align="center" className="max-sm:hidden" title={t.races.track.last}>
-                        {t.races.track.lastShort}
-                      </Th>
-                    </tr>
-                  </THead>
-                  <TBody>
-                    {rows.map(({ userId, stats }) => {
-                      const entrant = entrants.get(userId)!;
-                      return (
-                        <Tr key={userId}>
-                          <Td>
-                            <DriverName
-                              name={entrant.user.name}
-                              username={entrant.user.username}
-                              color={entrant.user.favoriteColor?.hex}
-                              detail={entrant.status === "WAITLIST" ? t.races.track.reserve : undefined}
-                            />
-                          </Td>
-                          {stats ? (
-                            <>
-                              <Td align="center">{stats.starts}</Td>
-                              <Td align="center">{stats.wins}</Td>
-                              <Td align="center">{stats.podiums}</Td>
-                              <Td align="center">
-                                <PositionBadge position={stats.bestFinish!} size="sm" />
-                              </Td>
-                              <Td align="right" className="max-sm:hidden">
-                                {stats.averageFinish == null ? "—" : formatDecimal(stats.averageFinish)}
-                              </Td>
-                              <Td align="center" className="max-sm:hidden">
-                                <PositionBadge position={stats.form[0]} size="sm" />
-                              </Td>
-                            </>
-                          ) : (
-                            <Td colSpan={6} className="text-fg-muted italic">
-                              {t.races.track.debut}
-                            </Td>
-                          )}
-                        </Tr>
-                      );
-                    })}
-                  </TBody>
-                </Table>
-              </Card>
-            )}
-
-            <Card className={rows.length === 0 ? "lg:col-span-3" : undefined}>
-              <CardHeader>
-                <CardTitle>{t.races.track.history}</CardTitle>
-              </CardHeader>
-              <ol className="flex flex-col divide-y divide-border/60">
-                {history.slice(0, HISTORY_LIMIT).map(({ race: past, scheduledAt, podium }) => (
-                  <li key={past.id} className="flex flex-col gap-1.5 px-5 py-3">
-                    <Link
-                      href={`/carreras/${past.id}`}
-                      className="text-xs text-fg-muted hover:text-primary hover:underline"
-                    >
-                      {formatDate(scheduledAt)} · {past.seasonName} · {t.common.roundShort(past.round)}
-                    </Link>
-                    {podium[0] && (
-                      <div className="flex items-center gap-2.5">
-                        <PositionBadge position={1} size="sm" />
-                        <DriverName
-                          name={nameOf(podium[0])}
-                          username={drivers.get(podium[0])?.username}
-                          color={drivers.get(podium[0])?.favoriteColor?.hex}
-                        />
-                      </div>
-                    )}
-                    {(podium[1] || podium[2]) && (
-                      <p className="text-xs text-fg-muted">
-                        {podium
-                          .slice(1)
-                          .map((userId, i) => userId && `${t.common.ordinal(i + 2)} ${nameOf(userId)}`)
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ol>
-              {history.length > HISTORY_LIMIT && (
-                <p className="px-5 pb-3 text-xs text-fg-muted">{t.races.track.moreRaces(history.length - HISTORY_LIMIT)}</p>
-              )}
-            </Card>
-          </div>
-        </>
+      {races.length > 0 && (
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+          {rows.length > 0 && (
+            <TrackDriversTable
+              className="lg:col-span-2"
+              title={t.races.track.entrants}
+              description={t.races.track.entrantsDescription(track.name)}
+              rows={rows}
+              driverOf={(userId) => {
+                const entrant = entrants.get(userId)!;
+                return {
+                  name: entrant.user.name,
+                  username: entrant.user.username,
+                  color: entrant.user.favoriteColor?.hex,
+                  detail: entrant.status === "WAITLIST" ? t.races.track.reserve : undefined,
+                };
+              }}
+            />
+          )}
+          <TrackHistoryCard
+            className={rows.length === 0 ? "lg:col-span-3" : undefined}
+            races={races}
+            drivers={drivers}
+            nameOf={nameOf}
+            limit={HISTORY_LIMIT}
+          />
+        </div>
       )}
     </Section>
   );

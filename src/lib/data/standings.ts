@@ -23,7 +23,7 @@ export async function getSeasonStandings(seasonId: string, { throughRound }: { t
       id: true,
       round: true,
       scheduledAt: true,
-      track: { select: { name: true } },
+      track: { select: { name: true, countryCode: true } },
       results: { select: { userId: true, position: true, points: true } },
     },
   });

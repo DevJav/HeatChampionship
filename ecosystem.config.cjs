@@ -20,5 +20,13 @@ module.exports = {
       autorestart: true,
       max_memory_restart: "600M",
     },
+    {
+      // Nightly back-up (scripts/backup.mjs): runs once when pm2 starts, then at 04:30
+      name: "heat-backup",
+      cwd: __dirname,
+      script: "scripts/backup.mjs",
+      cron_restart: "30 4 * * *",
+      autorestart: false,
+    },
   ],
 };

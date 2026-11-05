@@ -9,6 +9,71 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 ### Added
 - **3D replay:** races logged round by round can be watched like a real race, on a 3D track with cars in your colours, drivers turning the wheel included. Open it with the **3D** button in **Round by round**. Every car ends each round where it was logged, and in between it brakes for corners, overtakes, slipstreams and spins. **TV** cuts between cameras like a broadcast (helicopter, chase, onboard and corner cameras), or pick a camera and who to follow. It comes with a timing tower, captions and each driver's team radio as they cross the line, and **Video** makes a sharp video to share (1080p at 60 fps, MP4, rendered frame by frame so it never stutters). **Script** shows the list of TV shots: change a shot's camera or car, cut at the moment you're watching or remove shots, and the TV camera and the video follow your version (kept on your device). With sound: sixties V8 engines, each car a little different, that climb through the gears, crackle when lifting and pass by the camera, squealing tyres in spins, the start lights and a crowd that cheers the big moments, in the video too. Pick the time of day: **Day**, **Sunset** or **Night** under the floodlights. The broadcast shows instant replays of spins and lead changes in slow motion from another angle, marks slipstreams with trails of air and a **Slipstream** tag on the timing tower, calls the last lap, and ends with a podium ceremony: each of the top three announced in turn with their arms up, trophies, confetti and champagne.
 
+## [1.14.0] - 2026-11-05
+
+### Added
+- **Japan** can now be recorded round by round: its race pages get the lap chart, the replay and the race stats, and its circuit page shows the **Track map**, with the start straight drawn as a bridge over the stretch that runs underneath.
+- The **Netherlands** can now be recorded round by round too, with the lap chart, the replay, the race stats and the **Track map** on its circuit page.
+- **Mexico** too: lap chart, replay, race stats and its **Track map**.
+
+### Changed
+- The **USA**, **Italy**, **Great Britain** and **Spain** track maps have been touched up: the track and its spaces follow the board more closely.
+
+## [1.13.1] - 2026-11-05
+
+### Added
+- **Spain** can now be recorded round by round too: its one long lap, tunnels included, gets the lap chart, the replay and the race stats, and its circuit page shows the **Track map**.
+
+## [1.13.0] - 2026-11-05
+
+### Added
+- **Great Britain** and **Italy** can now be recorded round by round, like the USA and France: their race pages get the lap chart, the replay and the race stats, and their circuit pages show the **Track map**.
+
+### Changed
+- The **USA** track map has been touched up: the track and its spaces follow the board more closely, and a corner's speed limit sits in a better place.
+
+## [1.12.1] - 2026-11-04
+
+### Fixed
+- On phones, the **Title fight** card on the **Standings** page no longer runs off the screen and makes the whole page slide sideways: each driver's gap and maximum points now sit under their name.
+- On narrower phones, the header no longer makes every page slide sideways when you're logged in: the site name now wraps onto two lines when it needs to.
+- On phones, the **Stats** and **Drivers** pages no longer slide sideways either.
+- On phones, the **Leader** card on the **Standings** page now takes the full width, so long names are no longer cut off.
+
+## [1.12.0] - 2026-11-03
+
+### Added
+- Circuit pages now show the **Track map** when the circuit has one (USA and France for now): the same drawing as the recorder, with its corners, speed limits and the spaces left to each corner.
+
+## [1.11.1] - 2026-10-26
+
+### Changed
+- In the **Standings** table, each race column now shows the circuit's flag next to R1, R2…, so you can tell at a glance where each race was run (hover it for the circuit's name). Thin lines now separate the points, the gap/wins/podiums and the races, and the arrows with places gained or lost since the last race are gone.
+- On phones and tablets, the **Standings** table now shows every race too: swipe it sideways to see them.
+
+## [1.11.0] - 2026-10-25
+
+### Added
+- Every circuit has its own page: how many races it has hosted, the king of the track, how often the pole sitter wins, the biggest comeback, every driver's record there, the full race history and the next races booked on it. Find them all under **Circuits** on the Races page, or tap a track's name on a race page or in the Stats tracks table.
+
+### Changed
+- The **Pass.** column in a recorded race's data now counts every car a driver passes, even if they're passed back later in the same round. Before, it counted the places gained each round, so passing two cars and then losing one place counted as one.
+
+### Removed
+- The **Corners** card of recorded races: crediting every pass to a whole corner-to-corner stretch didn't say much about where the overtakes really happen.
+
+### Fixed
+- On the track maps (recorder and replay), the spaces now bend with the track instead of cutting straight across the curves, which left dark gaps in tight corners.
+- On phones, the track section of an upcoming race no longer makes the whole page scroll sideways.
+
+## [1.10.0] - 2026-10-24
+
+### Added
+- **France** can now be recorded round by round, like the USA: its race page gets the lap chart, the replay and the race stats.
+
+### Changed
+- For admins recording a race: the map now shows, beside each space, how many spaces are left before the next corner, the same numbers as on the board, so it's easier to find where each car ended up.
+
 ## [1.9.0] - 2026-10-23
 
 ### Added
@@ -147,7 +212,15 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...HEAD
+[1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0
+[1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1
+[1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0
+[1.12.1]: https://github.com/DevJav/HeatChampionship/compare/v1.12.0...v1.12.1
+[1.12.0]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...v1.12.0
+[1.11.1]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...v1.11.1
+[1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
+[1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0

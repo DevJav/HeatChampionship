@@ -9,6 +9,71 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 ### Nuevo
 - **Repetición 3D:** las carreras anotadas vuelta a vuelta se pueden ver como una carrera de verdad, en un circuito en 3D con coches de vuestros colores, con pilotos girando el volante y todo. Ábrela con el botón **3D** en **Vuelta a vuelta**. Cada coche acaba cada ronda donde se anotó, y entre medias frena en las curvas, adelanta, coge el rebufo y hace trompos. La **Realización** cambia de cámara como en la tele (helicóptero, persecución, a bordo y cámaras de curva), o elige una cámara y a quién seguir. Lleva tabla de tiempos, rótulos y la radio de cada piloto al cruzar la meta, y con **Vídeo** se crea un vídeo nítido para compartir (1080p a 60 fps, MP4, hecho fotograma a fotograma para que nunca dé tirones). **Guion** muestra la lista de planos de la realización: cambia la cámara o el coche de un plano, corta en el momento que estás viendo o quita planos, y la realización y el vídeo siguen tu versión (se guarda en tu dispositivo). Con sonido: motores V8 de los sesenta, cada coche un poco distinto, que suben de marcha, petardean al levantar el pie y pasan junto a la cámara, chirrido de neumáticos en los trompos, los semáforos de salida y un público que celebra los grandes momentos, también en el vídeo. Elige la hora del día: **Día**, **Atardecer** o **Noche** con focos. La retransmisión muestra repeticiones a cámara lenta de trompos y cambios de líder desde otro ángulo, marca los rebufos con estelas de aire y la etiqueta **Rebufo** en la tabla de tiempos, avisa de la última vuelta y termina con la ceremonia del podio: los tres primeros anunciados uno a uno con los brazos en alto, trofeos, confeti y champán.
 
+## [1.14.0] - 2026-11-05
+
+### Nuevo
+- **Japón** ya se puede anotar ronda a ronda: sus páginas de carrera tienen el gráfico de vueltas, la repetición y las estadísticas de la carrera, y su página de circuito muestra el **Mapa del circuito**, con la recta de salida dibujada como un puente sobre el tramo que pasa por debajo.
+- **Países Bajos** también se puede anotar ronda a ronda, con el gráfico de vueltas, la repetición, las estadísticas de la carrera y el **Mapa del circuito** en su página de circuito.
+- **México** también: gráfico de vueltas, repetición, estadísticas de la carrera y su **Mapa del circuito**.
+
+### Cambios
+- Se han retocado los mapas de **Estados Unidos**, **Italia**, **Gran Bretaña** y **España**: la pista y sus casillas siguen mejor el tablero.
+
+## [1.13.1] - 2026-11-05
+
+### Nuevo
+- **España** también se puede anotar ronda a ronda: su única vuelta larga, túneles incluidos, tiene el gráfico de vueltas, la repetición y las estadísticas de la carrera, y su página de circuito muestra el **Mapa del circuito**.
+
+## [1.13.0] - 2026-11-05
+
+### Nuevo
+- Ya se pueden anotar **Gran Bretaña** e **Italia** ronda a ronda, como Estados Unidos y Francia: sus páginas de carrera tienen el gráfico de vueltas, la repetición y las estadísticas de la carrera, y sus páginas de circuito muestran el **Mapa del circuito**.
+
+### Cambios
+- Se ha retocado el mapa de **Estados Unidos**: la pista y sus casillas siguen mejor el tablero, y el límite de velocidad de una curva está mejor colocado.
+
+## [1.12.1] - 2026-11-04
+
+### Arreglos
+- En el móvil, la tarjeta **Lucha por el título** de la página de **Clasificación** ya no se sale de la pantalla ni hace que toda la página se desplace de lado: la diferencia y el máximo de puntos de cada piloto aparecen ahora bajo su nombre.
+- En los móviles más estrechos, la cabecera ya no hace que todas las páginas se desplacen de lado cuando has iniciado sesión: el nombre de la web pasa a dos líneas cuando hace falta.
+- En el móvil, las páginas de **Estadísticas** y **Pilotos** tampoco se desplazan ya de lado.
+- En el móvil, la tarjeta **Líder** de la página de **Clasificación** ocupa ahora todo el ancho, así que los nombres largos ya no se cortan.
+
+## [1.12.0] - 2026-11-03
+
+### Nuevo
+- Las páginas de circuito muestran ahora el **Mapa del circuito** cuando lo tiene (de momento, Estados Unidos y Francia): el mismo dibujo que al anotar las carreras, con sus curvas, sus límites de velocidad y las casillas que faltan hasta cada curva.
+
+## [1.11.1] - 2026-10-26
+
+### Cambios
+- En la tabla de la **Clasificación**, cada columna de carrera muestra ahora la bandera del circuito junto a R1, R2…, para ver de un vistazo dónde se corrió cada carrera (pasa el ratón por encima para ver el nombre del circuito). Unas líneas finas separan ahora los puntos, la diferencia/victorias/podios y las carreras, y ya no salen las flechas de puestos ganados o perdidos desde la última carrera.
+- En móviles y tablets, la tabla de la **Clasificación** muestra ahora también cada carrera: desliza la tabla hacia los lados para verlas.
+
+## [1.11.0] - 2026-10-25
+
+### Nuevo
+- Cada circuito tiene su propia página: cuántas carreras se han corrido allí, el rey del circuito, cuántas veces gana el que sale primero, la mayor remontada, el historial de cada piloto en él, todas las carreras disputadas y las próximas que hay en ese circuito. Están todos en **Circuitos**, en la página de Carreras, o tocando el nombre del circuito en una carrera o en la tabla de circuitos de Estadísticas.
+
+### Cambios
+- La columna **Adel.** de los datos de una carrera anotada cuenta ahora cada coche que adelanta un piloto, aunque luego le vuelvan a pasar en la misma ronda. Antes contaba las posiciones ganadas en cada ronda, así que adelantar a dos y perder un puesto contaba como uno.
+
+### Eliminado
+- La tarjeta **Curvas** de las carreras anotadas: apuntar cada adelantamiento a todo el tramo entre dos curvas no decía gran cosa de dónde se adelanta de verdad.
+
+### Arreglos
+- En los mapas del circuito (anotar y repetición), las casillas ahora siguen la curva de la pista en vez de cortarla en línea recta, lo que dejaba huecos oscuros en las curvas cerradas.
+- En el móvil, la sección del circuito de una carrera próxima ya no hace que toda la página se desplace de lado.
+
+## [1.10.0] - 2026-10-24
+
+### Nuevo
+- **Francia** ya se puede anotar ronda a ronda, como Estados Unidos: su carrera tendrá gráfico de vueltas, repetición y estadísticas de carrera.
+
+### Cambios
+- Para administradores que anotan una carrera: el mapa muestra junto a cada casilla cuántas quedan hasta la siguiente curva, los mismos números que en el tablero, para encontrar más fácil dónde ha acabado cada coche.
+
 ## [1.9.0] - 2026-10-23
 
 ### Nuevo
@@ -147,7 +212,15 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...HEAD
+[1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0
+[1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1
+[1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0
+[1.12.1]: https://github.com/DevJav/HeatChampionship/compare/v1.12.0...v1.12.1
+[1.12.0]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...v1.12.0
+[1.11.1]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...v1.11.1
+[1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0
+[1.10.0]: https://github.com/DevJav/HeatChampionship/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/DevJav/HeatChampionship/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/DevJav/HeatChampionship/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/DevJav/HeatChampionship/compare/v1.6.1...v1.7.0

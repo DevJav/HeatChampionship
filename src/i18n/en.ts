@@ -23,7 +23,6 @@ export const en: Dictionary = {
     namesAndMore: (names, more) => `${names.join(", ")} and ${more} more`,
     columns: {
       position: "Pos.",
-      movement: "Movement",
       driver: "Driver",
       points: "Pts",
       gap: "Gap",
@@ -353,6 +352,20 @@ export const en: Dictionary = {
       legend: { name: "Legend", description: (n) => `${n} races run.` },
       spin: { name: "Spin", description: "Their first spin. It happens to everyone." },
     },
+  },
+
+  tracks: {
+    title: "Circuits",
+    description: "Where we've raced and who rules each one.",
+    fallbackTitle: "Circuit",
+    empty: "No circuits yet",
+    seeTrack: "See circuit",
+    races: (n) => (n === 1 ? "1 race" : `${n} races`),
+    noRacesYet: "No races yet",
+    lastWinner: (name) => `Last winner: ${name}`,
+    upcoming: "Coming up here",
+    drivers: "Drivers",
+    driversDescription: (track) => `Everyone who has raced at ${track}, best average finish first.`,
   },
 
   stats: {
@@ -875,13 +888,6 @@ export const en: Dictionary = {
 
   raceLog: {
     momentTitle: "Moment of the race",
-    cornersTitle: "Corners",
-    cornersHint: "Passes completed on each stretch, from one corner to the next.",
-    corner: (n, limit) => `Corner ${n} · ${limit}`,
-    passes: "Passes",
-    fewerPasses: "Fewer passes",
-    morePasses: "More",
-    cornerTooltip: (n, passes, spins) => `Corner ${n}: ${passes} passes, ${spins} spins`,
     video: {
       button: "Make a video of the replay to share",
       short: "Video",
@@ -920,6 +926,7 @@ export const en: Dictionary = {
       slipstream: "Slipstream",
       replay: "Replay",
       lastLap: "Last lap!",
+      corner: (n, limit) => `Corner ${n} · ${limit}`,
       podium: "Podium",
       place: (n, name) => `${["1st", "2nd", "3rd"][n - 1] ?? `${n}th`} · ${name}`,
       timeOfDay: "Time of day",
@@ -1002,7 +1009,7 @@ export const en: Dictionary = {
     raceData: "Race data",
     driver: "Driver",
     overtakes: "Pass.",
-    overtakesTitle: "Places gained, counting every pass",
+    overtakesTitle: "Cars passed, counting every pass",
     slipstreams: "Slipstreams",
     spins: "Spins",
     average: "Avg.",
@@ -1012,7 +1019,7 @@ export const en: Dictionary = {
     led: "Led",
     ledTitle: "Rounds in the lead",
     noDrawing: "This track can't be logged yet",
-    noDrawingDescription: "Its map of spaces hasn't been drawn. For now only USA is available.",
+    noDrawingDescription: "Its map of spaces hasn't been drawn. For now USA, Italy, France, Great Britain, Spain, Japan, the Netherlands and Mexico are available.",
     notEnoughDrivers: "Not enough drivers",
     notEnoughDriversDescription: "At least two confirmed drivers are needed to log the race.",
     goToEntrants: "Manage entrants",

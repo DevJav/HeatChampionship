@@ -171,7 +171,7 @@ export function ShotScript({ replay, shots, edited, time, onSave, onReset, onSee
                 <Select value={shot.cam} onChange={(e) => change(i, { cam: Number(e.target.value) })} aria-label={s.corner} className="h-8 w-auto text-sm">
                   {stage.layout.corners.map((corner, c) => (
                     <option key={c} value={c}>
-                      {t.raceLog.corner(c + 1, corner.limit)}
+                      {t.raceLog.replay3d.corner(c + 1, corner.limit)}
                     </option>
                   ))}
                 </Select>

@@ -2,12 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  bridgePath,
   carPoint,
   dividerEnds,
   lapSpace,
+  offset,
   racingLineSide,
+  spaceEdgePath,
+  spacePath,
   spacePolygon,
-  type Point,
+  spacesToCorner,
   type TrackGeometry,
   type TrackLayout,
 } from "@/lib/race-log/layout";
@@ -35,15 +39,14 @@ type TrackMapProps = {
   reachable?: Set<number>;
   /** Lap spaces that are full */
   blocked?: Set<number>;
-  /** Fill and hover text per lap space, for heat maps */
-  heat?: Map<number, { fill: string; title: string }>;
+  /** Print each space's distance to the next corner beside it, as on the board */
+  distances?: boolean;
   /** Width / height of the frame; defaults to the track card's. Squarer frames zoom in further on phones. */
   aspect?: number;
   onSpaceTap?: (space: number) => void;
   className?: string;
 };
 
-const points = (ps: Point[]) => ps.map((p) => `${p.x},${p.y}`).join(" ");
 const PAD = 40;
 const CAR = { length: 15, width: 9 };
 
@@ -86,7 +89,7 @@ export function TrackMap({
   focus = [],
   reachable,
   blocked,
-  heat,
+  distances,
   onSpaceTap,
   aspect: frameAspect,
   className,
@@ -123,17 +126,80 @@ export function TrackMap({
 
   // Racing-line edge: the side of each space where spot 0 sits
   const racingEdges = useMemo(
-    () =>
-      Array.from({ length: n }, (_, s) => {
-        const side = racingLineSide(layout, s) === "right" ? 1 : 0;
-        const a = dividerEnds(geometry, s)[side];
-        const b = dividerEnds(geometry, (s + 1) % n)[side];
-        return [a, b] as [Point, Point];
-      }),
+    () => Array.from({ length: n }, (_, s) => spaceEdgePath(geometry, s, racingLineSide(layout, s) === "right" ? 1 : -1)),
     [geometry, layout, n],
   );
+  const outlines = useMemo(() => Array.from({ length: n }, (_, s) => spacePath(geometry, s)), [geometry, n]);
+
+  // Distance labels go on the outside of the bend (opposite the racing line on straights), clear of the badges
+  const distanceLabels = useMemo(() => {
+    if (!distances) return [];
+    const turn = (s: number) => {
+      const a = geometry.spaces[(s + n) % n][2];
+      const b = geometry.spaces[(s + 1 + n) % n][2];
+      return ((b - a + 540) % 360) - 180;
+    };
+    return geometry.spaces.flatMap((space, s) => {
+      const bend = [-3, -2, -1, 0, 1, 2].reduce((sum, k) => sum + turn(s + k), 0);
+      const outside = Math.abs(bend) > 15 ? -Math.sign(bend) : racingLineSide(layout, s) === "right" ? -1 : 1;
+      const p = offset(space, (halfWidth + 8) * outside);
+      if (geometry.badges.some(([bx, by]) => Math.hypot(bx - p.x, by - p.y) < 22)) return [];
+      return [{ s, ...p, value: spacesToCorner(layout, s) }];
+    });
+  }, [distances, geometry, layout, halfWidth, n]);
 
   const finish = dividerEnds(geometry, 0);
+
+  const all = useMemo(() => Array.from({ length: n }, (_, s) => s), [n]);
+  const bridge = useMemo(() => {
+    if (!geometry.bridge?.length) return null;
+    const spaces = geometry.bridge;
+    return { spaces, dividers: [...spaces, (spaces[spaces.length - 1] + 1) % n], path: bridgePath(geometry) };
+  }, [geometry, n]);
+
+  // Racing-line edges, tap targets and dividers for some spaces (all of them, or a bridge's again on top)
+  const spaceLayer = (spaces: number[], dividers: number[]) => (
+    <>
+      {spaces.map((s) => (
+        <path key={`e${s}`} d={racingEdges[s]} fill="none" stroke="var(--track-edge)" strokeWidth={3} strokeLinecap="round" />
+      ))}
+
+      {/* Tap targets and highlights */}
+      {spaces.map((s) => {
+        const d = outlines[s];
+        const tint = blocked?.has(s) ? "var(--track-blocked)" : reachable?.has(s) ? "var(--track-highlight)" : null;
+        if (!tint && !onSpaceTap) return null;
+        return (
+          <path
+            key={`o${s}`}
+            d={d}
+            fill={tint ?? "transparent"}
+            className={onSpaceTap ? "cursor-pointer" : undefined}
+            onClick={onSpaceTap ? () => onSpaceTap(s) : undefined}
+          />
+        );
+      })}
+
+      {/* Dividers; corner lines thick */}
+      {dividers.map((s) => {
+        if (s === 0) return null;
+        const [a, b] = dividerEnds(geometry, s);
+        const corner = cornerAt.has(s);
+        return (
+          <line
+            key={`d${s}`}
+            x1={a.x}
+            y1={a.y}
+            x2={b.x}
+            y2={b.y}
+            stroke={corner ? "var(--track-edge)" : "var(--track-line)"}
+            strokeWidth={corner ? 3.5 : 1}
+            pointerEvents="none"
+          />
+        );
+      })}
+    </>
+  );
 
   return (
     <svg
@@ -149,49 +215,17 @@ export function TrackMap({
       <path d={geometry.path} fill="none" stroke="var(--track-asphalt)" strokeWidth={halfWidth * 2 - 1} strokeLinejoin="round" />
       <path d={geometry.path} fill="none" stroke="var(--track-line)" strokeWidth={0.8} strokeDasharray="4 4" />
 
-      {racingEdges.map(([a, b], s) => (
-        <line key={s} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--track-edge)" strokeWidth={3} strokeLinecap="round" />
-      ))}
+      {spaceLayer(all, all)}
 
-      {/* Tap targets and highlights */}
-      {geometry.dividers.map((_, s) => {
-        const hot = heat?.get(s);
-        const tint = blocked?.has(s)
-          ? "var(--track-blocked)"
-          : reachable?.has(s)
-            ? "var(--track-highlight)"
-            : (hot?.fill ?? "transparent");
-        return (
-          <polygon
-            key={s}
-            points={points(spacePolygon(geometry, s))}
-            fill={tint}
-            className={onSpaceTap ? "cursor-pointer" : undefined}
-            onClick={onSpaceTap ? () => onSpaceTap(s) : undefined}
-          >
-            {hot && <title>{hot.title}</title>}
-          </polygon>
-        );
-      })}
-
-      {/* Dividers; corner lines thick */}
-      {geometry.dividers.map((_, s) => {
-        if (s === 0) return null;
-        const [a, b] = dividerEnds(geometry, s);
-        const corner = cornerAt.has(s);
-        return (
-          <line
-            key={s}
-            x1={a.x}
-            y1={a.y}
-            x2={b.x}
-            y2={b.y}
-            stroke={corner ? "var(--track-edge)" : "var(--track-line)"}
-            strokeWidth={corner ? 3.5 : 1}
-            pointerEvents="none"
-          />
-        );
-      })}
+      {/* A bridge (Japan): its spaces again, on top of the stretch that runs underneath */}
+      {bridge && (
+        <g>
+          <path d={bridge.path} fill="none" stroke="var(--track-edge)" strokeWidth={halfWidth * 2 + 3} pointerEvents="none" />
+          <path d={bridge.path} fill="none" stroke="var(--track-asphalt)" strokeWidth={halfWidth * 2 - 1} pointerEvents="none" />
+          <path d={bridge.path} fill="none" stroke="var(--track-line)" strokeWidth={0.8} strokeDasharray="4 4" pointerEvents="none" />
+          {spaceLayer(bridge.spaces, bridge.dividers)}
+        </g>
+      )}
 
       {/* Start/finish: chequered */}
       <line x1={finish[0].x} y1={finish[0].y} x2={finish[1].x} y2={finish[1].y} stroke="var(--bar-fg)" strokeWidth={6} pointerEvents="none" />
@@ -205,6 +239,20 @@ export function TrackMap({
         strokeDasharray="3 3"
         pointerEvents="none"
       />
+
+      {distanceLabels.map(({ s, x, y, value }) => (
+        <text
+          key={s}
+          x={x}
+          y={y}
+          dy="0.35em"
+          textAnchor="middle"
+          className="fill-fg-muted font-display text-[10px] font-bold"
+          pointerEvents="none"
+        >
+          {value}
+        </text>
+      ))}
 
       {/* Speed limits */}
       {layout.corners.map((corner, i) => {

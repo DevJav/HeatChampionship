@@ -80,6 +80,7 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
                 value={leader?.name ?? "—"}
                 hint={`${rows[0].points} ${t.common.pts}${rows[1] ? ` · ${t.standings.leadOverSecond(rows[0].points - rows[1].points)}` : ""}`}
                 icon={<Crown />}
+                className="max-lg:col-span-2"
               />
             )}
             <StatCard
@@ -98,7 +99,7 @@ async function StandingsView({ searchParams }: { searchParams: PageProps<"/clasi
                     : winLeaders.join(", ")
               }
               icon={<Trophy />}
-              className="max-lg:col-span-2"
+              className={cn(finished && "max-lg:col-span-2")}
             />
           </div>
 

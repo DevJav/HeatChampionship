@@ -79,6 +79,23 @@ describe("trackDrawing", () => {
   it("applies the race's laps and knows only traced tracks", () => {
     expect(trackDrawing("usa", 3)?.layout.laps).toBe(3);
     expect(trackDrawing("usa")?.layout.laps).toBe(usa.laps);
-    expect(trackDrawing("italia")).toBeNull();
+    expect(trackDrawing("francia")?.layout.spacesPerLap).toBe(60);
+    expect(trackDrawing("france")?.layout.spacesPerLap).toBe(60);
+    expect(trackDrawing("italia")?.layout.spacesPerLap).toBe(54);
+    expect(trackDrawing("gran-bretana")?.layout.spacesPerLap).toBe(63);
+    expect(trackDrawing("espana")?.layout.laps).toBe(1);
+    expect(trackDrawing("japon")?.layout.spacesPerLap).toBe(60);
+    expect(trackDrawing("paises-bajos")?.layout.laps).toBe(3);
+    expect(trackDrawing("mexico")?.layout.corners).toHaveLength(6);
+    expect(trackDrawing("no-such-track")).toBeNull();
+  });
+
+  it("has one divider, space and badge per space and corner", () => {
+    for (const slug of ["usa", "francia"]) {
+      const { layout, geometry } = trackDrawing(slug)!;
+      expect(geometry.dividers).toHaveLength(layout.spacesPerLap);
+      expect(geometry.spaces).toHaveLength(layout.spacesPerLap);
+      expect(geometry.badges).toHaveLength(layout.corners.length);
+    }
   });
 });

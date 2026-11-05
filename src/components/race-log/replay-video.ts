@@ -1,5 +1,5 @@
 import { rankHistory } from "@/lib/race-log/insights";
-import { carPoint, dividerEnds, racingLineSide, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
+import { bridgePath, carPoint, dividerEnds, racingLineSide, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
 import type { LoggedRound } from "@/lib/race-log/rounds";
 import { t } from "@/i18n";
 
@@ -91,15 +91,38 @@ function drawTrack(ctx: CanvasRenderingContext2D, { layout, geometry }: ReplaySc
     ctx.lineTo(b.x, b.y);
     ctx.stroke();
   };
-  for (let s = 0; s < n; s++) {
+  const drawSpace = (s: number) => {
     const side = racingLineSide(layout, s) === "right" ? 1 : 0;
     ctx.strokeStyle = c.edge;
     ctx.lineWidth = 3;
     line(dividerEnds(geometry, s)[side], dividerEnds(geometry, (s + 1) % n)[side]);
-    if (s === 0) continue;
+    drawDivider(s);
+  };
+  const drawDivider = (s: number) => {
+    if (s === 0) return;
     ctx.strokeStyle = corners.has(s) ? c.edge : c.line;
     ctx.lineWidth = corners.has(s) ? 3.5 : 1;
     line(...dividerEnds(geometry, s));
+  };
+  for (let s = 0; s < n; s++) drawSpace(s);
+
+  // A bridge (Japan): its spaces again, on top of the stretch that runs underneath
+  if (geometry.bridge?.length) {
+    const bridge = new Path2D(bridgePath(geometry));
+    ctx.lineCap = "butt";
+    ctx.strokeStyle = c.edge;
+    ctx.lineWidth = halfWidth * 2 + 3;
+    ctx.stroke(bridge);
+    ctx.strokeStyle = c.asphalt;
+    ctx.lineWidth = halfWidth * 2 - 1;
+    ctx.stroke(bridge);
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = c.line;
+    ctx.lineWidth = 0.8;
+    ctx.stroke(bridge);
+    ctx.setLineDash([]);
+    geometry.bridge.forEach(drawSpace);
+    drawDivider((geometry.bridge[geometry.bridge.length - 1] + 1) % n);
   }
 
   const [f1, f2] = dividerEnds(geometry, 0);

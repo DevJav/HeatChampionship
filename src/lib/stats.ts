@@ -22,7 +22,7 @@ export type StatsRace = {
   round: number;
   scheduledAt: Date;
   season: { id: string; name: string };
-  track: { id: string; name: string };
+  track: { id: string; slug: string; name: string };
   results: StatsResult[];
   /** Story beats from the round-by-round log, when the race was logged on a traced track */
   highlights?: RaceHighlights | null;
@@ -275,6 +275,7 @@ export function duelStep({ meetings, ahead }: Duel) {
 
 export type TrackStats = {
   trackId: string;
+  trackSlug: string;
   trackName: string;
   races: number;
   averageField: number;
@@ -298,6 +299,7 @@ export function trackStats(races: StatsRace[]): TrackStats[] {
       const top = leaders(winCounts, (w) => w.wins);
       return {
         trackId: list[0].track.id,
+        trackSlug: list[0].track.slug,
         trackName: list[0].track.name,
         races: list.length,
         averageField: average(list.map((race) => race.results.length)) ?? 0,

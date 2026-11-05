@@ -43,7 +43,6 @@ export type DossierInput = {
     moment: { driver: string; round: number; from: number; to: number } | null;
     rivalry: { a: string; b: string; swaps: number; close: number } | null;
     drivers: { driver: string; overtakes: number; slipstreams: number; spins: number; averageMove: number; bestMove: number; roundsLed: number }[];
-    corners: { corner: number; limit: number; passes: number; spins: number; slipstreams: number }[];
     /** Running order after each round, driver → ranks (round 0 = grid) */
     order: { driver: string; ranks: number[] }[];
   } | null;
@@ -121,12 +120,9 @@ export function raceDossier(d: DossierInput): string {
       "### Per driver",
       "",
       table(
-        ["Driver", "Places gained (all passes)", "Slipstreams", "Spins", "Avg spaces/round", "Best move", "Rounds led"],
+        ["Driver", "Overtakes (cars passed)", "Slipstreams", "Spins", "Avg spaces/round", "Best move", "Rounds led"],
         l.drivers.map((x) => [x.driver, x.overtakes, x.slipstreams, x.spins, Math.round(x.averageMove * 10) / 10, x.bestMove, x.roundsLed]),
       ),
-      "### Corners (passes count where the move was completed; spins at the corner being taken)",
-      "",
-      table(["Corner", "Speed limit", "Passes", "Spins", "Slipstreams"], l.corners.map((c) => [c.corner, c.limit, c.passes, c.spins, c.slipstreams])),
       "### Running order after each round (R0 = grid)",
       "",
       table(["Driver", ...l.order[0].ranks.map((_, i) => `R${i}`)], l.order.map((o) => [o.driver, ...o.ranks])),

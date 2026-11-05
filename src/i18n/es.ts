@@ -18,7 +18,6 @@ export const es = {
     namesAndMore: (names: string[], more: number) => `${names.join(", ")} y ${more} más`,
     columns: {
       position: "Pos.",
-      movement: "Movimiento",
       driver: "Piloto",
       points: "Pts",
       gap: "Dif.",
@@ -359,6 +358,20 @@ export const es = {
       legend: { name: "Leyenda", description: (n: number) => `${n} carreras disputadas.` },
       spin: { name: "Trompo", description: "Su primer trompo. Le pasa a cualquiera." },
     },
+  },
+
+  tracks: {
+    title: "Circuitos",
+    description: "Dónde hemos corrido y quién manda en cada uno.",
+    fallbackTitle: "Circuito",
+    empty: "Todavía no hay circuitos",
+    seeTrack: "Ver circuito",
+    races: (n: number) => (n === 1 ? "1 carrera" : `${n} carreras`),
+    noRacesYet: "Sin carreras todavía",
+    lastWinner: (name: string) => `Último ganador: ${name}`,
+    upcoming: "Próximas carreras aquí",
+    drivers: "Pilotos",
+    driversDescription: (track: string) => `Todos los que han corrido en ${track}, de mejor a peor media de llegada.`,
   },
 
   stats: {
@@ -898,13 +911,6 @@ export const es = {
 
   raceLog: {
     momentTitle: "Momento de la carrera",
-    cornersTitle: "Curvas",
-    cornersHint: "Adelantamientos completados en cada tramo, de una curva a la siguiente.",
-    corner: (n: number, limit: number) => `Curva ${n} · ${limit}`,
-    passes: "Adelant.",
-    fewerPasses: "Menos adelantamientos",
-    morePasses: "Más",
-    cornerTooltip: (n: number, passes: number, spins: number) => `Curva ${n}: ${passes} adelantamientos, ${spins} trompos`,
     video: {
       button: "Crear un vídeo de la repetición para compartir",
       short: "Vídeo",
@@ -944,6 +950,7 @@ export const es = {
       slipstream: "Rebufo",
       replay: "Repetición",
       lastLap: "¡Última vuelta!",
+      corner: (n: number, limit: number) => `Curva ${n} · ${limit}`,
       podium: "Podio",
       place: (n: number, name: string) => `${n}º · ${name}`,
       timeOfDay: "Hora del día",
@@ -1027,7 +1034,7 @@ export const es = {
     raceData: "Datos de la carrera",
     driver: "Piloto",
     overtakes: "Adel.",
-    overtakesTitle: "Posiciones ganadas, contando cada adelantamiento",
+    overtakesTitle: "Coches adelantados, contando cada adelantamiento",
     slipstreams: "Rebufos",
     spins: "Trompos",
     average: "Media",
@@ -1037,7 +1044,7 @@ export const es = {
     led: "Líder",
     ledTitle: "Rondas como líder",
     noDrawing: "Este circuito aún no se puede anotar",
-    noDrawingDescription: "Falta dibujar su mapa de casillas. De momento solo está Estados Unidos.",
+    noDrawingDescription: "Falta dibujar su mapa de casillas. De momento están Estados Unidos, Italia, Francia, Gran Bretaña, España, Japón, Países Bajos y México.",
     notEnoughDrivers: "Faltan pilotos",
     notEnoughDriversDescription: "Hacen falta al menos dos pilotos confirmados para anotar la carrera.",
     goToEntrants: "Gestionar inscritos",

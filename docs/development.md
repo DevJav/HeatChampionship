@@ -21,7 +21,7 @@ To get a database to work with, follow [the setup guide](setup.md), or run `npm 
 
 ```
 prisma/                Schema, migrations, seed scripts (seed-content.ts holds the seed data per language)
-scripts/               generate-icons.mjs: favicon and app icons from the logo
+scripts/               generate-icons.mjs: favicon and app icons from the logo; trace-track.py: trace a board photo into a race-log track (see .claude/skills/trace-track); hand-tune it afterwards at /dev/trazado (dev only)
 docs/                  These guides and the README screenshots
 src/
   actions/             Server actions: auth, profile, races, results, seasons, catalog, articles, comments, …

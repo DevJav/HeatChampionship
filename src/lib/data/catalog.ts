@@ -37,6 +37,11 @@ export async function getTrack(id: string) {
   return db.track.findUnique({ where: { id }, include: { _count: { select: { races: true } } } });
 }
 
+export async function getTrackBySlug(slug: string) {
+  await connection();
+  return db.track.findUnique({ where: { slug } });
+}
+
 export async function listUpgrades() {
   await connection();
   return db.upgrade.findMany({

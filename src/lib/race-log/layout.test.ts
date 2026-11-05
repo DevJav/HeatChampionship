@@ -1,7 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { franceLayout as france } from "./france";
+import { franceGeometry, franceLayout as france } from "./france";
+import { greatBritainGeometry, greatBritainLayout as britain } from "./great-britain";
+import { italyGeometry, italyLayout as italy } from "./italy";
 import { cornerOf, spaceEdge, spacePath, spacesToCorner } from "./layout";
 import { usaGeometry as usa, usaLayout } from "./usa";
+
+describe("traced tracks", () => {
+  it.each([
+    ["usa", usaLayout, usa],
+    ["france", france, franceGeometry],
+    ["great britain", britain, greatBritainGeometry],
+    ["italy", italy, italyGeometry],
+  ] as const)("%s has a divider and a centre for every space, and a badge per corner", (_, layout, geometry) => {
+    expect(geometry.dividers).toHaveLength(layout.spacesPerLap);
+    expect(geometry.spaces).toHaveLength(layout.spacesPerLap);
+    expect(geometry.badges).toHaveLength(layout.corners.length);
+    const befores = layout.corners.map((c) => c.before);
+    expect(befores).toEqual([...befores].sort((a, b) => a - b));
+  });
+});
 
 // USA corner lines sit before spaces 12, 33, 49 and 57
 
@@ -21,6 +38,24 @@ describe("spacesToCorner", () => {
     expect(spacesToCorner(france, 11)).toBe(0);
     expect(spacesToCorner(france, 12)).toBe(7);
     expect(spacesToCorner(france, 47)).toBe(24);
+  });
+
+  it("matches the Great Britain card's 15-7-6-5-30 stretches", () => {
+    expect(spacesToCorner(britain, 0)).toBe(14);
+    expect(spacesToCorner(britain, 62)).toBe(15); // pole
+    expect(spacesToCorner(britain, 15)).toBe(14);
+    expect(spacesToCorner(britain, 30)).toBe(6);
+    expect(spacesToCorner(britain, 37)).toBe(5);
+    expect(spacesToCorner(britain, 43)).toBe(4);
+    expect(spacesToCorner(britain, 48)).toBe(29);
+  });
+
+  it("matches the numbers on the Italy board: 8, 6 and 37 after each corner", () => {
+    expect(spacesToCorner(italy, 0)).toBe(9);
+    expect(spacesToCorner(italy, 53)).toBe(10); // pole
+    expect(spacesToCorner(italy, 10)).toBe(8);
+    expect(spacesToCorner(italy, 19)).toBe(6);
+    expect(spacesToCorner(italy, 26)).toBe(37);
   });
 });
 

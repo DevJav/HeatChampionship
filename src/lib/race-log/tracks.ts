@@ -1,5 +1,7 @@
 import type { TrackGeometry, TrackLayout } from "./layout";
 import { franceGeometry, franceLayout } from "./france";
+import { greatBritainGeometry, greatBritainLayout } from "./great-britain";
+import { italyGeometry, italyLayout } from "./italy";
 import { parseRaceLog } from "./log";
 import { usaGeometry, usaLayout } from "./usa";
 
@@ -11,7 +13,18 @@ const drawings: Record<string, TrackDrawing> = {
   // Spanish and English seed slugs
   francia: { layout: franceLayout, geometry: franceGeometry },
   france: { layout: franceLayout, geometry: franceGeometry },
+  "gran-bretana": { layout: greatBritainLayout, geometry: greatBritainGeometry },
+  "great-britain": { layout: greatBritainLayout, geometry: greatBritainGeometry },
+  italia: { layout: italyLayout, geometry: italyGeometry },
+  italy: { layout: italyLayout, geometry: italyGeometry },
 };
+
+/** Each traced track once (by its layout's slug), for the /dev/trazado editor */
+export function tracedTracks() {
+  const seen = new Map<string, TrackDrawing>();
+  for (const drawing of Object.values(drawings)) seen.set(drawing.layout.slug, drawing);
+  return [...seen.values()];
+}
 
 export function hasTrackDrawing(slug: string) {
   return slug in drawings;

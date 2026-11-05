@@ -81,7 +81,9 @@ describe("trackDrawing", () => {
     expect(trackDrawing("usa")?.layout.laps).toBe(usa.laps);
     expect(trackDrawing("francia")?.layout.spacesPerLap).toBe(60);
     expect(trackDrawing("france")?.layout.spacesPerLap).toBe(60);
-    expect(trackDrawing("italia")).toBeNull();
+    expect(trackDrawing("italia")?.layout.spacesPerLap).toBe(54);
+    expect(trackDrawing("gran-bretana")?.layout.spacesPerLap).toBe(63);
+    expect(trackDrawing("no-such-track")).toBeNull();
   });
 
   it("has one divider, space and badge per space and corner", () => {

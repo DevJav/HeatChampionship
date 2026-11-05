@@ -950,7 +950,7 @@ export const en: Dictionary = {
     led: "Led",
     ledTitle: "Rounds in the lead",
     noDrawing: "This track can't be logged yet",
-    noDrawingDescription: "Its map of spaces hasn't been drawn. For now USA and France are available.",
+    noDrawingDescription: "Its map of spaces hasn't been drawn. For now USA, Italy, France and Great Britain are available.",
     notEnoughDrivers: "Not enough drivers",
     notEnoughDriversDescription: "At least two confirmed drivers are needed to log the race.",
     goToEntrants: "Manage entrants",

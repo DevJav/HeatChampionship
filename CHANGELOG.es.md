@@ -6,6 +6,14 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.13.0] - 2026-11-05
+
+### Nuevo
+- Ya se pueden anotar **Gran Bretaña** e **Italia** ronda a ronda, como Estados Unidos y Francia: sus páginas de carrera tienen el gráfico de vueltas, la repetición y las estadísticas de la carrera, y sus páginas de circuito muestran el **Mapa del circuito**.
+
+### Cambios
+- Se ha retocado el mapa de **Estados Unidos**: la pista y sus casillas siguen mejor el tablero, y el límite de velocidad de una curva está mejor colocado.
+
 ## [1.12.1] - 2026-11-04
 
 ### Arreglos
@@ -186,7 +194,9 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.12.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0
+[1.12.1]: https://github.com/DevJav/HeatChampionship/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/DevJav/HeatChampionship/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/DevJav/HeatChampionship/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/DevJav/HeatChampionship/compare/v1.10.0...v1.11.0

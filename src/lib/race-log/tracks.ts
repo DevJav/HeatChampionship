@@ -2,6 +2,7 @@ import type { TrackGeometry, TrackLayout } from "./layout";
 import { franceGeometry, franceLayout } from "./france";
 import { greatBritainGeometry, greatBritainLayout } from "./great-britain";
 import { italyGeometry, italyLayout } from "./italy";
+import { spainGeometry, spainLayout } from "./spain";
 import { parseRaceLog } from "./log";
 import { usaGeometry, usaLayout } from "./usa";
 
@@ -17,6 +18,8 @@ const drawings: Record<string, TrackDrawing> = {
   "great-britain": { layout: greatBritainLayout, geometry: greatBritainGeometry },
   italia: { layout: italyLayout, geometry: italyGeometry },
   italy: { layout: italyLayout, geometry: italyGeometry },
+  // Expansion circuits created in the live admin panel: slug = slugify(name)
+  espana: { layout: spainLayout, geometry: spainGeometry },
 };
 
 /** Each traced track once (by its layout's slug), for the /dev/trazado editor */

@@ -83,6 +83,7 @@ describe("trackDrawing", () => {
     expect(trackDrawing("france")?.layout.spacesPerLap).toBe(60);
     expect(trackDrawing("italia")?.layout.spacesPerLap).toBe(54);
     expect(trackDrawing("gran-bretana")?.layout.spacesPerLap).toBe(63);
+    expect(trackDrawing("espana")?.layout.laps).toBe(1);
     expect(trackDrawing("no-such-track")).toBeNull();
   });
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { franceGeometry, franceLayout as france } from "./france";
 import { greatBritainGeometry, greatBritainLayout as britain } from "./great-britain";
 import { italyGeometry, italyLayout as italy } from "./italy";
+import { spainGeometry, spainLayout as spain } from "./spain";
 import { cornerOf, spaceEdge, spacePath, spacesToCorner } from "./layout";
 import { usaGeometry as usa, usaLayout } from "./usa";
 
@@ -11,6 +12,7 @@ describe("traced tracks", () => {
     ["france", france, franceGeometry],
     ["great britain", britain, greatBritainGeometry],
     ["italy", italy, italyGeometry],
+    ["spain", spain, spainGeometry],
   ] as const)("%s has a divider and a centre for every space, and a badge per corner", (_, layout, geometry) => {
     expect(geometry.dividers).toHaveLength(layout.spacesPerLap);
     expect(geometry.spaces).toHaveLength(layout.spacesPerLap);
@@ -56,6 +58,12 @@ describe("spacesToCorner", () => {
     expect(spacesToCorner(italy, 10)).toBe(8);
     expect(spacesToCorner(italy, 19)).toBe(6);
     expect(spacesToCorner(italy, 26)).toBe(37);
+  });
+
+  it("matches the numbers on the Spain board, a single long lap", () => {
+    expect(spacesToCorner(spain, 0)).toBe(10);
+    expect(spacesToCorner(spain, 108)).toBe(11); // pole
+    expect(spain.corners.map((c) => spacesToCorner(spain, c.before))).toEqual([3, 13, 2, 11, 20, 19, 6, 2, 2, 4, 16]);
   });
 });
 

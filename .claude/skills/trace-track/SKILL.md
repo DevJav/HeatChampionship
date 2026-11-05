@@ -86,6 +86,18 @@ message). Copy the board photo into the scratchpad, never into the repo.
      track file's comment so the trace can be reproduced.
    - getting the right count isn't enough: check in `debug.png` that the purple line
      stays in the middle of the asphalt.
+   - **the skeleton can't follow the track** (tunnels breaking the asphalt up, two
+     asphalt colours, strips running side by side; Spain): give the route by hand.
+     Draw a coordinate grid over the photo (lines every 25 px, labelled) and read
+     ~100 `[x, y]` points along the centre line in travel order, in original pixels.
+     Work out the route first from the countdown numbers beside the spaces: they
+     decrease in the direction of travel. Save the points to
+     `scripts/track-routes/<slug>.json` and pass `--waypoints` with one `--seed` per
+     asphalt colour. The tracer snaps the route to the middle of the asphalt
+     (`snapped N%` in the output; tunnel walls stay as drawn). Faint 1 px dividers on
+     dark tarmac need `--thin-lines`. Spain: `--seed 700,670 --seed 180,105 --tol 22
+     --close 5 --no-orange-track --thin-lines --line-score 0.35 --drop 15,87`.
+   - auto-splitting runs before `--drop`, so after dropping, recheck `debug.png`.
    - the printed numbers count down to 0, so a stretch has one more space than the
      highest number in it (Italy: 37, 8, 6 → 38 + 9 + 7 = 54). The user may give you
      the highest numbers: add one to each before checking the total.
@@ -112,6 +124,11 @@ message). Copy the board photo into the scratchpad, never into the repo.
 
 7. **Register it** in `src/lib/race-log/tracks.ts` under both seed slugs (Spanish and
    English, from `prisma/seed-content.ts`, e.g. `gran-bretana` and `great-britain`).
+   Expansion circuits (España, Japón, México, Países Bajos…) aren't in the seed: they
+   were created in the live admin panel, whose slug is `slugify(name)` from
+   `src/lib/slug.ts` (`japon`, `paises-bajos`). Register only that slug and confirm it
+   with the user (the end of the circuit's URL on the live site). No database change is
+   needed; to see it locally, create the circuit in the local admin with the same name.
 
 8. **Tests**: add the track to the `traced tracks` table in
    `src/lib/race-log/layout.test.ts`, plus a `spacesToCorner` case that matches the

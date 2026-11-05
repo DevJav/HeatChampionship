@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  bridgePath,
   carPoint,
   dividerEnds,
   lapSpace,
@@ -149,6 +150,57 @@ export function TrackMap({
 
   const finish = dividerEnds(geometry, 0);
 
+  const all = useMemo(() => Array.from({ length: n }, (_, s) => s), [n]);
+  const bridge = useMemo(() => {
+    if (!geometry.bridge?.length) return null;
+    const spaces = geometry.bridge;
+    return { spaces, dividers: [...spaces, (spaces[spaces.length - 1] + 1) % n], path: bridgePath(geometry) };
+  }, [geometry, n]);
+
+  // Racing-line edges, tap targets and dividers for some spaces (all of them, or a bridge's again on top)
+  const spaceLayer = (spaces: number[], dividers: number[]) => (
+    <>
+      {spaces.map((s) => (
+        <path key={`e${s}`} d={racingEdges[s]} fill="none" stroke="var(--track-edge)" strokeWidth={3} strokeLinecap="round" />
+      ))}
+
+      {/* Tap targets and highlights */}
+      {spaces.map((s) => {
+        const d = outlines[s];
+        const tint = blocked?.has(s) ? "var(--track-blocked)" : reachable?.has(s) ? "var(--track-highlight)" : null;
+        if (!tint && !onSpaceTap) return null;
+        return (
+          <path
+            key={`o${s}`}
+            d={d}
+            fill={tint ?? "transparent"}
+            className={onSpaceTap ? "cursor-pointer" : undefined}
+            onClick={onSpaceTap ? () => onSpaceTap(s) : undefined}
+          />
+        );
+      })}
+
+      {/* Dividers; corner lines thick */}
+      {dividers.map((s) => {
+        if (s === 0) return null;
+        const [a, b] = dividerEnds(geometry, s);
+        const corner = cornerAt.has(s);
+        return (
+          <line
+            key={`d${s}`}
+            x1={a.x}
+            y1={a.y}
+            x2={b.x}
+            y2={b.y}
+            stroke={corner ? "var(--track-edge)" : "var(--track-line)"}
+            strokeWidth={corner ? 3.5 : 1}
+            pointerEvents="none"
+          />
+        );
+      })}
+    </>
+  );
+
   return (
     <svg
       viewBox={box.join(" ")}
@@ -163,43 +215,17 @@ export function TrackMap({
       <path d={geometry.path} fill="none" stroke="var(--track-asphalt)" strokeWidth={halfWidth * 2 - 1} strokeLinejoin="round" />
       <path d={geometry.path} fill="none" stroke="var(--track-line)" strokeWidth={0.8} strokeDasharray="4 4" />
 
-      {racingEdges.map((d, s) => (
-        <path key={s} d={d} fill="none" stroke="var(--track-edge)" strokeWidth={3} strokeLinecap="round" />
-      ))}
+      {spaceLayer(all, all)}
 
-      {/* Tap targets and highlights */}
-      {outlines.map((d, s) => {
-        const tint = blocked?.has(s) ? "var(--track-blocked)" : reachable?.has(s) ? "var(--track-highlight)" : null;
-        if (!tint && !onSpaceTap) return null;
-        return (
-          <path
-            key={s}
-            d={d}
-            fill={tint ?? "transparent"}
-            className={onSpaceTap ? "cursor-pointer" : undefined}
-            onClick={onSpaceTap ? () => onSpaceTap(s) : undefined}
-          />
-        );
-      })}
-
-      {/* Dividers; corner lines thick */}
-      {geometry.dividers.map((_, s) => {
-        if (s === 0) return null;
-        const [a, b] = dividerEnds(geometry, s);
-        const corner = cornerAt.has(s);
-        return (
-          <line
-            key={s}
-            x1={a.x}
-            y1={a.y}
-            x2={b.x}
-            y2={b.y}
-            stroke={corner ? "var(--track-edge)" : "var(--track-line)"}
-            strokeWidth={corner ? 3.5 : 1}
-            pointerEvents="none"
-          />
-        );
-      })}
+      {/* A bridge (Japan): its spaces again, on top of the stretch that runs underneath */}
+      {bridge && (
+        <g>
+          <path d={bridge.path} fill="none" stroke="var(--track-edge)" strokeWidth={halfWidth * 2 + 3} pointerEvents="none" />
+          <path d={bridge.path} fill="none" stroke="var(--track-asphalt)" strokeWidth={halfWidth * 2 - 1} pointerEvents="none" />
+          <path d={bridge.path} fill="none" stroke="var(--track-line)" strokeWidth={0.8} strokeDasharray="4 4" pointerEvents="none" />
+          {spaceLayer(bridge.spaces, bridge.dividers)}
+        </g>
+      )}
 
       {/* Start/finish: chequered */}
       <line x1={finish[0].x} y1={finish[0].y} x2={finish[1].x} y2={finish[1].y} stroke="var(--bar-fg)" strokeWidth={6} pointerEvents="none" />

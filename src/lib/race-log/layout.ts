@@ -42,6 +42,11 @@ export type TrackGeometry = {
   spaces: Anchor[];
   /** Where to draw each corner's speed-limit badge, same order as `corners` */
   badges: [number, number][];
+  /**
+   * Where the track crosses itself (Japan): spaces on the bridge, in lap order.
+   * The map draws them again on top, over the stretch that runs underneath.
+   */
+  bridge?: number[];
 };
 
 export type Point = { x: number; y: number };
@@ -124,9 +129,22 @@ export function dividerEnds(geometry: TrackGeometry, index: number): [Point, Poi
   return [offset(anchor, -geometry.halfWidth), offset(anchor, geometry.halfWidth)];
 }
 
-/** Control point that makes a quadratic curve from `a` to `b` pass through `mid` halfway along. */
+/**
+ * Control point that makes a quadratic curve from `a` to `b` pass through `mid`.
+ * The curve passes `mid` halfway along, unless `mid` sits well off to one end
+ * (Japan's space 29, whose centre is on the short piece before the bridge):
+ * then it passes it that share of the way along, so the edge doesn't bulge back.
+ */
 function through(a: Point, mid: Point, b: Point): Point {
-  return { x: 2 * mid.x - (a.x + b.x) / 2, y: 2 * mid.y - (a.y + b.y) / 2 };
+  const da = Math.hypot(mid.x - a.x, mid.y - a.y);
+  const db = Math.hypot(b.x - mid.x, b.y - mid.y);
+  const share = da + db > 0 ? da / (da + db) : 0.5;
+  const t = share > 0.35 && share < 0.65 ? 0.5 : share;
+  const k = 2 * t * (1 - t);
+  return {
+    x: (mid.x - (1 - t) ** 2 * a.x - t ** 2 * b.x) / k,
+    y: (mid.y - (1 - t) ** 2 * a.y - t ** 2 * b.y) / k,
+  };
 }
 
 /**
@@ -134,7 +152,7 @@ function through(a: Point, mid: Point, b: Point): Point {
  * point and end of a curve through the space's centre anchor, so it bends
  * with the track instead of cutting across the bend.
  */
-export function spaceEdge(geometry: TrackGeometry, space: number, side: -1 | 1): [Point, Point, Point] {
+export function spaceEdge(geometry: TrackGeometry, space: number, side: -1 | 0 | 1): [Point, Point, Point] {
   const next = (space + 1) % geometry.dividers.length;
   const a = offset(geometry.dividers[space], side * geometry.halfWidth);
   const b = offset(geometry.dividers[next], side * geometry.halfWidth);
@@ -154,6 +172,16 @@ export function spacePath(geometry: TrackGeometry, space: number) {
 export function spaceEdgePath(geometry: TrackGeometry, space: number, side: -1 | 1) {
   const [a, c, b] = spaceEdge(geometry, space, side);
   return `M${coord(a)}Q${coord(c)} ${coord(b)}`;
+}
+
+/** The centre line over the bridge spaces, as an open SVG path ("" when the track has no bridge) */
+export function bridgePath(geometry: TrackGeometry) {
+  return (geometry.bridge ?? [])
+    .map((space, i) => {
+      const [a, c, b] = spaceEdge(geometry, space, 0);
+      return `${i === 0 ? `M${coord(a)}` : ""}Q${coord(c)} ${coord(b)}`;
+    })
+    .join("");
 }
 
 /** The four corners of a space, for fitting it in view */

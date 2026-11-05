@@ -97,6 +97,19 @@ message). Copy the board photo into the scratchpad, never into the repo.
      (`snapped N%` in the output; tunnel walls stay as drawn). Faint 1 px dividers on
      dark tarmac need `--thin-lines`. Spain: `--seed 700,670 --seed 180,105 --tol 22
      --close 5 --no-orange-track --thin-lines --line-score 0.35 --drop 15,87`.
+   - only part of the ring in `mask.png`: the asphalt's shade drifts across the photo
+     (lighting). Add more `--seed`s around the ring. Mexico: four seeds, `--tol 25
+     --close 7 --no-orange-track`.
+   - **the track crosses itself** (Japan): use `--waypoints`; the tracer puts fake
+     dividers at the bridge edges, so `--drop` them. Ask the user whether a space
+     is hidden under the bridge (on Japan none is). In the track file, list the
+     spaces on the bridge in `bridge: [...]`: the map and replay video draw them
+     again on top. If a space runs under the bridge, move its centre onto its visible
+     piece so cars aren't drawn on the bridge; the editor keeps an off-centre spot
+     when saving.
+   - corner lines: each badge has a strip that meets the track exactly at its corner
+     line. Read the corner indices from those strips, not from the line colour.
+     Badges can read upside down (Mexico: 7 looks like L, 6 like 9, 4 like h).
    - auto-splitting runs before `--drop`, so after dropping, recheck `debug.png`.
    - the printed numbers count down to 0, so a stretch has one more space than the
      highest number in it (Italy: 37, 8, 6 → 38 + 9 + 7 = 54). The user may give you
@@ -115,7 +128,13 @@ message). Copy the board photo into the scratchpad, never into the repo.
    traced), smooth a stretch, check the live preview and **Save** straight into the
    track file (only the geometry block is rewritten; dev only). Use it for wobbles
    from cars or tokens rather than fighting the tracer's knobs. Mention in the file's
-   comment that it was hand-tuned.
+   comment that it was hand-tuned. **Línea de carrera** mode sets each stretch's
+   racing-line side over the photo (tap a space to flip its stretch) and Save
+   writes the sides into the layout too. Under the preview, **Coches de prueba** puts test
+   cars on the map the way the recorder draws them: **Todas las casillas** (two on
+   every space) shows any spot that falls off the track or under a bridge; tap a
+   space to drive a car there. Reload the page before saving if the track file
+   changed on disk: a stale tab writes its old geometry back.
 
 6. **Write `src/lib/race-log/<track>.ts`** from `geometry.json` (same shape and comments
    as `great-britain.ts`). Add the `badges`: one `[x, y]` per corner, in race order, at
@@ -136,7 +155,9 @@ message). Copy the board photo into the scratchpad, never into the repo.
    `log.test.ts` checks `trackDrawing` by slug: add the new slug there too.
    Run `npx vitest run src/lib/race-log` and `npx tsc --noEmit`.
 
-9. **Look at it in the app**: with `next dev` running, open `/circuitos/<slug>` and
+9. **Look at it in the app**: with `next dev` running (check which port: another app
+   may hold 3000), open `/circuitos/<slug>` (or `/dev/trazado`, which needs no local
+   circuit) and
    screenshot the **Track map** (e.g. `agent-browser open …`, `agent-browser screenshot …`).
    Compare the numbers beside the spaces with the board.
 

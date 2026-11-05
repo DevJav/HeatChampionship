@@ -1,4 +1,4 @@
-import type { Anchor, Point, TrackGeometry } from "./layout";
+import type { Anchor, Point, Side, TrackGeometry } from "./layout";
 
 /**
  * Hand-editing a traced track (the /dev/trazado editor).
@@ -7,7 +7,8 @@ import type { Anchor, Point, TrackGeometry } from "./layout";
  * distances along it, the half width and the badges. Everything else in a
  * TrackGeometry is derived from those, the same way scripts/trace-track.py
  * derives it: each divider's normal comes from the line's direction there,
- * and each space's centre sits halfway along the line between its dividers.
+ * and each space's centre sits halfway along the line between its dividers
+ * (or as far along as it was, for a space whose centre was set well off halfway).
  */
 export type EditModel = {
   width: number;
@@ -17,6 +18,19 @@ export type EditModel = {
   /** Distance along the centre line from vertex 0, one per divider, in lap order */
   dividers: number[];
   badges: [number, number][];
+  /** Spaces on a bridge (Japan), carried through untouched */
+  bridge?: number[];
+  /**
+   * Spaces whose centre sits well off halfway (Japan's space 29, on the short
+   * piece before the bridge): the share of the way along the space it sits at.
+   */
+  offCentre?: Record<number, number>;
+  /**
+   * Racing-line side of each corner's stretch (corner to corner), in race order.
+   * It belongs to the layout, not the geometry: edited here so undo covers it,
+   * ignored by toGeometry and saved with replaceRacingLines.
+   */
+  racingLines?: Side[];
 };
 
 const r1 = (v: number) => Math.round(v * 10) / 10;
@@ -108,6 +122,13 @@ export function fromGeometry(geometry: TrackGeometry): EditModel {
     const s = i === 0 ? project(vertices, cum, p).s : project(vertices, cum, p, dividers[i - 1], dividers[i - 1] + total / 4).s;
     dividers.push(s);
   });
+  const offCentre: Record<number, number> = {};
+  geometry.spaces.forEach(([x, y], i) => {
+    const from = dividers[i];
+    const span = wrap(dividers[(i + 1) % dividers.length] - from, total);
+    const share = wrap(project(vertices, cum, { x, y }, from, from + span).s - from, total) / span;
+    if (Math.abs(share - 0.5) > 0.15) offCentre[i] = Math.round(share * 1000) / 1000;
+  });
   return {
     width: geometry.width,
     height: geometry.height,
@@ -115,6 +136,8 @@ export function fromGeometry(geometry: TrackGeometry): EditModel {
     vertices,
     dividers,
     badges: geometry.badges.map(([x, y]) => [x, y]),
+    ...(geometry.bridge && { bridge: geometry.bridge.slice() }),
+    ...(Object.keys(offCentre).length > 0 && { offCentre }),
   };
 }
 
@@ -129,8 +152,9 @@ export function toGeometry(model: EditModel): TrackGeometry {
     halfWidth: model.halfWidth,
     path: "M" + vertices.map((v) => `${r1(v.x)} ${r1(v.y)}`).join(" L") + " Z",
     dividers: dividers.map((s) => anchorAt(vertices, cum, s)),
-    spaces: dividers.map((s, i) => anchorAt(vertices, cum, s + wrap(dividers[(i + 1) % n] - s, total) / 2)),
+    spaces: dividers.map((s, i) => anchorAt(vertices, cum, s + wrap(dividers[(i + 1) % n] - s, total) * (model.offCentre?.[i] ?? 0.5))),
     badges: model.badges.map(([x, y]) => [Math.round(x), Math.round(y)]),
+    ...(model.bridge && { bridge: model.bridge.slice() }),
   };
 }
 
@@ -187,7 +211,23 @@ export function serializeGeometry(name: string, g: TrackGeometry) {
   dividers: ${anchors(g.dividers)},
   spaces: ${anchors(g.spaces)},
   badges: [
-${g.badges.map(([x, y]) => `    [${x}, ${y}],\n`).join("")}  ],
+${g.badges.map(([x, y]) => `    [${x}, ${y}],\n`).join("")}  ],${g.bridge ? `\n  bridge: [${g.bridge.join(", ")}],` : ""}
 };
 `;
+}
+
+const LAYOUT_BLOCK = /export const \w+: TrackLayout = \{[\s\S]*?\n\};\n/;
+
+/**
+ * A track file's source with its layout's racing-line sides replaced, in race
+ * order; null when the file has no layout block or a different number of corners.
+ */
+export function replaceRacingLines(source: string, sides: Side[]): string | null {
+  const block = source.match(LAYOUT_BLOCK)?.[0];
+  if (!block) return null;
+  const found = block.match(/racingLine: "(left|right)"/g) ?? [];
+  if (found.length !== sides.length) return null;
+  let i = 0;
+  const next = block.replace(/racingLine: "(left|right)"/g, () => `racingLine: "${sides[i++]}"`);
+  return source.replace(block, next);
 }

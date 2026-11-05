@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Redo2, RotateCcw, Save, Undo2, Wand2 } from "lucide-react";
 import { Alert, Button, Card, CardBody, Field, Input, Select } from "@/components/ui";
-import { TrackMap } from "@/components/race-log/TrackMap";
 import {
   cumulative,
   fromGeometry,
@@ -15,12 +14,13 @@ import {
   toGeometry,
   type EditModel,
 } from "@/lib/race-log/geometry-edit";
-import { dividerEnds, type Point, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
+import { cornerOf, dividerEnds, spaceEdgePath, spacePath, type Point, type Side, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
 import { cn } from "@/lib/cn";
 import { saveTrackGeometry } from "./actions";
+import { CarPreview } from "./CarPreview";
 
 type Track = { layout: TrackLayout; geometry: TrackGeometry };
-type Mode = "line" | "dividers" | "badges";
+type Mode = "line" | "dividers" | "badges" | "racing";
 type History = { past: EditModel[]; present: EditModel; future: EditModel[] };
 type Drag =
   | { kind: "vertex" | "divider" | "badge"; index: number; before: EditModel; moved: boolean; shift: boolean }
@@ -39,14 +39,25 @@ const MODES: { id: Mode; label: string; help: string }[] = [
     help: "Arrastra una división a lo largo de la línea. Doble clic en la línea añade una; Alt + clic en una la borra. Las curvas se marcan en grueso.",
   },
   { id: "badges", label: "Curvas", help: "Arrastra el círculo de cada límite de velocidad." },
+  {
+    id: "racing",
+    label: "Línea de carrera",
+    help: "El borde grueso es la línea de carrera; va de curva a curva. Toca una casilla para cambiar de lado todo su tramo, o usa los botones de cada tramo.",
+  },
 ];
+
+/** Alternating colours, so neighbouring stretches are easy to tell apart over the photo */
+const STRETCH_COLOURS = ["#22d3ee", "#e879f9"];
+
+/** The editable model for a track: its geometry plus its corners' racing-line sides */
+const editModel = (track: Track): EditModel => ({ ...fromGeometry(track.geometry), racingLines: track.layout.corners.map((c) => c.racingLine) });
 
 const wrap = (s: number, total: number) => ((s % total) + total) % total;
 
 export function TrackEditor({ tracks }: { tracks: Track[] }) {
   const [trackIndex, setTrackIndex] = useState(0);
   const track = tracks[trackIndex];
-  const [history, setHistory] = useState<History>(() => ({ past: [], present: fromGeometry(track.geometry), future: [] }));
+  const [history, setHistory] = useState<History>(() => ({ past: [], present: editModel(track), future: [] }));
   const [dirty, setDirty] = useState(false);
   const [mode, setMode] = useState<Mode>("line");
   const [selection, setSelection] = useState<{ from: number | null; to: number | null }>({ from: null, to: null });
@@ -65,13 +76,19 @@ export function TrackEditor({ tracks }: { tracks: Track[] }) {
   const cum = useMemo(() => cumulative(model.vertices), [model.vertices]);
   const total = cum[cum.length - 1];
   const cornerAt = useMemo(() => new Set(track.layout.corners.map((c) => c.before)), [track]);
+  // The layout with the racing-line sides being edited, for the overlay and the preview
+  const racingLines = useMemo(() => model.racingLines ?? track.layout.corners.map((c) => c.racingLine), [model.racingLines, track]);
+  const layout = useMemo(
+    (): TrackLayout => ({ ...track.layout, corners: track.layout.corners.map((c, i) => ({ ...c, racingLine: racingLines[i] })) }),
+    [track, racingLines],
+  );
   const expected = track.layout.spacesPerLap;
 
   const loadTrack = (index: number) => {
     if (dirty && !confirm("Hay cambios sin guardar. ¿Cambiar de circuito?")) return;
     const next = tracks[index];
     setTrackIndex(index);
-    setHistory({ past: [], present: fromGeometry(next.geometry), future: [] });
+    setHistory({ past: [], present: editModel(next), future: [] });
     setDirty(false);
     setSelection({ from: null, to: null });
     setBox([0, 0, next.geometry.width, next.geometry.height]);
@@ -83,6 +100,13 @@ export function TrackEditor({ tracks }: { tracks: Track[] }) {
     setHistory((h) => ({ past: before ? [...h.past, before] : h.past, present: next, future: before ? [] : h.future }));
     setDirty(true);
   }, []);
+
+  // Racing-line side of a corner's stretch (corner to corner)
+  const setSide = (corner: number, side: Side) => {
+    if (racingLines[corner] === side) return;
+    commit({ ...model, racingLines: racingLines.map((s, i) => (i === corner ? side : s)) }, model);
+  };
+  const flip = (corner: number) => setSide(corner, racingLines[corner] === "left" ? "right" : "left");
 
   const undo = useCallback(() => {
     setHistory((h) => (h.past.length ? { past: h.past.slice(0, -1), present: h.past[h.past.length - 1], future: [h.present, ...h.future] } : h));
@@ -264,7 +288,7 @@ export function TrackEditor({ tracks }: { tracks: Track[] }) {
 
   const save = () =>
     startSaving(async () => {
-      const result = await saveTrackGeometry(track.layout.slug, geometry);
+      const result = await saveTrackGeometry(track.layout.slug, geometry, racingLines);
       if (result.ok) {
         setMessage({ tone: "success", text: `Guardado en ${result.file}. Revisa el diff y pasa los tests.` });
         setDirty(false);
@@ -351,6 +375,32 @@ export function TrackEditor({ tracks }: { tracks: Track[] }) {
       <p className="text-sm text-fg-muted">
         {MODES.find((m) => m.id === mode)!.help} Rueda para acercar, arrastra el fondo para moverte.
       </p>
+      {mode === "racing" && (
+        <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {track.layout.corners.map((corner, i) => {
+            const next = track.layout.corners[(i + 1) % track.layout.corners.length];
+            const last = (next.before - 1 + expected) % expected;
+            return (
+              <li key={i} className="flex items-center gap-2 rounded-card border border-border px-3 py-2 text-sm">
+                <span className="size-3 shrink-0 rounded-full" style={{ background: STRETCH_COLOURS[i % 2] }} />
+                <span className="grow">
+                  <b>
+                    Curva {i + 1} ({corner.limit}) → {(i + 1) % track.layout.corners.length + 1} ({next.limit})
+                  </b>
+                  <span className="block text-xs text-fg-muted">
+                    Casillas {corner.before}–{last}
+                  </span>
+                </span>
+                {(["left", "right"] as const).map((side) => (
+                  <Button key={side} size="sm" variant={racingLines[i] === side ? "primary" : "ghost"} onClick={() => setSide(i, side)}>
+                    {side === "left" ? "Izq." : "Der."}
+                  </Button>
+                ))}
+              </li>
+            );
+          })}
+        </ol>
+      )}
       {message && <Alert tone={message.tone}>{message.text}</Alert>}
 
       <div className="flex flex-col gap-4">
@@ -412,6 +462,33 @@ export function TrackEditor({ tracks }: { tracks: Track[] }) {
               </text>
             ))}
 
+            {mode === "racing" &&
+              geometry.spaces.map((_, s) => {
+                const corner = cornerOf(layout, s);
+                return (
+                  <g key={`racing${s}`}>
+                    <path
+                      d={spaceEdgePath(geometry, s, racingLines[corner] === "right" ? 1 : -1)}
+                      fill="none"
+                      stroke={STRETCH_COLOURS[corner % 2]}
+                      strokeWidth={4 * unit}
+                      strokeLinecap="round"
+                      pointerEvents="none"
+                    />
+                    {/* Tap target: flips the whole stretch */}
+                    <path
+                      d={spacePath(geometry, s)}
+                      fill="transparent"
+                      className="cursor-pointer"
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        flip(corner);
+                      }}
+                    />
+                  </g>
+                );
+              })}
+
             {track.layout.corners.map((corner, i) => {
               const [x, y] = model.badges[i];
               return (
@@ -459,7 +536,7 @@ export function TrackEditor({ tracks }: { tracks: Track[] }) {
           <p className="text-sm font-bold">Así se verá</p>
           <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-card border border-border">
             {countOk ? (
-              <TrackMap layout={track.layout} geometry={geometry} cars={[]} distances />
+              <CarPreview key={track.layout.slug} layout={layout} geometry={geometry} />
             ) : (
               <p className="p-4 text-sm text-danger">
                 El número de divisiones ({model.dividers.length}) no coincide con las casillas del circuito ({expected}).

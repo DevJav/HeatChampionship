@@ -7,12 +7,14 @@ import {
   parsePath,
   rangeIndices,
   reproject,
+  replaceRacingLines,
   serializeGeometry,
   smooth,
   toGeometry,
 } from "./geometry-edit";
 import { greatBritainGeometry } from "./great-britain";
 import { italyGeometry } from "./italy";
+import { japanGeometry } from "./japan";
 import { usaGeometry } from "./usa";
 
 const angleGap = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
@@ -95,5 +97,42 @@ describe("serializeGeometry", () => {
     const code = serializeGeometry("italyGeometry", italyGeometry);
     expect(code).toMatch(/^export const italyGeometry: TrackGeometry = \{\n {2}width: 1000,/);
     expect(code.trimEnd().endsWith("};")).toBe(true);
+    expect(code).not.toContain("bridge");
+  });
+
+  it("keeps Japan's bridge through an edit", () => {
+    const back = toGeometry(fromGeometry(japanGeometry));
+    expect(back.bridge).toEqual([0, 1, 2]);
+    // Space 29's centre stays on the piece above the bridge instead of going back halfway, under it
+    expect(back.spaces[29][0]).toBeCloseTo(japanGeometry.spaces[29][0], 0);
+    expect(back.spaces[29][1]).toBeCloseTo(japanGeometry.spaces[29][1], 0);
+    expect(serializeGeometry("japanGeometry", back)).toContain("\n  bridge: [0, 1, 2],\n};");
+  });
+});
+
+describe("replaceRacingLines", () => {
+  const source = `export const xLayout: TrackLayout = {
+  slug: "x",
+  corners: [
+    { before: 9, limit: 5, racingLine: "left" },
+    { before: 13, limit: 5, racingLine: "right" },
+  ],
+};
+
+export const xGeometry: TrackGeometry = {
+  width: 1000,
+};
+`;
+
+  it("rewrites each corner's side in race order and leaves the rest alone", () => {
+    const out = replaceRacingLines(source, ["right", "left"])!;
+    expect(out).toContain('{ before: 9, limit: 5, racingLine: "right" }');
+    expect(out).toContain('{ before: 13, limit: 5, racingLine: "left" }');
+    expect(out.replace(/racingLine: "\w+"/g, "")).toBe(source.replace(/racingLine: "\w+"/g, ""));
+  });
+
+  it("refuses a different number of corners", () => {
+    expect(replaceRacingLines(source, ["left"])).toBeNull();
+    expect(replaceRacingLines("no layout here", [])).toBeNull();
   });
 });

@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import { franceGeometry, franceLayout as france } from "./france";
 import { greatBritainGeometry, greatBritainLayout as britain } from "./great-britain";
 import { italyGeometry, italyLayout as italy } from "./italy";
+import { japanGeometry, japanLayout as japan } from "./japan";
+import { mexicoGeometry, mexicoLayout as mexico } from "./mexico";
+import { netherlandsGeometry, netherlandsLayout as netherlands } from "./netherlands";
 import { spainGeometry, spainLayout as spain } from "./spain";
-import { cornerOf, spaceEdge, spacePath, spacesToCorner } from "./layout";
+import { bridgePath, cornerOf, spaceEdge, spacePath, spacesToCorner } from "./layout";
 import { usaGeometry as usa, usaLayout } from "./usa";
 
 describe("traced tracks", () => {
@@ -13,6 +16,9 @@ describe("traced tracks", () => {
     ["great britain", britain, greatBritainGeometry],
     ["italy", italy, italyGeometry],
     ["spain", spain, spainGeometry],
+    ["japan", japan, japanGeometry],
+    ["netherlands", netherlands, netherlandsGeometry],
+    ["mexico", mexico, mexicoGeometry],
   ] as const)("%s has a divider and a centre for every space, and a badge per corner", (_, layout, geometry) => {
     expect(geometry.dividers).toHaveLength(layout.spacesPerLap);
     expect(geometry.spaces).toHaveLength(layout.spacesPerLap);
@@ -64,6 +70,50 @@ describe("spacesToCorner", () => {
     expect(spacesToCorner(spain, 0)).toBe(10);
     expect(spacesToCorner(spain, 108)).toBe(11); // pole
     expect(spain.corners.map((c) => spacesToCorner(spain, c.before))).toEqual([3, 13, 2, 11, 20, 19, 6, 2, 2, 4, 16]);
+  });
+
+  it("matches the numbers on the Japan board, with nothing under the bridge", () => {
+    expect(spacesToCorner(japan, 0)).toBe(9);
+    expect(spacesToCorner(japan, 59)).toBe(10); // pole
+    expect(japan.corners.map((c) => spacesToCorner(japan, c.before))).toEqual([1, 5, 26, 7, 16]);
+    // 15 on the piece above the bridge, 14 where the road comes out below it
+    expect(spacesToCorner(japan, 29)).toBe(15);
+    expect(spacesToCorner(japan, 30)).toBe(14);
+  });
+});
+
+describe("spacesToCorner on the Netherlands board", () => {
+  it("matches the numbers printed beside the spaces: 9-4-3-10-8-21", () => {
+    expect(spacesToCorner(netherlands, 0)).toBe(8);
+    expect(spacesToCorner(netherlands, 54)).toBe(9); // pole
+    expect(netherlands.corners.map((c) => spacesToCorner(netherlands, c.before))).toEqual([3, 2, 9, 7, 29]);
+  });
+});
+
+describe("spacesToCorner on the Mexico board", () => {
+  it("matches the numbers printed beside the spaces: 14-5-19-6-6-1-9", () => {
+    expect(spacesToCorner(mexico, 0)).toBe(13);
+    expect(spacesToCorner(mexico, 59)).toBe(14); // pole
+    expect(mexico.corners.map((c) => spacesToCorner(mexico, c.before))).toEqual([4, 18, 5, 5, 0, 22]);
+  });
+});
+
+describe("bridge", () => {
+  it("runs along the bridge spaces, from the first one's divider to the last one's end", () => {
+    const d = bridgePath(japanGeometry);
+    const [x0, y0] = japanGeometry.dividers[0];
+    const [x3, y3] = japanGeometry.dividers[3];
+    expect(d.startsWith(`M${x0} ${y0}Q`)).toBe(true);
+    expect(d.endsWith(`${x3} ${y3}`)).toBe(true);
+    expect(d.match(/Q/g)).toHaveLength(japanGeometry.bridge!.length);
+    expect(bridgePath(spainGeometry)).toBe("");
+  });
+
+  it("keeps Japan's space 29 on the piece above the bridge, not under it", () => {
+    // The bridge's top edge is at y ≈ 310 where the stretch from the top dives under it
+    const [, y] = japanGeometry.spaces[29];
+    expect(y).toBeGreaterThan(japanGeometry.dividers[29][1]);
+    expect(y).toBeLessThan(310);
   });
 });
 

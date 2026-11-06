@@ -102,9 +102,11 @@ export function buildPodium(scene: THREE.Scene, stage: Stage) {
     add(new THREE.Mesh(new THREE.BoxGeometry(STEP.width, height, STEP.depth), [white, white, white, white, number, white]), x, height / 2 + 0.6, 0);
     add(new THREE.Mesh(new THREE.BoxGeometry(STEP.width + 0.3, 0.4, STEP.depth + 0.3), standard({ color: TRIM[i], metalness: 0.6, roughness: 0.3 })), x, height + 0.8, 0);
     // The trophy, at the front corner of the step
-    const cup = new THREE.Mesh(trophyGeometry(), standard({ color: TRIM[i], metalness: 0.8, roughness: 0.25 }));
-    cup.scale.setScalar(i === 0 ? 0.75 : 0.6);
-    add(cup, x + 4.8, height + LIFT, STEP.depth / 2 - 1.4);
+    if (podium.ids[i]) {
+      const cup = new THREE.Mesh(trophyGeometry(), standard({ color: TRIM[i], metalness: 0.8, roughness: 0.25 }));
+      cup.scale.setScalar(i === 0 ? 0.75 : 0.6);
+      add(cup, x + 4.8, height + LIFT, STEP.depth / 2 - 1.4);
+    }
   });
 
   // Sponsor wall behind, chequered flags either side
@@ -157,7 +159,8 @@ export function buildPodium(scene: THREE.Scene, stage: Stage) {
   );
   const facing = Math.atan2(face.z, face.x);
   const spray = Array.from({ length: SPRAY }, (_, i) => ({
-    from: i < SPRAY / 2 ? 0 : i < (SPRAY * 3) / 4 ? 1 : 2,
+    // A two-car race has nobody spraying from third
+    from: (i < SPRAY / 2 ? 0 : i < (SPRAY * 3) / 4 ? 1 : 2) % podium.ids.length,
     launch: beats.champagne + (i / SPRAY) * (beats.end - beats.champagne - 0.3) + rand() * 0.05,
     angle: facing + (rand() - 0.5) * 2.2,
     speed: 38 + rand() * 18,
@@ -181,7 +184,7 @@ export function buildPodium(scene: THREE.Scene, stage: Stage) {
         const rig = rigs.get(id);
         if (!rig) return;
         rig.root.position.set(spots[i].x, spots[i].y, spots[i].z);
-        rig.root.rotation.y = Math.atan2(-face.z, face.x);
+        rig.root.rotation.set(0, Math.atan2(-face.z, face.x), 0);
         rig.spinner.rotation.y = 0;
         rig.chassis.rotation.set(0, 0, 0);
         const since = age - cheerAt[i];

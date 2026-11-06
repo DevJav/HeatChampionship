@@ -30,12 +30,34 @@ export type TrackPath = {
   curvature(arc: number): number;
   /** Length along the race (keeps counting across laps) of a running position */
   arcOf(pos: number): number;
+  /** Height of the road at a length: 0 except on the way up to and over a bridge */
+  height(arc: number): number;
+  /** How steeply the road climbs at a length, height per unit of length */
+  slope(arc: number): number;
+  /** 0 … 1: how close a length is to running underneath a bridge, for cameras to stay below the deck */
+  under(arc: number): number;
+  /** Where the track crosses itself, if it does */
+  bridge: BridgeSpans | null;
+};
+
+/** Lengths along the lap; `from` can be negative, since a bridge can sit across the start line */
+export type BridgeSpans = {
+  /** The whole raised stretch, ramps included */
+  raised: [number, number];
+  /** The stretch of the road below that runs under the deck */
+  below: [number, number];
 };
 
 const STEP = 1;
 const SMOOTH = 30;
 /** How much the traced line is evened out, in drawing units */
 const EVEN_OUT = 18;
+/** Height of a bridge's deck: room for a car and a low camera underneath */
+export const BRIDGE_HEIGHT = 12;
+/** Length of a bridge's ramps, in drawing units */
+const BRIDGE_RAMP = 90;
+/** Length over which a camera drops as it nears the road under a bridge, in drawing units */
+const UNDER_FADE = 45;
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
@@ -126,6 +148,42 @@ function nearestIndex(xs: Float64Array, ys: Float64Array, x: number, y: number) 
   return best;
 }
 
+const smoothstep = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+
+/**
+ * Finds where the road crosses itself, starting from the bridge's spaces: the
+ * stretch of them directly above another part of the track, and that other part.
+ */
+function findCrossing(
+  xs: Float64Array,
+  ys: Float64Array,
+  step: number,
+  length: number,
+  halfWidth: number,
+  [start, end]: [number, number],
+): { deck: [number, number]; below: [number, number] } | null {
+  const count = xs.length;
+  const reach = 2 * halfWidth + 4;
+  const around = (a: number, b: number) => {
+    const d = mod(a - b, length);
+    return Math.min(d, length - d);
+  };
+  let deck: [number, number] | null = null;
+  let below: [number, number] | null = null;
+  for (let arc = start; arc <= end; arc += 2) {
+    const [x, y] = [xs[mod(Math.round(arc / step), count)], ys[mod(Math.round(arc / step), count)]];
+    for (let i = 0; i < count; i += 2) {
+      const other = i * step;
+      // Its own stretch of road doesn't count
+      if (around(other, arc) < end - start + 6 * halfWidth) continue;
+      if ((xs[i] - x) ** 2 + (ys[i] - y) ** 2 > reach * reach) continue;
+      deck = deck ? [Math.min(deck[0], arc), Math.max(deck[1], arc)] : [arc, arc];
+      below = below ? [Math.min(below[0], other), Math.max(below[1], other)] : [other, other];
+    }
+  }
+  return deck && below ? { deck, below } : null;
+}
+
 /** `scale` enlarges the whole circuit (road included); the 3D replay uses it to fit every car side by side. */
 export function trackPath(layout: TrackLayout, geometry: TrackGeometry, scale = 1): TrackPath {
   const halfWidth = geometry.halfWidth * scale;
@@ -176,6 +234,32 @@ export function trackPath(layout: TrackLayout, geometry: TrackGeometry, scale = 
   };
 
   const n = layout.spacesPerLap;
+
+  // The bridge, if any: up a ramp to the deck, across the road below, and down again
+  const spaces = geometry.bridge ?? [];
+  const crossing = spaces.length
+    ? findCrossing(xs, ys, step, length, halfWidth, [dividers[spaces[0]], dividers[spaces[spaces.length - 1] + 1] ?? length])
+    : null;
+  const ramp = BRIDGE_RAMP * scale;
+  const fade = UNDER_FADE * scale;
+  /** Distance past `from` going round the lap, as −length/2 … length/2 */
+  const signed = (arc: number, from: number) => mod(arc - from + length / 2, length) - length / 2;
+  const height = crossing
+    ? (arc: number) => {
+        const [from, to] = crossing.deck;
+        const middle = (from + to) / 2;
+        const away = Math.abs(signed(arc, middle)) - (to - from) / 2;
+        return BRIDGE_HEIGHT * smoothstep(1 - away / ramp);
+      }
+    : () => 0;
+  const under = crossing
+    ? (arc: number) => {
+        const [from, to] = crossing.below;
+        const away = Math.abs(signed(arc, (from + to) / 2)) - (to - from) / 2;
+        return smoothstep(1 - away / fade);
+      }
+    : () => 0;
+
   return {
     scale,
     length,
@@ -196,6 +280,13 @@ export function trackPath(layout: TrackLayout, geometry: TrackGeometry, scale = 
       const a = dividers[i];
       const b = i + 1 < n ? dividers[i + 1] : length;
       return lap * length + a + (b - a) * (s - i);
+    },
+    height,
+    slope: (arc) => (height(arc + 1) - height(arc - 1)) / 2,
+    under,
+    bridge: crossing && {
+      raised: [crossing.deck[0] - ramp, crossing.deck[1] + ramp],
+      below: crossing.below,
     },
   };
 }

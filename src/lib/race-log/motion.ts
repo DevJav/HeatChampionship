@@ -98,15 +98,22 @@ function speedProfile(layout: TrackLayout) {
   };
 }
 
-/** Time cost of covering track: integral of 1 / speed, tabulated so it can be inverted. */
-function costTable(layout: TrackLayout, from: number, to: number) {
+/**
+ * Time cost of covering track: integral of 1 / speed, tabulated so it can be
+ * inverted. Counted by real length, because spaces aren't all as long (Japan's
+ * space 29 is over twice the usual): a car takes longer over a long space
+ * instead of rushing through it.
+ */
+function costTable(layout: TrackLayout, path: TrackPath, from: number, to: number) {
   const speed = speedProfile(layout);
   const res = 16;
+  const usual = path.length / layout.spacesPerLap;
   const count = Math.ceil((to - from) * res) + 1;
   const table = new Float64Array(count);
   for (let i = 1; i < count; i++) {
     const mid = from + (i - 0.5) / res;
-    table[i] = table[i - 1] + 1 / res / speed(mid);
+    const distance = (path.arcOf(mid + 0.5 / res) - path.arcOf(mid - 0.5 / res)) / usual;
+    table[i] = table[i - 1] + distance / speed(mid);
   }
   const cost = (pos: number) => {
     const u = clamp((pos - from) * res, 0, count - 1);
@@ -184,7 +191,7 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
   const lastRound = rounds.length - 1;
   const end = lastRound + COAST_ROUNDS;
   const finish = finishLine(layout);
-  const table = costTable(layout, -30, finish + 120);
+  const table = costTable(layout, path, -30, finish + 120);
 
   // Where each car is at the end of every round, then rolling on past the flag
   const progress = new Map<string, (t: number) => number>();
@@ -263,7 +270,7 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
   const lanes = Array.from({ length: laneCount }, (_, i) => -LAT_MAX + (2 * LAT_MAX * i) / (laneCount - 1));
   const nearestLane = (l: number) => lanes.reduce((best, x, i) => (Math.abs(x - l) < Math.abs(lanes[best] - l) ? i : best), 0);
   // How far ahead (in samples) to check who will end up alongside whom, so cars move over in time
-  const LOOKAHEAD = [0, 4, 8, 12];
+  const LOOKAHEAD = 24;
   // A car goes back to the racing line once it has been clear for this many samples
   const RELEASE = 14;
 
@@ -277,7 +284,16 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
   for (let k = 0; k < count; k++) {
     const t = k * dt;
     const sorted = [...ids].sort((a, b) => posAt(b, k) - posAt(a, k));
-    const alongside = (a: string, b: string) => LOOKAHEAD.some((o) => Math.abs(posAt(a, k + o) - posAt(b, k + o)) < OVERLAP);
+    // Close at some sample, or swapping places between two: a fast car can cover more than a car length in one
+    const alongside = (a: string, b: string) => {
+      let before = posAt(a, k) - posAt(b, k);
+      for (let o = 0; o <= LOOKAHEAD; o++) {
+        const gap = posAt(a, k + o) - posAt(b, k + o);
+        if (Math.abs(gap) < OVERLAP || gap * before < 0) return true;
+        before = gap;
+      }
+      return false;
+    };
     const taken = new Map<string, number>();
     for (const id of sorted) {
       const current = lat.get(id)!;
@@ -294,8 +310,8 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
 
       let target = racingLine;
       if (spin?.active) {
-        // Sliding wide, off line: whatever lane it is in is taken
-        target = -Math.sign(path.curvature(arc + 60 * path.scale) || 1) * LAT_MAX;
+        // Sliding wide, off line, unless that would take it through a car: whatever lane it is in is taken
+        target = others.length ? current : -Math.sign(path.curvature(arc + 60 * path.scale) || 1) * LAT_MAX;
         taken.set(id, nearestLane(current));
       } else if (lane.get(id) !== null || others.length) {
         const busy = new Set(others.filter((o) => taken.has(o)).map((o) => taken.get(o)!));
@@ -353,8 +369,9 @@ export function raceMotion(layout: TrackLayout, path: TrackPath, rounds: LoggedR
       heading[k] = clamp(Math.atan(sideways / Math.max(Math.abs(forward), 4)), -0.35, 0.35);
     }
     headingSamples.set(id, smooth(heading, 4));
-    // Speeds from the sampled positions, smoothed, so braking reads as one dip rather than jitter
-    const speed = smooth(smooth(derivative(pos), 4), 4);
+    // Speeds from the real distance covered, smoothed, so braking reads as one dip rather than jitter
+    const usual = path.length / layout.spacesPerLap;
+    const speed = smooth(smooth(derivative(pos.map((p) => path.arcOf(p) / usual)), 4), 4);
     speedSamples.set(id, speed);
     accelSamples.set(id, smooth(smooth(derivative(speed), 6), 6));
   }

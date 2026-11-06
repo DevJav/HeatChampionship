@@ -176,6 +176,7 @@ function buildSlipstreams(scene: THREE.Scene, stage: Stage) {
         const p = carPose(stage, car.id, Math.max(0, t - k * STEP));
         const len = Math.hypot(p.dx, p.dz) || 1;
         const [fx, fz] = [p.dx / len, p.dz / len];
+        const y = HEIGHT + p.y;
         // Thinning and fading towards the tail
         const tail = k / (POINTS - 1);
         const half = 0.22 * (1 - tail * 0.8);
@@ -186,10 +187,10 @@ function buildSlipstreams(scene: THREE.Scene, stage: Stage) {
           const cz = p.z - fz * 4 + fx * side;
           const flat = ((si * 2) * POINTS + k) * 2;
           const up = ((si * 2 + 1) * POINTS + k) * 2;
-          car.position.setXYZ(flat, cx + fz * half, HEIGHT, cz - fx * half);
-          car.position.setXYZ(flat + 1, cx - fz * half, HEIGHT, cz + fx * half);
-          car.position.setXYZ(up, cx, HEIGHT + half, cz);
-          car.position.setXYZ(up + 1, cx, HEIGHT - half, cz);
+          car.position.setXYZ(flat, cx + fz * half, y, cz - fx * half);
+          car.position.setXYZ(flat + 1, cx - fz * half, y, cz + fx * half);
+          car.position.setXYZ(up, cx, y + half, cz);
+          car.position.setXYZ(up + 1, cx, y - half, cz);
           for (const v of [flat, flat + 1, up, up + 1]) car.color.setXYZW(v, 1, 1, 1, alpha);
         });
       }
@@ -202,7 +203,7 @@ function buildSlipstreams(scene: THREE.Scene, stage: Stage) {
 /** Tyre smoke and black skid marks for each spin-out, worked out from the time so scrubbing replays them */
 function buildSpins(scene: THREE.Scene, stage: Stage) {
   const smokeMap = smoke();
-  const puffs: { sprite: THREE.Sprite; born: number; x: number; z: number; drift: number }[] = [];
+  const puffs: { sprite: THREE.Sprite; born: number; x: number; y: number; z: number; drift: number }[] = [];
   const marks: { geometry: THREE.BufferGeometry; from: number; to: number; count: number }[] = [];
   const markMat = new THREE.MeshBasicMaterial({ color: "#050505", transparent: true, opacity: 0.55, depthWrite: false });
   for (const event of stage.motion.events) {
@@ -213,12 +214,13 @@ function buildSpins(scene: THREE.Scene, stage: Stage) {
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeMap, transparent: true, depthWrite: false, color: "#e8e8e8" }));
       sprite.visible = false;
       scene.add(sprite);
-      puffs.push({ sprite, born, x: car.x - car.dx * 4 * CAR_SCALE, z: car.z - car.dz * 4 * CAR_SCALE, drift: (i % 2 ? 1 : -1) * (0.5 + (i % 3)) });
+      puffs.push({ sprite, born, x: car.x - car.dx * 4 * CAR_SCALE, y: car.y, z: car.z - car.dz * 4 * CAR_SCALE, drift: (i % 2 ? 1 : -1) * (0.5 + (i % 3)) });
     }
     // Two rubber streaks from the rear tyres, drawn as the car slides
     const steps = 48;
     const positions: number[] = [];
     let previous: [number, number][] | null = null;
+    let previousY = 0;
     for (let k = 0; k <= steps; k++) {
       const t = event.t + ((event.end - event.t) * k) / steps;
       const car = carPose(stage, event.id, t);
@@ -233,11 +235,13 @@ function buildSpins(scene: THREE.Scene, stage: Stage) {
           const [a, b] = [previous[w], rear[w]];
           const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
           const [nx, nz] = [(-(b[1] - a[1]) / len) * 0.5, ((b[0] - a[0]) / len) * 0.5];
-          positions.push(a[0] - nx, 0.09, a[1] - nz, b[0] - nx, 0.09, b[1] - nz, a[0] + nx, 0.09, a[1] + nz);
-          positions.push(a[0] + nx, 0.09, a[1] + nz, b[0] - nx, 0.09, b[1] - nz, b[0] + nx, 0.09, b[1] + nz);
+          const [ya, yb] = [previousY + 0.09, car.y + 0.09];
+          positions.push(a[0] - nx, ya, a[1] - nz, b[0] - nx, yb, b[1] - nz, a[0] + nx, ya, a[1] + nz);
+          positions.push(a[0] + nx, ya, a[1] + nz, b[0] - nx, yb, b[1] - nz, b[0] + nx, yb, b[1] + nz);
         }
       }
       previous = rear;
+      previousY = car.y;
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
@@ -252,7 +256,7 @@ function buildSpins(scene: THREE.Scene, stage: Stage) {
       puff.sprite.visible = age > 0 && age < life;
       if (!puff.sprite.visible) continue;
       const k = age / life;
-      puff.sprite.position.set(puff.x + puff.drift * k * 8, 1.2 + k * 8, puff.z + puff.drift * k * 5);
+      puff.sprite.position.set(puff.x + puff.drift * k * 8, puff.y + 1.2 + k * 8, puff.z + puff.drift * k * 5);
       const size = 3 + k * 20;
       puff.sprite.scale.set(size, size, 1);
       puff.sprite.material.opacity = 0.7 * (1 - k) ** 1.5;
@@ -428,8 +432,10 @@ export async function createWorld(
   function placeCars(time: number) {
     for (const [id, rig] of rigs) {
       const car = carPose(stage, id, time);
-      rig.root.position.set(car.x, 0, car.z);
+      rig.root.position.set(car.x, car.y, car.z);
       rig.root.rotation.y = Math.atan2(-car.dz, car.dx);
+      // Up and down a bridge's ramps
+      rig.root.rotation.z = Math.atan(stage.path.slope(car.arc));
       rig.spinner.rotation.y = car.spin;
       // Smoothed speed and acceleration along the track, in spaces per round
       const { speed, accel } = stage.motion.at(id, time);

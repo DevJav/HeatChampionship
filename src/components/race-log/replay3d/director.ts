@@ -110,7 +110,7 @@ export function carPose({ path, motion }: Pick<Stage, "path" | "motion">, id: st
   // Along the track, turned towards the lane it is moving into
   const [c, s] = [Math.cos(now.heading), Math.sin(now.heading)];
   const [dx, dz] = [p.dx * c - p.dy * s, p.dy * c + p.dx * s];
-  return { x: p.x, z: p.y, dx, dz, arc, spin: now.spin, pos: now.pos };
+  return { x: p.x, y: path.height(arc), z: p.y, dx, dz, arc, spin: now.spin, pos: now.pos };
 }
 
 /** Fixed cameras beside each corner, then one at the finish line. */
@@ -124,12 +124,17 @@ export function tracksideCameras({ layout, path, boards }: Pick<Stage, "layout" 
     return v(p.x, 15, p.y);
   });
   // Just past the line, on the inside between the track and the barrier, looking back at the cars as they cross
-  const line = besideLine(path, FINISH_CAM_PAST * path.scale, 1 + 14 / path.halfWidth);
-  cams.push(v(line.x, 7, line.y));
+  const past = FINISH_CAM_PAST * path.scale;
+  const line = besideLine(path, past, 1 + 14 / path.halfWidth);
+  cams.push(v(line.x, 7 + path.height(past), line.y));
   return cams;
 }
 
 const FINISH_CAM_PAST = 30;
+/** How far the chase camera drops to pass under a bridge */
+const UNDER_BRIDGE = 6;
+/** Room the podium needs from the edge of any road: half its stage, corner to corner, and some air */
+const PODIUM_CLEARANCE = 36;
 
 /**
  * What each trackside camera films, as lines from the camera to the track:
@@ -173,7 +178,7 @@ export function planShots(stage: Stage): { shots: Shot[]; end: number } {
   const cams = tracksideCameras(stage);
   const finishes = motion.official.map((id) => motion.finishedAt[id]).filter((x): x is number => x !== null);
   const firstFinish = finishes.length ? Math.min(...finishes) : null;
-  const lastFinish = finishes.length === motion.ids.length ? Math.max(...finishes) : null;
+  const lastFinish = finishes.length ? Math.max(...finishes) : null;
   const podium = stage.podium;
   const end = podium ? podium.start + PODIUM_LENGTH : lastFinish !== null ? Math.min(motion.end, lastFinish + 1.6) : motion.lastRound + 0.6;
   const racingUntil = firstFinish !== null ? firstFinish - 0.6 : end;
@@ -281,9 +286,12 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 function chase(stage: Stage, id: string, t: number, back = 44, height = 13): Omit<CameraPose, "label"> {
   const car = carPose(stage, id, t);
   const lat = stage.motion.at(id, t).lat * 0.6;
-  const p = besideLine(stage.path, car.arc - back, lat);
+  const arc = car.arc - back;
+  const p = besideLine(stage.path, arc, lat);
   const ahead = besideLine(stage.path, car.arc + 30, lat);
-  return { position: v(p.x, height, p.y), target: v(lerp(car.x, ahead.x, 0.4), 2, lerp(car.z, ahead.y, 0.4)), fov: 50, subject: id };
+  // Stays low going under a bridge, rather than through its deck
+  const y = lerp(height, UNDER_BRIDGE, stage.path.under(arc)) + stage.path.height(arc);
+  return { position: v(p.x, y, p.y), target: v(lerp(car.x, ahead.x, 0.4), 2 + car.y, lerp(car.z, ahead.y, 0.4)), fov: 50, subject: id };
 }
 
 function onboard(stage: Stage, id: string, t: number): Omit<CameraPose, "label"> {
@@ -294,8 +302,8 @@ function onboard(stage: Stage, id: string, t: number): Omit<CameraPose, "label">
   const dz = car.dx * s + car.dz * c;
   return {
     // Just ahead of the helmet, at the driver's eye line
-    position: v(car.x - dx * EYE.back * CAR_SCALE, EYE.up * CAR_SCALE, car.z - dz * EYE.back * CAR_SCALE),
-    target: v(car.x + dx * 40, 2.2, car.z + dz * 40),
+    position: v(car.x - dx * EYE.back * CAR_SCALE, EYE.up * CAR_SCALE + car.y, car.z - dz * EYE.back * CAR_SCALE),
+    target: v(car.x + dx * 40, 2.2 + stage.path.height(car.arc + 40), car.z + dz * 40),
     // Wide, so the cockpit and the cars around it fit in
     fov: 85,
     subject: id,
@@ -307,7 +315,7 @@ function heli(stage: Stage, id: string, t: number, radius = 150, height = 120): 
   const angle = t * 0.22 + 1.3;
   return {
     position: v(car.x + Math.cos(angle) * radius, height, car.z + Math.sin(angle) * radius),
-    target: v(car.x, 0, car.z),
+    target: v(car.x, car.y, car.z),
     fov: 42,
     subject: id,
   };
@@ -316,7 +324,7 @@ function heli(stage: Stage, id: string, t: number, radius = 150, height = 120): 
 /** A fixed camera turning to follow a car, zoomed so the car stays about the same size. */
 function trackside(stage: Stage, cam: Vec3, id: string, t: number): Omit<CameraPose, "label"> {
   const car = carPose(stage, id, t);
-  const target = v(car.x + car.dx * 6, 1.5, car.z + car.dz * 6);
+  const target = v(car.x + car.dx * 6, 1.5 + car.y, car.z + car.dz * 6);
   const d = dist(cam, target);
   const fov = Math.min(50, Math.max(9, ((2 * Math.atan(26 / d)) * 180) / Math.PI));
   return { position: cam, target, fov, subject: id };
@@ -351,7 +359,7 @@ function finishLine3d(stage: Stage, cam: Vec3, t: number): Omit<CameraPose, "lab
   const along = points.reduce((sum, p) => sum + p.along * p.w, 0) / total;
   const lat = points.reduce((sum, p) => sum + p.lat * p.w, 0) / total;
   const aim = besideLine(path, line + along + 6, lat);
-  const target = v(aim.x, 1.5, aim.y);
+  const target = v(aim.x, 1.5 + path.height(line + along + 6), aim.y);
   // Zoom out to take in the cars that count: how spread out they are, by their weight
   const spread = 1.6 * Math.sqrt(points.reduce((sum, p) => sum + p.w * (p.along - along) ** 2, 0) / total);
   const d = dist(cam, target);
@@ -444,12 +452,12 @@ function replayCamera(stage: Stage, view: ReplayView, subject: string, time: num
       // Low on the track ahead, looking back at the car as it comes
       const lat = stage.motion.at(subject, time).lat * 0.6;
       const p = besideLine(path, car.arc + 26, lat);
-      return { position: v(p.x, 3.2, p.y), target: v(car.x, 2, car.z), fov: 42, subject };
+      return { position: v(p.x, 3.2 + path.height(car.arc + 26), p.y), target: v(car.x, 2 + car.y, car.z), fov: 42, subject };
     }
     case "top": {
       // Straight down from above, a little behind
       const behind = besideLine(path, car.arc - 12, 0);
-      return { position: v(behind.x, 75, behind.y), target: v(car.x, 0, car.z), fov: 38, subject };
+      return { position: v(behind.x, 75, behind.y), target: v(car.x, car.y, car.z), fov: 38, subject };
     }
     case "corner": {
       const cam = nearCorner(stage, subject, middle);
@@ -461,7 +469,7 @@ function replayCamera(stage: Stage, view: ReplayView, subject: string, time: num
   const at = carPose(stage, subject, middle);
   const outside = -Math.sign(path.curvature(at.arc)) || 1;
   const p = besideLine(path, at.arc + 30 * path.scale, outside * (1 + 16 / path.halfWidth));
-  return trackside(stage, v(p.x, 3, p.y), subject, time);
+  return trackside(stage, v(p.x, 3 + path.height(at.arc + 30 * path.scale), p.y), subject, time);
 }
 
 /** Where first, second and third stand (the top of their step); second on the viewer's left, third on the right */
@@ -496,7 +504,8 @@ function podiumCamera(podium: Podium, t: number): Omit<CameraPose, "label"> {
       subject: podium.ids[i],
     };
   };
-  if (age < beats.third) {
+  // A two-car race has nobody in third: the wide shot holds until second is announced
+  if (age < beats.third || (age < beats.second && !podium.ids[2])) {
     const k = Math.min(1, age / beats.third);
     const e = k * k * (3 - 2 * k);
     const d = lerp(70, 46, e);
@@ -542,9 +551,16 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
       // Behind the grid, looking at the lights; the camera pushes in as they go out
       const k = Math.min(1, Math.max(0, (t + INTRO) / (INTRO + 0.2)));
       // Just behind the last car on the grid, however big the circuit is
-      const from = besideLine(stage.path, gridBack(stage) - 70 + k * 50, 0);
+      const back = gridBack(stage) - 70 + k * 50;
+      const from = besideLine(stage.path, back, 0);
       const to = besideLine(stage.path, 15, 0);
-      return { position: v(from.x, lerp(15, 10, k), from.y), target: v(to.x, 6, to.y), fov: 46, subject: null, label: text.raceLog.grid };
+      return {
+        position: v(from.x, lerp(15, 10, k) + stage.path.height(back), from.y),
+        target: v(to.x, 6 + stage.path.height(15), to.y),
+        fov: 46,
+        subject: null,
+        label: text.raceLog.grid,
+      };
     }
     case "trackside": {
       const corner = stage.layout.corners[shot.cam!];
@@ -654,16 +670,40 @@ export function replayDuration(replay: Replay) {
   return (replay.end - replay.start) * replay.secondsPerRound * 1000;
 }
 
-/** The podium, inside the circuit just past the line, once every car has finished */
+/**
+ * The podium, once everyone still in the race has finished or the log has run
+ * out (a log can stop early, and a small game has only two on it). It stands
+ * just past the line on the pit side, as near as it can with clear ground all
+ * round: another stretch of track can run close by (Japan's does).
+ */
 function podiumFor(stage: Stage): Podium | null {
   const { motion, path } = stage;
   const top = motion.official.slice(0, 3);
-  const times = motion.ids.map((id) => motion.finishedAt[id]);
-  if (top.length < 3 || times.some((x) => x === null)) return null;
-  const at = besideLine(path, 40 * path.scale, (path.halfWidth + 44) / path.halfWidth);
-  const track = besideLine(path, 40 * path.scale, 0);
+  const times = motion.ids.map((id) => motion.finishedAt[id]).filter((x): x is number => x !== null);
+  if (!times.length) return null;
+  const allIn = times.length === motion.ids.length;
+  const start = Math.max(...times, allIn ? 0 : motion.lastRound) + 0.9;
+  const road: [number, number][] = [];
+  for (let arc = 0; arc < path.length; arc += 8) {
+    const p = path.at(arc);
+    road.push([p.x, p.y]);
+  }
+  const clearance = path.halfWidth + PODIUM_CLEARANCE;
+  const clear = (x: number, z: number) => road.every(([rx, rz]) => (rx - x) ** 2 + (rz - z) ** 2 >= clearance ** 2);
+  const spot = (arc: number) => besideLine(path, arc, (path.halfWidth + 44) / path.halfWidth);
+  // Going on round the lap until it fits; the usual place if it never does
+  let arc = 40 * path.scale;
+  for (let tried = 40 * path.scale; tried < path.length / 2; tried += 20) {
+    const p = spot(tried);
+    if (clear(p.x, p.y)) {
+      arc = tried;
+      break;
+    }
+  }
+  const at = spot(arc);
+  const track = besideLine(path, arc, 0);
   const d = Math.hypot(track.x - at.x, track.y - at.y);
-  return { start: Math.max(...(times as number[])) + 0.9, ids: top, x: at.x, z: at.y, face: { x: (track.x - at.x) / d, z: (track.y - at.y) / d } };
+  return { start, ids: top, x: at.x, z: at.y, face: { x: (track.x - at.x) / d, z: (track.y - at.y) / d } };
 }
 
 /** Everything the 3D replay plays from: the motion, the TV shots and the captions. */

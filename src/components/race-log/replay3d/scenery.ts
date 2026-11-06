@@ -19,7 +19,8 @@ const WHITE = "#f4f4f2";
 /**
  * A strip following the track between two sideways offsets (drawing units
  * from the centre line), at heights `inner` and `outer` (so kerbs can rise
- * towards the outside). `keep` can drop pieces, e.g. over another part of the track.
+ * towards the outside), lifted with the road over a bridge unless `ground` is
+ * set. `keep` can drop pieces, e.g. over another part of the track.
  */
 function ribbon(
   path: TrackPath,
@@ -33,7 +34,8 @@ function ribbon(
     vLength = 0,
     heights = [0, 0],
     keep,
-  }: { step?: number; uLength?: number; vLength?: number; heights?: [number, number]; keep?: (x: number, z: number) => boolean } = {},
+    ground = false,
+  }: { step?: number; uLength?: number; vLength?: number; heights?: [number, number]; keep?: (x: number, z: number) => boolean; ground?: boolean } = {},
 ) {
   const positions: number[] = [];
   const uvs: number[] = [];
@@ -46,8 +48,9 @@ function ribbon(
     if (keep && !quad.every((p) => keep(p.x, p.y))) continue;
     const [ua, ub] = uLength ? [a / uLength, b / uLength] : [0, 1];
     const [p0, p1, p2, p3] = quad;
-    const [hi, ho] = heights;
-    positions.push(p0.x, hi, p0.y, p2.x, hi, p2.y, p1.x, ho, p1.y, p1.x, ho, p1.y, p2.x, hi, p2.y, p3.x, ho, p3.y);
+    const [ha, hb] = ground ? [0, 0] : [path.height(a), path.height(b)];
+    const [ai, ao, bi, bo] = [ha + heights[0], ha + heights[1], hb + heights[0], hb + heights[1]];
+    positions.push(p0.x, ai, p0.y, p2.x, bi, p2.y, p1.x, ao, p1.y, p1.x, ao, p1.y, p2.x, bi, p2.y, p3.x, bo, p3.y);
     uvs.push(ua, vi, ub, vi, ua, vo, ua, vo, ub, vi, ub, vo);
   }
   faceUp(positions, uvs);
@@ -228,7 +231,8 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
       const [la, lb] = [stage.motion.racingLine(a), stage.motion.racingLine(b)];
       const quad = [besideLine(path, a, la - half), besideLine(path, a, la + half), besideLine(path, b, lb - half), besideLine(path, b, lb + half)];
       const [p0, p1, p2, p3] = quad;
-      positions.push(p0.x, 0, p0.y, p2.x, 0, p2.y, p1.x, 0, p1.y, p1.x, 0, p1.y, p2.x, 0, p2.y, p3.x, 0, p3.y);
+      const [ha, hb] = [path.height(a), path.height(b)];
+      positions.push(p0.x, ha, p0.y, p2.x, hb, p2.y, p1.x, ha, p1.y, p1.x, ha, p1.y, p2.x, hb, p2.y, p3.x, hb, p3.y);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
@@ -251,10 +255,12 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
     flat(ribbon(path, from, to, hw + 0.6, hw + 4, { step: 2, uLength: 9, heights: [0.05, 0.35] }), kerbMat, 0.06);
     const outside = -Math.sign(path.curvature((from + to) / 2)) || 1;
     const [a, b] = outside > 0 ? [hw + 4, hw + 24] : [-hw - 24, -hw - 4];
-    flat(ribbon(path, from - 10, to + 25, a, b, { step: 3, uLength: 14, vLength: 14, keep: clear(hw + 2) }), gravelMat, 0.03);
+    flat(ribbon(path, from - 10, to + 25, a, b, { step: 3, uLength: 14, vLength: 14, keep: clear(hw + 2), ground: true }), gravelMat, 0.03);
   }
   const inCorner = (arc: number) => corners.some(([from, to]) => arc > from - 10 && arc < to + 25);
   const outsideAt = (arc: number) => -Math.sign(path.curvature(arc)) || 1;
+
+  buildBridge(path, add);
 
   // Start/finish line and grid boxes
   flat(ribbon(path, -2.5, 2.5, -hw, hw, { step: 5 }), standard({ map: tex.chequered(2, 12), roughness: 0.6 }), 0.11);
@@ -433,15 +439,17 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
   // Gantry over the line, lights facing the grid
   const gantry = new THREE.Group();
   const dark = standard({ color: "#2b2f36", roughness: 0.45, metalness: 0.5 });
+  // The line can be up on a bridge's ramp
+  const beamY = 17 + path.height(0);
   for (const side of [-1, 1]) {
-    const post = new THREE.Mesh(new THREE.BoxGeometry(1.4, 18, 1.4), dark);
-    post.position.set(0, 9, side * (hw + 5));
+    const post = new THREE.Mesh(new THREE.BoxGeometry(1.4, beamY + 1, 1.4), dark);
+    post.position.set(0, (beamY + 1) / 2, side * (hw + 5));
     gantry.add(post);
   }
   const beam = new THREE.Mesh(new THREE.BoxGeometry(2, 2.6, hw * 2 + 10), dark);
-  beam.position.set(0, 17, 0);
+  beam.position.set(0, beamY, 0);
   const panel = new THREE.Mesh(new THREE.BoxGeometry(0.6, 2.2, 14), standard({ color: "#0b0b0c", roughness: 0.6 }));
-  panel.position.set(-1.2, 17, 0);
+  panel.position.set(-1.2, beamY, 0);
   gantry.add(beam, panel);
   // Pure red and not too bright: tone mapping turns a very bright red yellow. A halo makes up the glow
   const lights: THREE.MeshStandardMaterial[] = [];
@@ -450,10 +458,10 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
   for (let i = 0; i < 5; i++) {
     const mat = standard({ color: "#200000", emissive: "#ff0000", emissiveIntensity: 0, roughness: 0.3 });
     const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.8, 14, 10), mat);
-    bulb.position.set(-1.6, 17, (i - 2) * 2.5);
+    bulb.position.set(-1.6, beamY, (i - 2) * 2.5);
     const halo = new THREE.SpriteMaterial({ map: glow, color: "#ff1000", blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 });
     const sprite = new THREE.Sprite(halo);
-    sprite.position.set(-2.3, 17, (i - 2) * 2.5);
+    sprite.position.set(-2.3, beamY, (i - 2) * 2.5);
     sprite.scale.setScalar(4.2);
     gantry.add(bulb, sprite);
     lights.push(mat);
@@ -555,6 +563,60 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
       });
     },
   };
+}
+
+/**
+ * A bridge where the track crosses itself: a concrete deck under the raised
+ * road, with walls from the ground up to a low parapet. The walls stop where
+ * the road below passes, leaving it open underneath, and the deck casts its
+ * shadow on the cars going through.
+ */
+function buildBridge(path: TrackPath, add: (object: THREE.Object3D) => void) {
+  if (!path.bridge) return;
+  const hw = path.halfWidth;
+  const [from, to] = path.bridge.raised;
+  const [belowFrom, belowTo] = path.bridge.below;
+  const edge = hw + 4.4;
+  const PARAPET = 1.1;
+  const concrete = new THREE.MeshStandardMaterial({ color: "#c4c8cd", roughness: 0.85, side: THREE.DoubleSide });
+
+  // Plain dark: lit, its underside would take on the green of the light from the ground
+  const deck = new THREE.Mesh(ribbon(path, from, to, -edge, edge, { step: 3 }), new THREE.MeshBasicMaterial({ color: "#2c2e32", side: THREE.DoubleSide }));
+  deck.position.y = -0.25;
+  deck.castShadow = true;
+  deck.userData.flat = true;
+  add(deck);
+
+  // The road below, to leave a gap in the walls for it
+  const below: [number, number][] = [];
+  for (let arc = belowFrom - 40; arc <= belowTo + 40; arc += 3) {
+    const p = path.at(arc);
+    below.push([p.x, p.y]);
+  }
+  const gap = hw + 8;
+  const overRoad = (x: number, z: number) => below.some(([bx, bz]) => (bx - x) ** 2 + (bz - z) ** 2 < gap * gap);
+
+  const positions: number[] = [];
+  const STEP = 3;
+  for (const side of [-1, 1]) {
+    for (let arc = from; arc < to; arc += STEP) {
+      const [a, b] = [besideLine(path, arc, (side * edge) / hw), besideLine(path, arc + STEP, (side * edge) / hw)];
+      const [ha, hb] = [path.height(arc), path.height(arc + STEP)];
+      // Only the parapet and the deck's edge over the road below, down to the ground elsewhere
+      const open = overRoad(a.x, a.y) || overRoad(b.x, b.y);
+      const [la, lb] = open ? [ha - 1.2, hb - 1.2] : [0, 0];
+      const [ta, tb] = [ha + PARAPET, hb + PARAPET];
+      positions.push(a.x, la, a.y, b.x, lb, b.y, a.x, ta, a.y, a.x, ta, a.y, b.x, lb, b.y, b.x, tb, b.y);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  const walls = new THREE.Mesh(geometry, concrete);
+  walls.castShadow = true;
+  walls.receiveShadow = true;
+  walls.userData.flat = true;
+  add(walls);
 }
 
 function mergeCones() {

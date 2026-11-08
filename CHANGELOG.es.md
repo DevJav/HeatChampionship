@@ -6,6 +6,11 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.14.1] - 2026-11-08
+
+### Cambios
+- Una carrera ya puede tener hasta **12 plazas** en lugar de 8.
+
 ## [1.14.0] - 2026-11-05
 
 ### Nuevo
@@ -209,7 +214,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...HEAD
+[1.14.1]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0

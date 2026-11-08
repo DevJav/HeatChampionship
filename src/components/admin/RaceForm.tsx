@@ -126,7 +126,7 @@ export function RaceForm({ action, seasons, tracks, race, defaults }: RaceFormPr
           min={2}
           max={siteConfig.maxPlayersPerRace}
           state={state}
-          defaultValue={race?.maxPlayers ?? siteConfig.maxPlayersPerRace}
+          defaultValue={race?.maxPlayers ?? siteConfig.defaultPlayersPerRace}
         />
         <SelectField
           name="status"

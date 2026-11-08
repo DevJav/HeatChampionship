@@ -182,7 +182,7 @@ const en: SeedContent = {
 
 Once a month we sit around the board for a round of the championship. Each race is posted on the calendar here, with its date, place and track.
 
-- **Limited seats:** up to 8 drivers per race, first come first served.
+- **Limited seats:** up to 12 drivers per race, first come first served.
 - **Waitlist:** if the grid is full you join the waitlist. If someone drops out, the first in line moves up automatically.
 - **Changed your mind?** You can withdraw yourself until the race starts. Do it early so someone else gets your seat.
 

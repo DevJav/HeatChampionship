@@ -1,5 +1,5 @@
 import { finishLine, type TrackGeometry, type TrackLayout } from "@/lib/race-log/layout";
-import { raceMotion, roadHalfWidthFor, type RaceMotion } from "@/lib/race-log/motion";
+import { raceMotion, roadHalfWidthFor, type MotionEvent, type RaceMotion } from "@/lib/race-log/motion";
 import type { LoggedRound } from "@/lib/race-log/rounds";
 import { besideLine, trackPath, type TrackPath } from "@/lib/race-log/track-path";
 import { t as text } from "@/i18n";
@@ -42,6 +42,8 @@ export type Shot = {
   of?: number;
   /** Instant replay: where it's seen from */
   view?: ReplayView;
+  /** Instant replay: share of real speed it plays at */
+  rate?: number;
 };
 
 /** Where an instant replay is seen from: never the same kind of camera that showed it live */
@@ -75,8 +77,10 @@ export type Podium = {
 
 /** Time before the start (in rounds) for the lights */
 export const INTRO = 1;
-/** Instant replays play at this share of real speed */
-const REPLAY_RATE = 0.5;
+/** Instant replays play at this share of real speed, unless the script says otherwise */
+export const REPLAY_RATE = 0.5;
+/** The speeds an instant replay can be set to */
+export const REPLAY_RATES = [0.25, 0.5, 1] as const;
 const MAX_REPLAYS = 4;
 /** Rounds on the podium at the end */
 const PODIUM_LENGTH = 3.2;
@@ -226,6 +230,12 @@ export function planShots(stage: Stage): { shots: Shot[]; end: number } {
   return { shots: withReplays(stage, shots, racingUntil), end };
 }
 
+/** The stretch of race worth replaying for a moment: a spin from start to finish, a pass or a finish around it */
+export function replayWindow(e: MotionEvent): [number, number] {
+  if (e.kind === "spin" || e.kind === "slipstream") return [e.t - 0.2, e.end + 0.1];
+  return [e.t - 0.35, e.t + 0.2];
+}
+
 /**
  * Instant replays of the spins and lead changes, in slow motion, put in the
  * first quiet moment after each (nothing else worth seeing while it plays),
@@ -243,7 +253,7 @@ function withReplays(stage: Stage, shots: Shot[], racingUntil: number) {
   const replays: Shot[] = [];
   for (const e of beats) {
     if (replays.length >= MAX_REPLAYS) break;
-    const [from, to] = e.kind === "spin" ? [e.t - 0.2, e.end + 0.1] : [e.t - 0.35, e.t + 0.2];
+    const [from, to] = replayWindow(e);
     const length = (to - from) / REPLAY_RATE;
     // A different angle from the one it was seen from live, and from the last replay
     const seenAs: Partial<Record<ShotKind, ReplayView>> = { trackside: "corner", onboard: "onboard", heli: "top", finish: "corner" };
@@ -393,7 +403,8 @@ export function fitShots(stage: Stage, shots: Shot[], start: number, end: number
     const fitted: Shot = { start: shot.start, end: until, kind: shot.kind, subject };
     // A replay made by hand plays back what happened just before it
     if (shot.kind === "replay") {
-      fitted.of = shot.of ?? shot.start - (until - shot.start) * REPLAY_RATE - 0.2;
+      fitted.rate = REPLAY_RATES.find((rate) => rate === shot.rate) ?? REPLAY_RATE;
+      fitted.of = Math.max(0, shot.of ?? shot.start - (until - shot.start) * fitted.rate - 0.2);
       fitted.view = shot.view && REPLAY_VIEWS.includes(shot.view) ? shot.view : "front";
     }
     if (shot.kind === "trackside") {
@@ -419,6 +430,7 @@ export function readScript(stage: Stage, saved: unknown, start: number, end: num
       cam: typeof s.cam === "number" ? s.cam : undefined,
       of: typeof s.of === "number" ? s.of : undefined,
       view: REPLAY_VIEWS.includes(s.view) ? s.view : undefined,
+      rate: typeof s.rate === "number" ? s.rate : undefined,
     });
   }
   return fitShots(stage, shots, start, end);
@@ -587,8 +599,9 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
       return { ...heli(stage, shot.subject, t, 190, 90), label: labels.heli };
     case "replay": {
       const of = shot.of ?? shot.start - 1;
-      const time = of + (t - shot.start) * REPLAY_RATE;
-      const middle = of + ((shot.end - shot.start) * REPLAY_RATE) / 2;
+      const rate = shot.rate ?? REPLAY_RATE;
+      const time = of + (t - shot.start) * rate;
+      const middle = of + ((shot.end - shot.start) * rate) / 2;
       return {
         ...replayCamera(stage, shot.view ?? "low", shot.subject, time, middle),
         time,
@@ -606,7 +619,7 @@ export function cameraPose(stage: Stage, plan: Shot[], mode: CameraMode, follow:
 }
 
 /** When the leader starts the last lap, or null for a one-lap race */
-function lastLapAt({ motion, layout }: Stage) {
+export function lastLapAt({ motion, layout }: Stage) {
   if (layout.laps < 2) return null;
   const from = finishLine(layout) - layout.spacesPerLap;
   for (let t = 0; t < motion.end; t += 0.01) if (motion.at(motion.order(t)[0], t).pos >= from) return t;

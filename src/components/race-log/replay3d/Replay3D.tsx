@@ -384,6 +384,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
                 setMode("tv");
                 seek(at);
               }}
+              onTogglePlay={togglePlay}
             />
           )}
         </CardBody>

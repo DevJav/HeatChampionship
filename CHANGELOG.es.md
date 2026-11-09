@@ -6,6 +6,9 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+### Nuevo
+- Los artículos pueden tener formato de **entrevista**: una **P** roja marca cada pregunta y una **R** del color del coche del piloto marca cada respuesta, así que se ve bien quién habla en cada momento.
+
 ## [1.14.1] - 2026-11-08
 
 ### Cambios

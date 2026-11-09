@@ -272,6 +272,13 @@ export const es = {
       formattingHint: "Admite **negrita**, *cursiva* y enlaces.",
       cancel: "Cancelar",
     },
+    interview: {
+      /** Letters in the margin of an interview */
+      questionMark: "P",
+      answerMark: "R",
+      question: "Pregunta",
+      answer: "Respuesta",
+    },
     embeds: {
       raceMissing: "No se encuentra la carrera (¿está en borrador?).",
       noResults: "La carrera aún no tiene resultados; aparecerán cuando se registren.",
@@ -1293,6 +1300,8 @@ export const es = {
         image: "Imagen",
         textPlaceholder: "texto",
         linkPlaceholder: "texto del enlace",
+        interview: "Entrevista",
+        interviewTemplate: "P: Pregunta\n\nR @usuario: Respuesta",
         tableTemplate: "| Piloto | Puntos |\n| --- | ---: |\n| Nombre | 0 |",
         driver: "Piloto",
         race: "Carrera",
@@ -1301,7 +1310,7 @@ export const es = {
           "Escribe aquí. **Negrita**, *cursiva*, ## Títulos, listas con -…\nEscribe @ para mencionar a un piloto. Pega o arrastra imágenes.",
         uploading: (n: number) => (n === 1 ? "Subiendo imagen…" : `Subiendo ${n} imágenes…`),
         uploadFailed: (name: string) => `No se pudo subir "${name}".`,
-        help: "Markdown. Los bloques {{…}} muestran datos en directo; el texto tras | es solo una etiqueta para ti.",
+        help: "Markdown. Los bloques {{…}} muestran datos en directo; el texto tras | es solo una etiqueta para ti. Para entrevistas, empieza el párrafo con P: (pregunta) o R @usuario: (respuesta).",
         insert: "Insertar",
         mentionTitle: "Mencionar piloto",
         mentionDescription: "La mención enlaza a su perfil y lleva su color. También puedes escribir @usuario directamente.",

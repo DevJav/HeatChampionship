@@ -269,6 +269,13 @@ export const en: Dictionary = {
       formattingHint: "Supports **bold**, *italics* and links.",
       cancel: "Cancel",
     },
+    interview: {
+      /** Letters in the margin of an interview */
+      questionMark: "Q",
+      answerMark: "A",
+      question: "Question",
+      answer: "Answer",
+    },
     embeds: {
       raceMissing: "Race not found (is it a draft?).",
       noResults: "This race has no results yet; they'll appear once they're entered.",
@@ -1264,6 +1271,8 @@ export const en: Dictionary = {
         image: "Image",
         textPlaceholder: "text",
         linkPlaceholder: "link text",
+        interview: "Interview",
+        interviewTemplate: "Q: Question\n\nA @username: Answer",
         tableTemplate: "| Driver | Points |\n| --- | ---: |\n| Name | 0 |",
         driver: "Driver",
         race: "Race",
@@ -1272,7 +1281,7 @@ export const en: Dictionary = {
           "Write here. **Bold**, *italic*, ## Headings, lists with -…\nType @ to mention a driver. Paste or drop images.",
         uploading: (n) => (n === 1 ? "Uploading image…" : `Uploading ${n} images…`),
         uploadFailed: (name) => `Couldn't upload "${name}".`,
-        help: "Markdown. {{…}} blocks show live data; the text after | is just a label for you.",
+        help: "Markdown. {{…}} blocks show live data; the text after | is just a label for you. For interviews, start a paragraph with Q: (question) or A @username: (answer).",
         insert: "Insert",
         mentionTitle: "Mention a driver",
         mentionDescription: "The mention links to their profile and carries their colour. You can also type @username directly.",

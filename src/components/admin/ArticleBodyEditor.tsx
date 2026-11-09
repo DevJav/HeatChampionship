@@ -12,6 +12,7 @@ import {
   Link2,
   List,
   ListOrdered,
+  Mic,
   Quote,
   Table2,
   Trophy,
@@ -370,6 +371,9 @@ export function ArticleBodyEditor({ state, defaultValue, options, className }: A
           </ToolButton>
           <ToolButton label={t.admin.articles.editor.quote} onClick={() => edit((ta) => prefixLines(ta, () => "> "))}>
             <Quote />
+          </ToolButton>
+          <ToolButton label={t.admin.articles.editor.interview} onClick={() => edit((ta) => insertBlock(ta, t.admin.articles.editor.interviewTemplate))}>
+            <Mic />
           </ToolButton>
           <ToolButton
             label={t.admin.articles.editor.link}

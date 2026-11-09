@@ -6,6 +6,9 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Added
+- Articles can be written as an **interview**: a red **P** marks each question and an **R** in the driver's car colour marks each answer, so it's easy to tell who's talking.
+
 ## [1.14.1] - 2026-11-08
 
 ### Changed

@@ -110,8 +110,9 @@ Articles from the organiser, filtered by category: **previews**, **race reports*
 
 ![Race report article](screenshots/article.png)
 
-Articles are written in Markdown, and two things make them more than plain text:
+Articles are written in Markdown, and a few things make them more than plain text:
 - **Mentions:** `@username` links to the driver's profile (with their car colour) and notifies them.
+- **Interviews:** a paragraph starting with `P:` (or `Q:`) is a question, and one starting with `R @username:` (or `A @username:`) is that driver's answer, marked with an R in their car colour. An answer of several paragraphs goes in a quote (`> R @username: …`).
 - **Live blocks:** a race card (countdown and sign-up before the race, podium after), a results table, a podium, the standings after a race, the current standings or a driver card. They always show current data, so a preview written before the race shows the podium once it's over. The editor inserts them from the toolbar; in the text they look like `{{podio:<race id> | Round 1 · Italy}}`.
 
 Logged-in players can **comment**, reply and mention each other.

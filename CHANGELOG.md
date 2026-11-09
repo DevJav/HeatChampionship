@@ -6,6 +6,8 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-11-09
+
 ### Added
 - Articles can be written as an **interview**: a red **P** marks each question and an **R** in the driver's car colour marks each answer, so it's easy to tell who's talking.
 
@@ -217,7 +219,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...HEAD
+[1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0
 [1.14.1]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1

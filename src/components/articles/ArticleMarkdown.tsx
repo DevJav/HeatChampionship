@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import type { MentionedDriver } from "@/lib/data/articles";
 import { cn } from "@/lib/cn";
 import { needsOutline } from "@/lib/colors";
+import { remarkInterview } from "@/lib/remark-interview";
 import { remarkMentions } from "@/lib/remark-mentions";
 import { ChequeredStrip, Table, TBody, Td, Th, THead, Tr } from "@/components/ui";
 import { t } from "@/i18n";
@@ -16,7 +17,7 @@ function Mention({ driver }: { driver: MentionedDriver }) {
   return (
     <Link
       href={`/pilotos/${driver.username}`}
-      className="inline-flex items-baseline gap-1.5 font-display font-bold uppercase italic tracking-wide hover:text-primary hover:underline"
+      className="ml-0.5 inline-flex items-baseline gap-1 font-display font-bold uppercase italic tracking-wide hover:text-primary hover:underline"
     >
       <span
         aria-hidden
@@ -26,10 +27,47 @@ function Mention({ driver }: { driver: MentionedDriver }) {
         )}
         style={color ? { backgroundColor: color } : undefined}
       />
-      <span data-driver={driver.username ?? undefined} className="pr-0.5">
+      <span data-driver={driver.username ?? undefined}>
         {driver.name}
       </span>
     </Link>
+  );
+}
+
+/** A red P or a driver-coloured R in the margin, the text lined up beside it (see remark-interview.ts). */
+function InterviewRow({ letter, label, color, children }: { letter: string; label: string; color?: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-2">
+      <span aria-hidden className="font-display text-lg leading-7 font-black text-primary italic" style={color ? { color } : undefined}>
+        {letter}
+      </span>
+      <div className="flex flex-col gap-3 [&_p]:leading-7">
+        <span className="sr-only">{label}:</span>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** An interview question: `P: …` */
+function InterviewQuestion({ children }: { children: React.ReactNode }) {
+  return (
+    <InterviewRow letter={t.articles.interview.questionMark} label={t.articles.interview.question}>
+      <p className="font-semibold">{children}</p>
+    </InterviewRow>
+  );
+}
+
+/** An interview answer: `R @username: …`, its letter in the driver's car colour. A quote holds several paragraphs. */
+function InterviewAnswer({ speaker, block, children }: { speaker: MentionedDriver | undefined; block: boolean; children: React.ReactNode }) {
+  return (
+    <InterviewRow
+      letter={t.articles.interview.answerMark}
+      label={speaker?.name ?? t.articles.interview.answer}
+      color={speaker?.favoriteColor?.hex ?? "var(--color-fg-muted)"}
+    >
+      {block ? children : <p>{children}</p>}
+    </InterviewRow>
   );
 }
 
@@ -57,8 +95,18 @@ function ArticleFigure({ src, alt }: { src: string; alt: string }) {
   );
 }
 
+const speakerOf = (drivers: ReadonlyMap<string, MentionedDriver>, username: unknown) =>
+  typeof username === "string" ? drivers.get(username) : undefined;
+
 function components(drivers: ReadonlyMap<string, MentionedDriver>): Components {
   return {
+    // A question and its answer in one panel (see remark-interview.ts)
+    div: ({ node, ...props }) =>
+      node?.properties?.dataInterview === "exchange" ? (
+        <div className="flex flex-col gap-3 bg-surface-2 px-4 py-3 clip-chamfer">{props.children}</div>
+      ) : (
+        <div {...props} />
+      ),
     h1: (props) => <h2 className="mt-4 text-3xl" {...withoutNode(props)} />,
     h2: ({ children, ...props }) => (
       <h2 className="mt-4 flex items-center gap-3 text-3xl" {...withoutNode(props)}>
@@ -69,6 +117,9 @@ function components(drivers: ReadonlyMap<string, MentionedDriver>): Components {
     h3: (props) => <h3 className="mt-2 text-2xl" {...withoutNode(props)} />,
     h4: (props) => <h4 className="text-xl" {...withoutNode(props)} />,
     p: ({ node, ...props }) => {
+      const role = node?.properties?.dataInterview;
+      if (role === "question") return <InterviewQuestion>{props.children}</InterviewQuestion>;
+      if (role === "answer") return <InterviewAnswer speaker={speakerOf(drivers, node?.properties?.dataSpeaker)} block={false}>{props.children}</InterviewAnswer>;
       // A paragraph holding just an image (how the editor inserts them) becomes a captioned figure
       const content = node?.children.filter((child) => child.type !== "text" || child.value.trim() !== "") ?? [];
       const [only] = content;
@@ -106,10 +157,15 @@ function components(drivers: ReadonlyMap<string, MentionedDriver>): Components {
       <ol className="list-decimal space-y-1.5 pl-6 marker:font-display marker:font-bold marker:text-primary" {...withoutNode(props)} />
     ),
     li: (props) => <li className="pl-1 leading-7" {...withoutNode(props)} />,
-    blockquote: (props) => (
+    blockquote: ({ node, ...props }) =>
+      node?.properties?.dataInterview === "answer" ? (
+        <InterviewAnswer speaker={speakerOf(drivers, node.properties.dataSpeaker)} block>
+          {props.children}
+        </InterviewAnswer>
+      ) : (
       <blockquote
         className="flex flex-col gap-2 border-l-4 border-primary bg-surface-2/60 px-5 py-3 text-lg italic text-fg-muted"
-        {...withoutNode(props)}
+        {...props}
       />
     ),
     hr: () => <ChequeredStrip className="my-2 text-fg/15" />,
@@ -155,7 +211,7 @@ export function ArticleMarkdown({ text, drivers, variant = "article" }: ArticleM
   return (
     <div className={comment ? "flex flex-col gap-2 text-sm [&_p]:leading-6" : "flex flex-col gap-4 text-base"}>
       <Markdown
-        remarkPlugins={[remarkGfm, [remarkMentions, { known: new Set(drivers.keys()) }]]}
+        remarkPlugins={[remarkGfm, remarkInterview, [remarkMentions, { known: new Set(drivers.keys()) }]]}
         components={components(drivers)}
         {...(comment && { allowedElements: COMMENT_ELEMENTS, unwrapDisallowed: true })}
       >

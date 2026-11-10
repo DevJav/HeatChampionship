@@ -2,12 +2,13 @@ import type { ArticleCategory, ArticleStatus } from "@/generated/prisma/client";
 import { t } from "@/i18n";
 
 /**
- * Articles are Markdown (GitHub flavor: tables, autolinks…) plus two additions:
+ * Articles are Markdown (GitHub flavor: tables, autolinks…) plus three additions:
  *
  * - Mentions: `@username` inline links to the driver, shown with their color.
  * - Embeds: a line on its own like `{{resultados:<raceId> | Ronda 3 · Italia}}`
  *   renders a live block (race card, results table…). The text after `|` is
  *   only a reminder for whoever edits the Markdown; it's ignored.
+ * - Interviews: `P: …` questions and `R @username: …` answers (see remark-interview.ts).
  */
 
 type Tone = "neutral" | "primary" | "accent" | "success" | "warning" | "danger" | "info" | "bar";

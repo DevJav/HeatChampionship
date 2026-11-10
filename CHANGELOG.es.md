@@ -9,6 +9,21 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 ### Nuevo
 - **Repetición 3D:** las carreras anotadas vuelta a vuelta se pueden ver como una carrera de verdad, en un circuito en 3D con coches de vuestros colores, con pilotos girando el volante y todo. Ábrela con el botón **3D** en **Vuelta a vuelta**. Cada coche acaba cada ronda donde se anotó, y entre medias frena en las curvas, adelanta, coge el rebufo y hace trompos. La **Realización** cambia de cámara como en la tele (helicóptero, persecución, a bordo y cámaras de curva), o elige una cámara y a quién seguir. Lleva tabla de tiempos, rótulos y la radio de cada piloto al cruzar la meta, y con **Vídeo** se crea un vídeo nítido para compartir (1080p a 60 fps, MP4, hecho fotograma a fotograma para que nunca dé tirones). **Guion** muestra la lista de planos de la realización: cambia la cámara o el coche de un plano, corta en el momento que estás viendo o quita planos, y la realización y el vídeo siguen tu versión (se guarda en tu dispositivo). Con sonido: motores V8 de los sesenta, cada coche un poco distinto, que suben de marcha, petardean al levantar el pie y pasan junto a la cámara, chirrido de neumáticos en los trompos, los semáforos de salida y un público que celebra los grandes momentos, también en el vídeo. Elige la hora del día: **Día**, **Atardecer** o **Noche** con focos. La retransmisión muestra repeticiones a cámara lenta de trompos y cambios de líder desde otro ángulo, marca los rebufos con estelas de aire y la etiqueta **Rebufo** en la tabla de tiempos, avisa de la última vuelta y termina con la ceremonia del podio: los tres primeros anunciados uno a uno con los brazos en alto, trofeos, confeti y champán.
 
+## [1.15.1] - 2026-11-10
+
+### Arreglos
+- Los nombres de pilotos mencionados en los artículos encajan mejor en el texto: la franja de color ya no se pega a la palabra anterior, y las comas y los puntos van pegados al nombre.
+
+## [1.15.0] - 2026-11-09
+
+### Nuevo
+- Los artículos pueden tener formato de **entrevista**: una **P** roja marca cada pregunta y una **R** del color del coche del piloto marca cada respuesta, así que se ve bien quién habla en cada momento.
+
+## [1.14.1] - 2026-11-08
+
+### Cambios
+- Una carrera ya puede tener hasta **12 plazas** en lugar de 8.
+
 ## [1.14.0] - 2026-11-05
 
 ### Nuevo
@@ -212,7 +227,10 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...HEAD
+[1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1
+[1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0
+[1.14.1]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0

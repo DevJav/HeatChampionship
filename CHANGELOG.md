@@ -9,6 +9,21 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 ### Added
 - **3D replay:** races logged round by round can be watched like a real race, on a 3D track with cars in your colours, drivers turning the wheel included. Open it with the **3D** button in **Round by round**. Every car ends each round where it was logged, and in between it brakes for corners, overtakes, slipstreams and spins. **TV** cuts between cameras like a broadcast (helicopter, chase, onboard and corner cameras), or pick a camera and who to follow. It comes with a timing tower, captions and each driver's team radio as they cross the line, and **Video** makes a sharp video to share (1080p at 60 fps, MP4, rendered frame by frame so it never stutters). **Script** shows the list of TV shots: change a shot's camera or car, cut at the moment you're watching or remove shots, and the TV camera and the video follow your version (kept on your device). With sound: sixties V8 engines, each car a little different, that climb through the gears, crackle when lifting and pass by the camera, squealing tyres in spins, the start lights and a crowd that cheers the big moments, in the video too. Pick the time of day: **Day**, **Sunset** or **Night** under the floodlights. The broadcast shows instant replays of spins and lead changes in slow motion from another angle, marks slipstreams with trails of air and a **Slipstream** tag on the timing tower, calls the last lap, and ends with a podium ceremony: each of the top three announced in turn with their arms up, trophies, confetti and champagne.
 
+## [1.15.1] - 2026-11-10
+
+### Fixed
+- Driver names mentioned in articles sit better in the text: their colour stripe no longer crowds the word before, and commas and full stops follow the name straight away.
+
+## [1.15.0] - 2026-11-09
+
+### Added
+- Articles can be written as an **interview**: a red **P** marks each question and an **R** in the driver's car colour marks each answer, so it's easy to tell who's talking.
+
+## [1.14.1] - 2026-11-08
+
+### Changed
+- A race can now have up to **12 seats** instead of 8.
+
 ## [1.14.0] - 2026-11-05
 
 ### Added
@@ -212,7 +227,10 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...HEAD
+[1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1
+[1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0
+[1.14.1]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/DevJav/HeatChampionship/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/DevJav/HeatChampionship/compare/v1.12.1...v1.13.0

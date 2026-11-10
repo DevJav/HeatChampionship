@@ -10,9 +10,10 @@ import { trackDrawing } from "@/lib/race-log/tracks";
 
 type TrackInfo = { slug: string; spaces: number; corners: number; laps: number };
 
-const COLORS = ["#e8112d", "#1f6bff", "#12b84a", "#f2a900", "#ff6fb5", "#f4f4f2", "#2b2b2b", "#8a2be2"];
+const COLORS = ["#e8112d", "#1f6bff", "#12b84a", "#f2a900", "#ff6fb5", "#f4f4f2", "#2b2b2b", "#8a2be2", "#00b8d9", "#ff7a00", "#8b5a2b", "#9be15d"];
 const RADIO = ["¡Vaya carrera!", "Me he quedado sin cartas de calor en la última curva.", "La próxima vez no me adelantas.", "Los neumáticos no daban para más."];
-const COUNTS = [2, 3, 4, 5, 6, 7, 8];
+/** Up to a full race: siteConfig.maxPlayersPerRace */
+const COUNTS = Array.from({ length: 11 }, (_, i) => i + 2);
 
 /** Pick a track and a made-up race, and watch it. */
 export function ReplayReview({ tracks }: { tracks: TrackInfo[] }) {

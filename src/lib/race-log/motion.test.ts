@@ -147,3 +147,20 @@ describe("the podium in small or unfinished races", () => {
     expect(replay.shots.some((shot) => shot.kind === "podium")).toBe(false);
   });
 });
+
+describe("a full grid of 12", () => {
+  const track = tracks[0];
+  const eight = race(track, 8, 1).replay;
+  const twelve = race(track, 12, 1);
+
+  it("races on a circuit no bigger than for eight", () => {
+    expect(twelve.replay.stage.path.scale).toBeCloseTo(eight.stage.path.scale, 6);
+  });
+
+  it("keeps every car on the road and gives the top three their podium", () => {
+    for (let t = 0; t <= twelve.replay.end; t += 0.1) {
+      for (const id of twelve.ids) expect(Math.abs(twelve.replay.stage.motion.at(id, t).lat)).toBeLessThanOrEqual(1);
+    }
+    expect(twelve.replay.stage.podium?.ids).toHaveLength(3);
+  });
+});

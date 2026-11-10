@@ -99,6 +99,13 @@ const SECONDS_PER_ROUND = 3.2;
  */
 const MIN_TRACK_SCALE = 1.3;
 export const CAR_SCALE = 0.7;
+/**
+ * The road is never wider than this many cars side by side. Two cars share a
+ * space on the board, so a full grid of 12 rarely spreads across more: a
+ * road for all of them would make the circuit three times the card and the
+ * cars specks, and measured on simulated races it doesn't save a single touch.
+ */
+const MAX_LANES = 8;
 /** The car model is 16 × 10.5 drawing units over the wheels before scaling (CAR_WIDTH in car-model.ts) */
 const CAR_SIZE = { length: 16 * CAR_SCALE, width: 10.5 * CAR_SCALE };
 /** Onboard camera on the model: just above the driver's helmet (DRIVER_EYE in car-model.ts) */
@@ -727,7 +734,7 @@ export function prepareReplay(
   cars: { id: string; name: string; color: string }[],
   radio: Record<string, string>,
 ): Replay {
-  const scale = Math.max(MIN_TRACK_SCALE, roadHalfWidthFor(cars.length, CAR_SIZE) / geometry.halfWidth);
+  const scale = Math.max(MIN_TRACK_SCALE, roadHalfWidthFor(Math.min(cars.length, MAX_LANES), CAR_SIZE) / geometry.halfWidth);
   const path = trackPath(layout, geometry, scale);
   const motion = raceMotion(layout, path, rounds, CAR_SIZE);
   const stage: Stage = {

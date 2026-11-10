@@ -6,7 +6,7 @@ import { CAR_SCALE, cameraSightLines, START_LIGHTS, tracksideCameras, type Stage
 import * as tex from "./textures";
 
 /**
- * The circuit around the cars: asphalt with a rubbered-in racing line,
+ * The circuit around the cars: asphalt,
  * raised kerbs, gravel traps, armco and tyre walls, advertising boards, the
  * start gantry, grandstand and pit building, speed-limit boards, woods and
  * rolling hills. Everything is placed from the traced centre line, and kept
@@ -216,29 +216,12 @@ export function buildScenery(scene: THREE.Scene, stage: Stage, geometry: TrackGe
   const ground = flat(groundGeo, grassMaterial(grassSurface), -0.02);
   ground.position.set(size.x / 2, -0.02, size.z / 2);
 
-  // Asphalt, and the darker rubbered-in line the cars drive on
+  // Asphalt and its white edge lines
   const asphalt = tex.asphalt();
   const asphaltMat = new THREE.MeshStandardMaterial({ ...asphalt, roughness: 1, side: THREE.DoubleSide });
   // The cel-shaded look paints it flat instead
   asphaltMat.userData.toonColor = "#3b3d42";
   flat(ribbon(path, 0, path.length, -hw - 1.5, hw + 1.5, { step: 2, uLength: 40, vLength: 40 }), asphaltMat, 0.05);
-  const rubber = new THREE.MeshBasicMaterial({ color: "#000000", transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide });
-  const rubberGeo = (() => {
-    const positions: number[] = [];
-    const half = 0.18;
-    for (let arc = 0; arc < path.length; arc += 3) {
-      const [a, b] = [arc, arc + 3];
-      const [la, lb] = [stage.motion.racingLine(a), stage.motion.racingLine(b)];
-      const quad = [besideLine(path, a, la - half), besideLine(path, a, la + half), besideLine(path, b, lb - half), besideLine(path, b, lb + half)];
-      const [p0, p1, p2, p3] = quad;
-      const [ha, hb] = [path.height(a), path.height(b)];
-      positions.push(p0.x, ha, p0.y, p2.x, hb, p2.y, p1.x, ha, p1.y, p1.x, ha, p1.y, p2.x, hb, p2.y, p3.x, hb, p3.y);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    return g;
-  })();
-  flat(rubberGeo, rubber, 0.07);
   const lineMat = standard({ color: WHITE, roughness: 0.55 });
   flat(ribbon(path, 0, path.length, -hw - 0.7, -hw + 0.3, { step: 3 }), lineMat, 0.08);
   flat(ribbon(path, 0, path.length, hw - 0.3, hw + 0.7, { step: 3 }), lineMat, 0.08);

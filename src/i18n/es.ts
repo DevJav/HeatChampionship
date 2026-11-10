@@ -957,11 +957,9 @@ export const es = {
       times: { day: "Día", sunset: "Atardecer", night: "Noche" },
       soundOn: "Activar el sonido",
       script: {
-        short: "Guion",
-        button: "Ver y cambiar el guion de la realización",
         title: "Guion de la realización",
         description:
-          "La cámara de realización sigue estos planos, preparados a partir de lo que pasa en la carrera. Arrastra los bordes de un plano para cambiar su duración o el plano entero para moverlo. Las barras amarillas de arriba son lo que repite cada repetición: arrástralas para elegir otro momento. Los cambios se guardan en este dispositivo.",
+          "La cámara de realización sigue estos planos, preparados a partir de lo que pasa en la carrera. Arrastra los bordes de un plano para cambiar su duración o el plano entero para moverlo. Las barras amarillas de arriba son lo que repite cada repetición: arrástralas para elegir otro momento, o tira de sus bordes para repetir más o menos. Los cambios se guardan en este dispositivo.",
         shortcuts: "Atajos: espacio reproduce, S divide, Supr quita, ← → mueven el cabezal, Ctrl+Z deshace.",
         automatic: "Automático",
         edited: "Editado",
@@ -991,6 +989,7 @@ export const es = {
         speedValue: (rate: number) => (rate === 1 ? "Normal" : `${rate * 100} %`),
         source: (from: string, to: string) => `Repite de ${from} a ${to}`,
         watchSource: "Ver el original",
+        sourceEdge: "Arrastra para repetir más o menos",
         sourceHere: "Repetir desde el cabezal",
         sourceHereTitle: "Que la repetición empiece en el momento que marca el cabezal",
         replayMoment: "Repetir un momento",

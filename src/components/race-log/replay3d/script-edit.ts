@@ -13,6 +13,16 @@ export const MIN_SHOT = 0.1;
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 const copy = (shots: Shot[]) => shots.map((shot) => ({ ...shot }));
 
+/**
+ * A shot starting later or earlier, like trimming a clip's head in a video
+ * editor: a replay keeps its end and plays back from a later (or earlier) moment.
+ */
+function startAt(shot: Shot, start: number): Shot {
+  const moved = { ...shot, start };
+  if (shot.kind === "replay" && shot.of !== undefined) moved.of = Math.max(0, shot.of + (start - shot.start) * (shot.rate ?? REPLAY_RATE));
+  return moved;
+}
+
 /** The shot playing at a time */
 export function indexAt(shots: Shot[], t: number) {
   const i = shots.findIndex((shot) => t < shot.end);
@@ -56,7 +66,7 @@ export function moveCut(shots: Shot[], i: number, t: number): Shot[] {
   const next = copy(shots);
   const at = clamp(t, next[i - 1].start + MIN_SHOT, next[i].end - MIN_SHOT);
   next[i - 1].end = at;
-  next[i].start = at;
+  next[i] = startAt(next[i], at);
   return next;
 }
 
@@ -93,7 +103,7 @@ export function insertShot(shots: Shot[], shot: Omit<Shot, "start" | "end">, sta
   const to = Math.min(last, from + Math.max(MIN_SHOT, length));
   const kept = shots.flatMap((s) => {
     if (s.end <= from || s.start >= to) return [{ ...s }];
-    return [...(s.start < from ? [{ ...s, end: from }] : []), ...(s.end > to ? [{ ...s, start: to }] : [])];
+    return [...(s.start < from ? [{ ...s, end: from }] : []), ...(s.end > to ? [startAt(s, to)] : [])];
   });
   const added: Shot = { ...shot, start: from, end: to };
   const all = [...kept, added].sort((a, b) => a.start - b.start);

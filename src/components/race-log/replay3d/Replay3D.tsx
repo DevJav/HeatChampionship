@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Clapperboard, Download, ListVideo, Maximize, Minimize, Pause, Play, Share2, Volume2, VolumeX } from "lucide-react";
+import { Clapperboard, Download, Maximize, Minimize, Pause, Play, Share2, Volume2, VolumeX } from "lucide-react";
 import { Button, buttonVariants, Card, CardBody, Modal, Select, Spinner } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { LoggedRound } from "@/lib/race-log/rounds";
@@ -11,6 +11,7 @@ import { videoMimeType } from "../replay-video";
 import { createRaceAudio, type RaceAudio } from "./audio";
 import { cameraPose, prepareReplay, replayDuration, type CameraMode } from "./director";
 import { drawHud, readHudStyle, type HudStyle } from "./hud";
+import { CarSelect } from "./CarSelect";
 import { ShotScript, useShotScript } from "./ShotScript";
 import type { TimeOfDay, World } from "./world";
 import { t } from "@/i18n";
@@ -58,7 +59,6 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   const [mode, setMode] = useState<CameraMode>("tv");
   const [follow, setFollow] = useState(replay.stage.motion.official[0]);
   const [fullscreen, setFullscreen] = useState(false);
-  const [showScript, setShowScript] = useState(false);
   const [muted, setMuted] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
   const audio = useRef<RaceAudio | null>(null);
@@ -254,29 +254,35 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
   return (
     <Card className="overflow-hidden">
       <div ref={frame} className={cn("flex flex-col", fullscreen && "h-full bg-black")}>
-        <div
-          ref={view}
-          className={cn("relative w-full bg-[#9cc7ea]", fullscreen ? "min-h-0 flex-1" : "aspect-[4/3] sm:aspect-video")}
-          onClick={() => status === "ready" && togglePlay()}
-        >
-          <canvas ref={glCanvas} className="absolute inset-0 size-full" />
-          <canvas ref={hudCanvas} className="pointer-events-none absolute inset-0 size-full" />
-          {status !== "ready" && (
-            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-bar/80 text-bar-fg">
-              {status === "loading" ? (
-                <>
-                  <Spinner /> {r.loading}
-                </>
-              ) : (
-                r.unsupported
-              )}
-            </div>
-          )}
-          {status === "ready" && !playing && (
-            <span className="pointer-events-none absolute left-1/2 top-1/2 flex size-16 -translate-1/2 items-center justify-center rounded-full bg-bar/70 text-bar-fg">
-              <Play className="size-8" />
-            </span>
-          )}
+        {/* The page runs full width for the timeline: the picture keeps its shape, at most 62% of the screen high, on a black band */}
+        <div className={cn("flex justify-center bg-black", fullscreen && "min-h-0 flex-1")}>
+          <div
+            ref={view}
+            className={cn(
+              "relative bg-[#9cc7ea]",
+              fullscreen ? "min-h-0 w-full" : "aspect-[4/3] w-[min(100%,calc(62vh*4/3))] sm:aspect-video sm:w-[min(100%,calc(62vh*16/9))]",
+            )}
+            onClick={() => status === "ready" && togglePlay()}
+          >
+            <canvas ref={glCanvas} className="absolute inset-0 size-full" />
+            <canvas ref={hudCanvas} className="pointer-events-none absolute inset-0 size-full" />
+            {status !== "ready" && (
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-bar/80 text-bar-fg">
+                {status === "loading" ? (
+                  <>
+                    <Spinner /> {r.loading}
+                  </>
+                ) : (
+                  r.unsupported
+                )}
+              </div>
+            )}
+            {status === "ready" && !playing && (
+              <span className="pointer-events-none absolute left-1/2 top-1/2 flex size-16 -translate-1/2 items-center justify-center rounded-full bg-bar/70 text-bar-fg">
+                <Play className="size-8" />
+              </span>
+            )}
+          </div>
         </div>
 
         <CardBody className={cn("flex flex-col gap-3 py-3", fullscreen && "bg-surface")}>
@@ -305,13 +311,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
               ))}
             </div>
             {mode !== "tv" && (
-              <Select value={follow} onChange={(e) => setFollow(e.target.value)} aria-label={r.follow} className="h-8 w-auto text-sm">
-                {byOrder.map((car) => (
-                  <option key={car.id} value={car.id}>
-                    {car.name}
-                  </option>
-                ))}
-              </Select>
+              <CarSelect cars={byOrder} value={follow} onChange={setFollow} label={r.follow} />
             )}
             <div className="ml-auto flex flex-wrap items-center gap-1">
               <Select
@@ -327,15 +327,6 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
                   </option>
                 ))}
               </Select>
-              <Button
-                size="sm"
-                variant={showScript ? "secondary" : "ghost"}
-                title={r.script.button}
-                aria-pressed={showScript}
-                onClick={() => setShowScript(!showScript)}
-              >
-                <ListVideo /> {r.script.short}
-              </Button>
               <Button
                 size="sm"
                 variant="ghost"
@@ -368,7 +359,7 @@ export function Replay3D({ raceId, track, laps, cars, rounds, title, radio, debu
               </Button>
             </div>
           </div>
-          {showScript && !fullscreen && (
+          {!fullscreen && (
             <ShotScript
               replay={replay}
               shots={shots}

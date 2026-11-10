@@ -131,3 +131,17 @@ describe("resize", () => {
     ]);
   });
 });
+
+describe("trimming a replay's start", () => {
+  const replays = () => [shot(0, 1), shot(1, 3, "replay", { of: 10, rate: 0.5 }), shot(3, 4)];
+
+  it("plays back from later when a cut moves into it, like trimming a clip", () => {
+    const next = moveCut(replays(), 1, 2);
+    expect(next[1]).toMatchObject({ start: 2, end: 3, of: 10.5 });
+  });
+
+  it("plays back from later when a new shot covers its start", () => {
+    const { shots } = insertShot(replays(), { kind: "heli", subject: "a" }, 0.5, 1);
+    expect(shots[2]).toMatchObject({ kind: "replay", start: 1.5, of: 10.25 });
+  });
+});

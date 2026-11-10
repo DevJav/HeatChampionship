@@ -933,11 +933,9 @@ export const en: Dictionary = {
       times: { day: "Day", sunset: "Sunset", night: "Night" },
       soundOn: "Sound on",
       script: {
-        short: "Script",
-        button: "See and change the broadcast script",
         title: "Broadcast script",
         description:
-          "The TV camera follows these shots, planned from what happens in the race. Drag a shot's edges to change how long it lasts, or the whole shot to move it. The yellow bars above show what each replay plays back: drag them to pick another moment. Your changes are kept on this device.",
+          "The TV camera follows these shots, planned from what happens in the race. Drag a shot's edges to change how long it lasts, or the whole shot to move it. The yellow bars above show what each replay plays back: drag them to pick another moment, or pull their ends to replay more or less. Your changes are kept on this device.",
         shortcuts: "Shortcuts: space plays, S splits, Delete removes, ← → move the playhead, Ctrl+Z undoes.",
         automatic: "Automatic",
         edited: "Edited",
@@ -967,6 +965,7 @@ export const en: Dictionary = {
         speedValue: (rate) => (rate === 1 ? "Normal" : `${rate * 100}%`),
         source: (from, to) => `Plays back ${from} to ${to}`,
         watchSource: "Watch the original",
+        sourceEdge: "Drag to replay more or less",
         sourceHere: "Replay from the playhead",
         sourceHereTitle: "Start the replay at the moment the playhead is on",
         replayMoment: "Replay a moment",

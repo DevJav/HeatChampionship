@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Revisar repetición 3D" };
 export default function ReplayReviewPage() {
   if (process.env.NODE_ENV !== "development") notFound();
   return (
-    <Container className="flex flex-col gap-6">
+    <Container className="flex max-w-none flex-col gap-6">
       <PageHeader
         eyebrow="Desarrollo"
         title="Revisar repetición 3D"

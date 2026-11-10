@@ -48,7 +48,8 @@ async function Replay3DContent({ params, searchParams }: PageProps<"/carreras/[i
 
 export default function Replay3DPage(props: PageProps<"/carreras/[id]/repeticion-3d">) {
   return (
-    <Container>
+    // Full width: the guion's timeline needs the room
+    <Container className="max-w-none">
       <Suspense fallback={<Skeleton className="aspect-video w-full" />}>
         <Replay3DContent {...props} />
       </Suspense>

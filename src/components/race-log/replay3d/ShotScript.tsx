@@ -19,7 +19,8 @@ import {
   type Shot,
   type ShotKind,
 } from "./director";
-import { indexAt, insertShot, moveCut, moveShot, patchShot, removeShot, resize, sourceLength, splitAt } from "./script-edit";
+import { CarSelect, type CarOption } from "./CarSelect";
+import { indexAt, insertShot, MIN_SHOT, moveCut, moveShot, patchShot, removeShot, resize, sourceLength, splitAt } from "./script-edit";
 import { t } from "@/i18n";
 
 /** Kinds that film one car you can pick; the others choose for themselves */
@@ -142,6 +143,8 @@ type Drag =
   | { type: "cut"; index: number }
   | { type: "move"; index: number; grab: number }
   | { type: "source"; index: number; grab: number }
+  /** One end of what a replay plays back: more or less of the race, the replay as much longer or shorter */
+  | { type: "sourceEdge"; index: number; edge: "start" | "end" }
   | { type: "scrub" };
 
 /**
@@ -275,6 +278,18 @@ export function ShotScript({ replay, shots: saved, edited, time, onSave, onReset
     return best;
   }
 
+  /** Moves one end of what replay `index` plays back, keeping its speed: the shot grows or shrinks to match */
+  function resizeSource(index: number, edge: "start" | "end", at: number) {
+    const shot = saved[index];
+    const rate = shot.rate ?? REPLAY_RATE;
+    const from = shot.of ?? 0;
+    const to = from + sourceLength(shot);
+    const shortest = MIN_SHOT * rate;
+    if (edge === "end") return resize(saved, index, (Math.max(from + shortest, at) - from) / rate);
+    const of = Math.min(to - shortest, Math.max(0, at));
+    return resize(patchShot(saved, index, { of }), index, (to - of) / rate);
+  }
+
   function startDrag(event: React.PointerEvent, what: Drag) {
     if (event.button !== 0) return;
     event.preventDefault();
@@ -294,7 +309,8 @@ export function ShotScript({ replay, shots: saved, edited, time, onSave, onReset
       if (d.type === "scrub") onSeek(clampTime(at));
       else if (d.type === "cut") latest = moveCut(saved, d.index, snap(at, d.index));
       else if (d.type === "move") latest = moveShot(saved, d.index, snap(at - d.grab));
-      else latest = patchShot(saved, d.index, { of: Math.max(0, snap(at - d.grab)) });
+      else if (d.type === "source") latest = patchShot(saved, d.index, { of: Math.max(0, snap(at - d.grab)) });
+      else latest = resizeSource(d.index, d.edge, snap(at));
       if (latest) setDraft(latest);
     };
     const onUp = (e: PointerEvent) => {
@@ -305,7 +321,8 @@ export function ShotScript({ replay, shots: saved, edited, time, onSave, onReset
       setDraft(null);
       if (!d) return;
       if (moved && latest) {
-        commit(latest);
+        // What you dragged is now the selection (for a cut, the shot after it)
+        commit(latest, d.type === "scrub" ? undefined : { type: "shot", index: d.index });
         return;
       }
       // A click: select what was clicked, and put the playhead there
@@ -313,7 +330,7 @@ export function ShotScript({ replay, shots: saved, edited, time, onSave, onReset
       if (d.type === "move" || d.type === "cut") {
         setSelected({ type: "shot", index: d.type === "cut" ? indexAt(saved, at) : d.index });
         onSeek(at);
-      } else if (d.type === "source") {
+      } else if (d.type === "source" || d.type === "sourceEdge") {
         setSelected({ type: "shot", index: d.index });
         onSeek(at);
       }
@@ -495,9 +512,20 @@ export function ShotScript({ replay, shots: saved, edited, time, onSave, onReset
                       "absolute top-1 bottom-1 flex cursor-grab items-center overflow-hidden rounded-sm border border-[#b37d00] px-1 text-[10px] font-bold text-[#3d2a00] active:cursor-grabbing",
                       active ? "bg-[#f2a900]" : "bg-[#f2a900]/40",
                     )}
-                    style={{ left: x(shot.of), width: Math.max(4, sourceLength(shot) * px) }}
+                    style={{ left: x(shot.of), width: Math.max(14, sourceLength(shot) * px) }}
                   >
                     R{replayNumber(i)}
+                    {/* Its ends: drag to replay more or less of the race */}
+                    {(["start", "end"] as const).map((edge) => (
+                      <span
+                        key={edge}
+                        title={s.sourceEdge}
+                        onPointerDown={(e) => startDrag(e, { type: "sourceEdge", index: i, edge })}
+                        className={cn("group absolute top-0 bottom-0 flex w-2 cursor-ew-resize justify-center", edge === "start" ? "left-0" : "right-0")}
+                      >
+                        <span className="h-full w-0.5 bg-[#7a5500]/0 group-hover:bg-[#7a5500]" />
+                      </span>
+                    ))}
                   </div>
                 );
               })}
@@ -600,7 +628,7 @@ type InspectorProps = {
   shot: Shot;
   /** Its number among the replays, for a replay */
   number: number;
-  cars: { id: string; name: string }[];
+  cars: CarOption[];
   corners: { limit: number }[];
   moments: Moment[];
   time: number;
@@ -631,13 +659,7 @@ function ShotInspector({ index, shot, number, cars, corners, moments, time, cloc
         ))}
       </Select>
       {WITH_SUBJECT.includes(shot.kind) ? (
-        <Select value={shot.subject} onChange={(e) => onChange({ subject: e.target.value })} aria-label={s.car} className={select}>
-          {cars.map((car) => (
-            <option key={car.id} value={car.id}>
-              {car.name}
-            </option>
-          ))}
-        </Select>
+        <CarSelect cars={cars} value={shot.subject} onChange={(subject) => onChange({ subject })} label={s.car} />
       ) : (
         <span className="text-sm text-fg-muted">{shot.kind === "finish" ? s.nextToCross : s.chooses}</span>
       )}

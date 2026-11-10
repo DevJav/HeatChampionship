@@ -6,6 +6,8 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.15.1] - 2026-11-10
+
 ### Arreglos
 - Los nombres de pilotos mencionados en los artículos encajan mejor en el texto: la franja de color ya no se pega a la palabra anterior, y las comas y los puntos van pegados al nombre.
 
@@ -222,7 +224,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...HEAD
+[1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0
 [1.14.1]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DevJav/HeatChampionship/compare/v1.13.1...v1.14.0

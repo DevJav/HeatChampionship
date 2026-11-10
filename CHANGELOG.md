@@ -6,6 +6,9 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Fixed
+- Driver names mentioned in articles sit better in the text: their colour stripe no longer crowds the word before, and commas and full stops follow the name straight away.
+
 ## [1.15.0] - 2026-11-09
 
 ### Added

@@ -6,6 +6,9 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+### Arreglos
+- Los nombres de pilotos mencionados en los artículos encajan mejor en el texto: la franja de color ya no se pega a la palabra anterior, y las comas y los puntos van pegados al nombre.
+
 ## [1.15.0] - 2026-11-09
 
 ### Nuevo

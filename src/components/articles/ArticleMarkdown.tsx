@@ -17,7 +17,7 @@ function Mention({ driver }: { driver: MentionedDriver }) {
   return (
     <Link
       href={`/pilotos/${driver.username}`}
-      className="inline-flex items-baseline gap-1.5 font-display font-bold uppercase italic tracking-wide hover:text-primary hover:underline"
+      className="ml-0.5 inline-flex items-baseline gap-1 font-display font-bold uppercase italic tracking-wide hover:text-primary hover:underline"
     >
       <span
         aria-hidden
@@ -27,7 +27,7 @@ function Mention({ driver }: { driver: MentionedDriver }) {
         )}
         style={color ? { backgroundColor: color } : undefined}
       />
-      <span data-driver={driver.username ?? undefined} className="pr-0.5">
+      <span data-driver={driver.username ?? undefined}>
         {driver.name}
       </span>
     </Link>

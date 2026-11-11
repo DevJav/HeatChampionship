@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { largeAvatar } from "./avatars";
 import { t } from "@/i18n";
 
 /**
@@ -62,7 +63,10 @@ export async function storeRacePhoto(raceId: string, file: File) {
   return storedPath;
 }
 
-/** Store a profile picture as a 256px square WebP. Returns the path relative to UPLOAD_DIR. */
+/**
+ * Store a profile picture as a 256px square WebP, plus a 1024px one to open it up.
+ * Returns the path of the small one, relative to UPLOAD_DIR.
+ */
 export async function storeAvatar(userId: string, file: File) {
   if (!file.type.startsWith("image/")) throw new UploadError(t.forms.uploads.notAnImage);
   if (file.size > MAX_UPLOAD_BYTES) throw new UploadError(t.forms.uploads.tooBig);
@@ -73,12 +77,13 @@ export async function storeAvatar(userId: string, file: File) {
   await mkdir(path.dirname(absolute), { recursive: true });
 
   try {
-    const avatar = await sharp(Buffer.from(await file.arrayBuffer()))
-      .rotate()
-      .resize(256, 256, { fit: "cover" })
-      .webp({ quality: 85 })
-      .toBuffer();
+    const image = sharp(Buffer.from(await file.arrayBuffer())).rotate();
+    const [avatar, full] = await Promise.all([
+      image.clone().resize(256, 256, { fit: "cover" }).webp({ quality: 85 }).toBuffer(),
+      image.clone().resize(1024, 1024, { fit: "cover" }).webp({ quality: 82 }).toBuffer(),
+    ]);
     await writeFile(absolute, avatar);
+    await writeFile(largeAvatar(absolute), full);
   } catch {
     throw new UploadError(t.forms.uploads.couldNotProcess);
   }
@@ -120,6 +125,13 @@ export async function deleteStoredFile(storedPath: string) {
 
 export async function deleteStoredPhoto(storedPath: string) {
   for (const variant of [storedPath, storedPath.replace(/\.webp$/, "-thumb.webp")]) {
+    const absolute = resolveUpload(variant);
+    if (absolute) await rm(absolute, { force: true });
+  }
+}
+
+export async function deleteStoredAvatar(storedPath: string) {
+  for (const variant of [storedPath, largeAvatar(storedPath)]) {
     const absolute = resolveUpload(variant);
     if (absolute) await rm(absolute, { force: true });
   }

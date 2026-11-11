@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Award, Flag, Gauge, MapPin, Pencil, Sparkles, Trophy, TrendingUp, Medal } from "lucide-react";
 import {
-  Avatar,
   Badge,
   ButtonLink,
   Card,
@@ -17,6 +16,7 @@ import {
   StatCard,
 } from "@/components/ui";
 import { CarColorChip } from "@/components/domain/CarColorChip";
+import { AvatarViewer } from "@/components/players/AvatarViewer";
 import { FormStrip } from "@/components/players/FormStrip";
 import { RaceHistory } from "@/components/players/RaceHistory";
 import { AchievementBadge } from "@/components/achievements/AchievementBadge";
@@ -58,7 +58,7 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
       <section className="relative overflow-hidden border-l-4 border-primary surface-bar clip-chamfer">
         <SpeedStripes className="absolute inset-y-0 right-0 w-1/2 opacity-80" />
         <div className="relative flex flex-col gap-5 px-6 py-8 sm:flex-row sm:items-center sm:px-10">
-          <Avatar name={player.name} src={player.image} color={player.favoriteColor?.hex} size="xl" />
+          <AvatarViewer name={player.name} src={player.image} color={player.favoriteColor?.hex} size="xl" />
           <div className="flex min-w-0 flex-col items-start gap-2">
             <div className="flex flex-wrap gap-2">
               {seasonRow && season && (

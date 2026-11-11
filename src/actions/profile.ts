@@ -12,7 +12,7 @@ import { newEmailToken, sendWelcome } from "@/lib/email/send";
 import { EMAIL_TOPICS, serializeTopics } from "@/lib/email/topics";
 import { formValues, optionalText, parseForm, type FormState } from "@/lib/forms";
 import { requireUser, type CurrentUser } from "@/lib/session";
-import { deleteStoredFile, storeAvatar, storedPathFromUrl, UploadError } from "@/lib/uploads";
+import { deleteStoredAvatar, storeAvatar, storedPathFromUrl, UploadError } from "@/lib/uploads";
 import { t } from "@/i18n";
 
 const profileSchema = z.object({
@@ -47,7 +47,7 @@ async function replaceAvatar(user: CurrentUser, file: File) {
 
   const previous = storedPathFromUrl(user.image);
   await db.user.update({ where: { id: user.id }, data: { image: `/media/${storedPath}` } });
-  if (previous) await deleteStoredFile(previous);
+  if (previous) await deleteStoredAvatar(previous);
   return null;
 }
 
@@ -138,7 +138,7 @@ export async function removeAvatar() {
   const user = await requireUser("/perfil");
   const previous = storedPathFromUrl(user.image);
   await db.user.update({ where: { id: user.id }, data: { image: null } });
-  if (previous) await deleteStoredFile(previous);
+  if (previous) await deleteStoredAvatar(previous);
   refresh();
 }
 

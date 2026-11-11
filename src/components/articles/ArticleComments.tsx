@@ -12,8 +12,9 @@ import {
 import type { FormAction } from "@/lib/forms";
 import { formatDateTime } from "@/lib/format";
 import { isAdmin, type CurrentUser } from "@/lib/session";
-import { Avatar, Card, CardBody, ConfirmButton, Section } from "@/components/ui";
+import { Card, CardBody, ConfirmButton, Section } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
+import { AvatarViewer } from "@/components/players/AvatarViewer";
 import { ArticleMarkdown } from "./ArticleMarkdown";
 import { CommentForm } from "./CommentForm";
 import { CommentReply } from "./CommentReply";
@@ -50,7 +51,7 @@ function CommentCard({
       // Opened from a notification (#comentario-…): tint it so it's easy to spot
       className="flex scroll-mt-24 gap-3 surface-panel clip-chamfer px-4 py-3 target:bg-primary/10"
     >
-      <Avatar name={comment.author.name} src={comment.author.image} color={color} className="shrink-0" />
+      <AvatarViewer name={comment.author.name} src={comment.author.image} color={color} className="shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">

@@ -300,6 +300,7 @@ export const en: Dictionary = {
     seasonRank: (rank, season) => `${rank} in ${season}`,
     favoriteCar: "Favourite car:",
     editProfile: "Edit profile",
+    openPhoto: (name) => `View ${name}'s photo`,
     races: "Races",
     wins: "Wins",
     podiums: "Podiums",

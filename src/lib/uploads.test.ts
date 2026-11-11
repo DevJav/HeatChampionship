@@ -1,5 +1,6 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { largeAvatar, largeAvatarUrl } from "./avatars";
 import { photoUrls, resolveUpload, UPLOAD_DIR } from "./uploads";
 
 describe("resolveUpload", () => {
@@ -21,5 +22,20 @@ describe("photoUrls", () => {
       full: "/media/races/abc/x.webp",
       thumb: "/media/races/abc/x-thumb.webp",
     });
+  });
+});
+
+describe("largeAvatar", () => {
+  it("names the large version next to the avatar", () => {
+    expect(largeAvatar("/media/users/abc/x.webp")).toBe("/media/users/abc/x-full.webp");
+    expect(largeAvatar("users/abc/x.webp")).toBe("users/abc/x-full.webp");
+  });
+});
+
+describe("largeAvatarUrl", () => {
+  it("only names one for avatars we stored", () => {
+    expect(largeAvatarUrl("/media/users/abc/x.webp")).toBe("/media/users/abc/x-full.webp");
+    expect(largeAvatarUrl("https://example.com/x.webp")).toBeNull();
+    expect(largeAvatarUrl(null)).toBeNull();
   });
 });

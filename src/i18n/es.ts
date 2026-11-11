@@ -304,6 +304,8 @@ export const es = {
     seasonRank: (rank: string, season: string) => `${rank} en ${season}`,
     favoriteCar: "Coche favorito:",
     editProfile: "Editar perfil",
+    /** Button label on an avatar that opens the photo */
+    openPhoto: (name: string) => `Ver la foto de ${name}`,
     races: "Carreras",
     wins: "Victorias",
     podiums: "Podios",

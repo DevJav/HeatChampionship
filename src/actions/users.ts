@@ -9,7 +9,7 @@ import { db } from "@/lib/db";
 import { checkbox, parseForm, type FormState } from "@/lib/forms";
 import { temporaryPassword } from "@/lib/passwords";
 import { requireAdmin } from "@/lib/session";
-import { deleteStoredFile, storedPathFromUrl } from "@/lib/uploads";
+import { deleteStoredAvatar, storedPathFromUrl } from "@/lib/uploads";
 import { t } from "@/i18n";
 
 // Admin management of player accounts. Better Auth's admin endpoints check
@@ -74,6 +74,6 @@ export async function deleteUser(userId: string) {
   if (user._count.results > 0) throw new Error("User has race results");
   await auth.api.removeUser({ body: { userId }, headers: await headers() });
   const avatar = storedPathFromUrl(user.image);
-  if (avatar) await deleteStoredFile(avatar);
+  if (avatar) await deleteStoredAvatar(avatar);
   redirect("/admin/pilotos");
 }

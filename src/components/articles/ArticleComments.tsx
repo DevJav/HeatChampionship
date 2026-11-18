@@ -11,12 +11,14 @@ import {
 } from "@/lib/data/articles";
 import type { FormAction } from "@/lib/forms";
 import { formatDateTime } from "@/lib/format";
+import { groupReactions } from "@/lib/reactions";
 import { isAdmin, type CurrentUser } from "@/lib/session";
 import { Card, CardBody, ConfirmButton, Section } from "@/components/ui";
 import { DriverName } from "@/components/domain/DriverName";
 import { AvatarViewer } from "@/components/players/AvatarViewer";
 import { ArticleMarkdown } from "./ArticleMarkdown";
 import { CommentForm } from "./CommentForm";
+import { CommentReactions } from "./CommentReactions";
 import { CommentReply } from "./CommentReply";
 import { t } from "@/i18n";
 
@@ -76,6 +78,12 @@ function CommentCard({
           )}
         </div>
         <ArticleMarkdown variant="comment" text={comment.body} drivers={mentioned} />
+        <CommentReactions
+          commentId={comment.id}
+          reactions={groupReactions(comment.reactions, user?.id ?? null)}
+          canReact={user != null}
+          me={user?.name ?? null}
+        />
         {reply && (
           <CommentReply
             action={reply.action}

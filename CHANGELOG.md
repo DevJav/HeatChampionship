@@ -6,6 +6,9 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+### Added
+- **Reactions on comments:** react to any comment with an emoji. Tap the smiley under a comment to pick one of the usual ones (🏁 🔥 😂 👏…) or type or paste any emoji you like, flags included. Tap a reaction to add yours too, or tap it again to take it off; hover over it to see who reacted.
+
 ## [1.15.1] - 2026-11-10
 
 ### Fixed

@@ -6,6 +6,7 @@ import { COMMENT_MAX } from "@/lib/articles";
 import { db } from "@/lib/db";
 import { parseForm, text, type FormState } from "@/lib/forms";
 import { notifyNewComment } from "@/lib/notify";
+import { isEmoji } from "@/lib/reactions";
 import { getCurrentUser, isAdmin, requireUser } from "@/lib/session";
 import { t } from "@/i18n";
 
@@ -53,4 +54,23 @@ export async function deleteComment(commentId: string) {
 
   await db.articleComment.delete({ where: { id: commentId } });
   refresh();
+}
+
+/** Adds the driver's emoji to a comment, or takes it off if it was already there. */
+export async function toggleReaction(commentId: string, emoji: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { error: t.articles.reactions.logIn };
+  if (!isEmoji(emoji)) return { error: t.articles.reactions.notEmoji };
+  const comment = await db.articleComment.findUnique({
+    where: { id: commentId },
+    select: { article: { select: { status: true } } },
+  });
+  if (!comment || comment.article.status !== "PUBLISHED") return { error: t.notifications.parentGone };
+
+  const key = { commentId_userId_emoji: { commentId, userId: user.id, emoji } };
+  const existing = await db.commentReaction.findUnique({ where: key, select: { id: true } });
+  if (existing) await db.commentReaction.delete({ where: { id: existing.id } });
+  else await db.commentReaction.upsert({ where: key, create: { commentId, userId: user.id, emoji }, update: {} });
+  refresh();
+  return {};
 }

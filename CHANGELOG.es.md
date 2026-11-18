@@ -6,6 +6,9 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+### Nuevo
+- **Reacciones en los comentarios:** reacciona a cualquier comentario con un emoji. Toca la carita bajo un comentario para elegir uno de los habituales (🏁 🔥 😂 👏…) o escribe o pega el emoji que quieras, banderas incluidas. Toca una reacción para sumarte o vuelve a tocarla para quitar la tuya; pasa el ratón por encima para ver quién ha reaccionado.
+
 ## [1.15.1] - 2026-11-10
 
 ### Arreglos

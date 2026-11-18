@@ -269,6 +269,15 @@ export const en: Dictionary = {
       formattingHint: "Supports **bold**, *italics* and links.",
       cancel: "Cancel",
     },
+    reactions: {
+      add: "Add a reaction",
+      custom: "Any emoji",
+      customPlaceholder: "Type or paste one",
+      customAdd: "Add",
+      notEmoji: "That isn't an emoji.",
+      logIn: "Log in to react.",
+      who: (names: string[], emoji: string) => `${names.join(", ")} reacted with ${emoji}`,
+    },
     interview: {
       /** Letters in the margin of an interview */
       questionMark: "Q",

@@ -54,6 +54,7 @@ model User {
   photos        RacePhoto[]
   articles      Article[]
   comments      ArticleComment[]
+  reactions     CommentReaction[]
   notifications Notification[]   @relation("NotificationsReceived")
   /// Notifications caused by this user (their mention, reply…)
   notified      Notification[]   @relation("NotificationsCaused")
@@ -472,9 +473,26 @@ model ArticleComment {
   author        User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
   parent        ArticleComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
   replies       ArticleComment[] @relation("Replies")
+  reactions     CommentReaction[]
   notifications Notification[]
 
   @@index([articleId, createdAt])
+}
+
+/// An emoji a driver put on a comment. Each driver can add several, but each emoji once.
+model CommentReaction {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  /// A single emoji (one grapheme), e.g. "🔥" or "🇫🇷"
+  emoji     String
+  createdAt DateTime @default(now())
+
+  comment ArticleComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, emoji])
+  @@index([commentId, createdAt])
 }
 
 // ---------------------------------------------------------------------------

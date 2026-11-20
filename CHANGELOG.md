@@ -9,6 +9,9 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 ### Added
 - **Reactions on comments:** react to any comment with an emoji. Tap the smiley under a comment to pick one of the usual ones (🏁 🔥 😂 👏…) or type or paste any emoji you like, flags included. Tap a reaction to add yours too, or tap it again to take it off; hover over it to see who reacted.
 
+### Changed
+- Each driver's profile now takes on the colour of their favourite car: buttons, badges and highlights use it instead of the league red. Yellow stays bright yellow, with the text kept readable, and black cars get a graphite tone so they still show up on the dark bars.
+
 ## [1.15.1] - 2026-11-10
 
 ### Fixed

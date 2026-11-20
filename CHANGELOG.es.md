@@ -9,6 +9,9 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 ### Nuevo
 - **Reacciones en los comentarios:** reacciona a cualquier comentario con un emoji. Toca la carita bajo un comentario para elegir uno de los habituales (🏁 🔥 😂 👏…) o escribe o pega el emoji que quieras, banderas incluidas. Toca una reacción para sumarte o vuelve a tocarla para quitar la tuya; pasa el ratón por encima para ver quién ha reaccionado.
 
+### Cambios
+- El perfil de cada piloto se tiñe ahora del color de su coche favorito: botones, etiquetas y detalles lo usan en lugar del rojo de la liga. El amarillo se queda amarillo de verdad, con los textos bien legibles, y los coches negros llevan un tono grafito para que se vean sobre las barras oscuras.
+
 ## [1.15.1] - 2026-11-10
 
 ### Arreglos

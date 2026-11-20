@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, type CSSProperties } from "react";
 import { Award, Flag, Gauge, MapPin, Pencil, Sparkles, Trophy, TrendingUp, Medal } from "lucide-react";
 import {
   Badge,
@@ -26,6 +26,7 @@ import { getAchievements } from "@/lib/data/achievements";
 import { getCurrentSeason } from "@/lib/data/catalog";
 import { getPlayerProfile, toPlayerResults } from "@/lib/data/players";
 import { getSeasonStandings } from "@/lib/data/standings";
+import { accentTokens } from "@/lib/colors";
 import { formatDecimal, formatSigned } from "@/lib/format";
 import { summarizePlayer } from "@/lib/player-stats";
 import { getCurrentUser } from "@/lib/session";
@@ -53,8 +54,11 @@ async function ProfileView({ params }: { params: PageProps<"/pilotos/[username]"
   const seasonRow = standings?.rows.find((row) => row.userId === player.id);
   const isMe = viewer?.id === player.id;
 
+  // The driver's car color replaces the league red across their profile
+  const accent = player.favoriteColor ? (accentTokens(player.favoriteColor.hex) as CSSProperties) : undefined;
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8" style={accent} data-accent={accent ? "" : undefined}>
       <section className="relative overflow-hidden border-l-4 border-primary surface-bar clip-chamfer">
         <SpeedStripes className="absolute inset-y-0 right-0 w-1/2 opacity-80" />
         <div className="relative flex flex-col gap-5 px-6 py-8 sm:flex-row sm:items-center sm:px-10">

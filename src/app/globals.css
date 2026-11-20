@@ -173,3 +173,11 @@
     outline-offset: 2px;
   }
 }
+
+/* Driver profiles tint "primary" with the driver's car color (accentTokens in
+   src/lib/colors.ts). Fills keep the car color itself; text and icons switch to
+   --primary-ink, which stays readable when the car is yellow or white. */
+[data-accent] .text-primary,
+[data-accent] .hover\:text-primary:hover {
+  color: var(--primary-ink);
+}

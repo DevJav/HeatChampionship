@@ -69,10 +69,6 @@ export async function listArticleComments(articleId: string) {
       author: {
         select: { id: true, name: true, username: true, image: true, favoriteColor: { select: { hex: true } } },
       },
-      reactions: {
-        orderBy: { createdAt: "asc" },
-        select: { emoji: true, user: { select: { id: true, name: true } } },
-      },
     },
   });
 }

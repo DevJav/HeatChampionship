@@ -272,15 +272,6 @@ export const es = {
       formattingHint: "Admite **negrita**, *cursiva* y enlaces.",
       cancel: "Cancelar",
     },
-    reactions: {
-      add: "Reaccionar",
-      custom: "Cualquier emoji",
-      customPlaceholder: "Escríbelo o pégalo",
-      customAdd: "Añadir",
-      notEmoji: "Eso no es un emoji.",
-      logIn: "Entra para reaccionar.",
-      who: (names: string[], emoji: string) => `${names.join(", ")} ${names.length === 1 ? "ha" : "han"} reaccionado con ${emoji}`,
-    },
     interview: {
       /** Letters in the margin of an interview */
       questionMark: "P",

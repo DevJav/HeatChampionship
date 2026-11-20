@@ -6,8 +6,7 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
-### Added
-- **Reactions on comments:** react to any comment with an emoji. Tap the smiley under a comment to pick one of the usual ones (🏁 🔥 😂 👏…) or type or paste any emoji you like, flags included. Tap a reaction to add yours too, or tap it again to take it off; hover over it to see who reacted.
+## [1.15.2] - 2026-11-20
 
 ### Changed
 - Each driver's profile now takes on the colour of their favourite car: buttons, badges and highlights use it instead of the league red. Yellow stays bright yellow, with the text kept readable, and black cars get a graphite tone so they still show up on the dark bars.
@@ -230,7 +229,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...HEAD
+[1.15.2]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0
 [1.14.1]: https://github.com/DevJav/HeatChampionship/compare/v1.14.0...v1.14.1

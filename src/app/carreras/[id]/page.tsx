@@ -23,6 +23,7 @@ import { RaceArticles } from "@/components/articles/RaceArticles";
 import { RaceUnlocks } from "@/components/achievements/RaceUnlocks";
 import { DriverOfTheDayCard } from "@/components/dotd/DriverOfTheDayCard";
 import { RacePredictions } from "@/components/predictions/RacePredictions";
+import { PredictionReminder } from "@/components/predictions/PredictionReminder";
 import { TeamRadio } from "@/components/radio/TeamRadio";
 import { RaceChancesCard } from "@/components/chances/RaceChancesCard";
 import { getAchievements } from "@/lib/data/achievements";
@@ -205,6 +206,9 @@ function UpcomingRace({ race }: { race: RaceDetail }) {
 
   return (
     <div className="flex flex-col gap-6">
+      <Suspense>
+        <PredictionReminder race={race} />
+      </Suspense>
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>

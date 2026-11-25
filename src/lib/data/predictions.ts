@@ -44,3 +44,10 @@ export async function getSeasonOracle(seasonId: string) {
   const users = await db.user.findMany({ where: { id: { in: rows.map((r) => r.userId) } }, select: driverSelect });
   return { rows, users: new Map(users.map((u) => [u.id, u])) };
 }
+
+/** Whether the user has already made their podium prediction for the race. */
+export async function hasPredicted(raceId: string, userId: string) {
+  await connection();
+  const row = await db.prediction.findUnique({ where: { raceId_userId: { raceId, userId } }, select: { raceId: true } });
+  return row !== null;
+}

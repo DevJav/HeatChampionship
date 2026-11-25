@@ -6,6 +6,11 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.16.0] - 2026-11-25
+
+### Nuevo
+- Si aún no has hecho tu **pronóstico del podio**, la tarjeta de **Próxima carrera** de la portada y la página de la carrera te lo recuerdan, con el botón para hacerlo ahí mismo. El aviso desaparece en cuanto lo haces.
+
 ## [1.15.2] - 2026-11-20
 
 ### Cambios
@@ -229,7 +234,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.16.0...HEAD
+[1.16.0]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...v1.16.0
 [1.15.2]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0

@@ -3,6 +3,7 @@ import { getNextRace } from "@/lib/data/races";
 import { raceTitle } from "@/lib/races";
 import { ButtonLink, Card, CardBody, CardFooter, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { RaceStatusBadge } from "@/components/domain/RaceStatusBadge";
+import { PredictionReminder } from "@/components/predictions/PredictionReminder";
 import { RaceCountdown } from "./RaceCountdown";
 import { RaceMeta } from "./RaceMeta";
 import { RaceSignupPanel } from "./RaceSignupPanel";
@@ -27,6 +28,7 @@ export async function NextRaceCard() {
             </div>
             {!race.dateTbd && <RaceCountdown target={race.scheduledAt.toISOString()} />}
             <RaceSignupPanel race={race} />
+            <PredictionReminder race={race} />
           </CardBody>
           <CardFooter>
             <ButtonLink href={`/carreras/${race.id}`} variant="secondary" size="sm">

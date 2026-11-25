@@ -813,6 +813,11 @@ export const es = {
     picks: "Pronóstico",
     points: "Pts",
     perfect: "¡Podio exacto!",
+    reminder: {
+      title: "Aún no has hecho tu pronóstico del podio.",
+      body: "Elige quién acaba 1º, 2º y 3º antes de la salida.",
+      bodyUntil: (date: string) => `Elige quién acaba 1º, 2º y 3º antes de la salida: ${date}.`,
+    },
     oracle: "Oráculo",
     oracleDescription: "Quién acierta más podios esta temporada.",
     exact: "Exactos",

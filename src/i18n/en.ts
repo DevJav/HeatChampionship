@@ -796,6 +796,11 @@ export const en: Dictionary = {
     picks: "Prediction",
     points: "Pts",
     perfect: "Exact podium!",
+    reminder: {
+      title: "You haven't made your podium prediction yet.",
+      body: "Pick who finishes 1st, 2nd and 3rd before the start.",
+      bodyUntil: (date) => `Pick who finishes 1st, 2nd and 3rd before the start: ${date}.`,
+    },
     oracle: "Oracle",
     oracleDescription: "Who calls the podium best this season.",
     exact: "Exact",

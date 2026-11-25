@@ -6,6 +6,11 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-11-25
+
+### Added
+- If you haven't made your **podium prediction** yet, the **Next race** card on the home page and the race page remind you, with the button to make it right there. The reminder goes away as soon as you do.
+
 ## [1.15.2] - 2026-11-20
 
 ### Changed
@@ -229,7 +234,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.16.0...HEAD
+[1.16.0]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...v1.16.0
 [1.15.2]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/DevJav/HeatChampionship/compare/v1.14.1...v1.15.0

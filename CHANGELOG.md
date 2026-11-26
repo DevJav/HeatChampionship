@@ -6,6 +6,15 @@ Versions are `MAJOR.MINOR.PATCH`: a new minor version brings new features, a pat
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-11-26
+
+### Added
+- Forgot your password? Press **Forgot your password?** on the log-in page and we'll email a link to the address in your profile, so you can choose a new one yourself. The link works for one hour, and only once.
+- If you haven't added an email yet, a banner reminds you once so you don't get locked out. You can keep it just for recovering your password: untick all the topics and we won't send you anything else.
+
+### Changed
+- Unsubscribing from emails keeps your address for password recovery. To remove it completely, clear it in **My profile**.
+
 ## [1.16.0] - 2026-11-25
 
 ### Added
@@ -234,7 +243,8 @@ The first build.
 - Driver profiles with career numbers, form and race history.
 - Statistics: records, head-to-head, win rate by starting position, tracks, car colours and upgrade cards.
 
-[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.16.0...HEAD
+[Unreleased]: https://github.com/DevJav/HeatChampionship/compare/v1.17.0...HEAD
+[1.17.0]: https://github.com/DevJav/HeatChampionship/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...v1.16.0
 [1.15.2]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1

@@ -102,7 +102,7 @@ Retro style utilities, defined in `globals.css`:
 
 ## Accounts
 
-Players log in with a username and password. Better Auth also needs an email, so one is generated behind the scenes (`<username>@users.heat.local`); no real emails are collected or sent. The registration on/off switch is enforced inside the auth API itself, so the sign-up endpoint can't be called directly to get around it.
+Players log in with a username and password. Better Auth also needs an email, so one is generated behind the scenes (`<username>@users.heat.local`); that placeholder never receives anything. Drivers can add a real address (`contactEmail`) for emails and for password resets: Better Auth's reset is wired in `src/lib/auth.ts` to send the link there (`sendPasswordReset` in `src/lib/email/send.ts`). The registration on/off switch is enforced inside the auth API itself, so the sign-up endpoint can't be called directly to get around it.
 
 ## Releases
 

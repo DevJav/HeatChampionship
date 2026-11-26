@@ -40,7 +40,7 @@ export function renderEmail(siteName: string, content: EmailContent, footer: Ema
 ${paragraphs}
 <a href="${escapeHtml(content.button.url)}" style="display:inline-block;margin:8px 0 16px;background:${RED};color:#fff;font-weight:bold;padding:12px 24px;text-decoration:none;">${escapeHtml(content.button.label)}</a>
 </td></tr>
-<tr><td style="padding:16px 24px 24px;border-top:1px solid #eee;font-size:12px;line-height:1.5;color:#888;">${escapeHtml(footer.reason)}<br>${footerLinks}</td></tr>
+<tr><td style="padding:16px 24px 24px;border-top:1px solid #eee;font-size:12px;line-height:1.5;color:#888;">${escapeHtml(footer.reason)}${footerLinks ? `<br>${footerLinks}` : ""}</td></tr>
 </table>
 </body></html>`;
 

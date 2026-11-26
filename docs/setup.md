@@ -41,7 +41,9 @@ Drivers can add an email address in their profile and choose what to hear about:
 2. Set `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `Heat Championship <heat@yourdomain.com>`), and optionally `EMAIL_REPLY_TO`.
 3. Restart the site. The profile page now shows an "Emails" card.
 
-Each email goes out once: when a race's sign-ups first open, when a race's results are first saved, and when an article is first published. Later edits send nothing. Every email has an unsubscribe link that works without logging in. The topics are listed in [`src/lib/email/topics.ts`](../src/lib/email/topics.ts).
+Each email goes out once: when a race's sign-ups first open, when a race's results are first saved, and when an article is first published. Later edits send nothing. Every email has an unsubscribe link that works without logging in; it stops the emails but keeps the address for password resets.
+
+The same address is how drivers recover a forgotten password without you: **Forgot your password?** on the log-in page (`/recuperar`) emails a one-hour, single-use link to `/recuperar/nueva`, and choosing a new password logs them out everywhere. Drivers without an address (or with emails off for the site) still need the admin reset in **Drivers**. A one-time banner asks drivers without an address to add one. The topics are listed in [`src/lib/email/topics.ts`](../src/lib/email/topics.ts).
 
 ## 2. Create the database and start
 

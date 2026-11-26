@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { FormSkeleton } from "@/components/auth/FormSkeleton";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { emailEnabled } from "@/lib/email/send";
 import { t } from "@/i18n";
 
 export const metadata: Metadata = { title: t.auth.logIn };
@@ -24,7 +25,7 @@ export default function LoginPage() {
     >
       {/* LoginForm reads ?volver= from the URL */}
       <Suspense fallback={<FormSkeleton fields={2} />}>
-        <LoginForm />
+        <LoginForm canRecover={emailEnabled()} />
       </Suspense>
     </AuthCard>
   );

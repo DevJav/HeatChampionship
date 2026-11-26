@@ -35,4 +35,9 @@ describe("renderEmail", () => {
     expect(text).toContain("Ver: https://heat.example.com/carreras/1?a=1&b=2");
     expect(text).toContain("Baja: https://heat.example.com/correo/baja?token=x");
   });
+
+  it("leaves out the footer links when there are none (password reset)", () => {
+    const { html } = renderEmail("Heat", content, { reason: "Porque sí.", links: [] });
+    expect(html).toContain("Porque sí.</td>");
+  });
 });

@@ -582,6 +582,35 @@ export const es = {
     },
   },
 
+  /** "Forgot your password?" (/recuperar) and the emailed link (/recuperar/nueva) */
+  passwordReset: {
+    forgot: "¿Has olvidado tu contraseña?",
+    title: "Recuperar contraseña",
+    description: "Te enviamos un enlace al correo de tu perfil para que elijas una nueva.",
+    submit: "Enviarme el enlace",
+    sent: (username: string) =>
+      `Si ${username} tiene un correo en su perfil, ya le hemos enviado el enlace. Mira también en spam.`,
+    noEmail: "¿No añadiste ningún correo? Pide al organizador que te la cambie.",
+    unavailable: "La recuperación por correo no está activada. Pide al organizador que te cambie la contraseña.",
+    backToLogin: "Volver a entrar",
+    newTitle: "Nueva contraseña",
+    newDescription: "Elige la contraseña con la que entrarás a partir de ahora.",
+    newPassword: "Nueva contraseña",
+    repeatNew: "Repite la nueva",
+    save: "Guardar contraseña",
+    linkExpired: "Este enlace ha caducado o ya se usó. Pide uno nuevo.",
+    requestNew: "Pedir otro enlace",
+    changed: "Contraseña cambiada. Entra con la nueva.",
+    /** The email */
+    emailSubject: "Elige una nueva contraseña",
+    emailHeading: "¿Se te ha olvidado la contraseña?",
+    emailBody: (username: string) =>
+      `Alguien ha pedido cambiar la contraseña de ${username}. Pulsa el botón para elegir una nueva.`,
+    emailExpires: "El enlace funciona durante una hora y solo una vez.",
+    emailButton: "Elegir contraseña",
+    emailFooter: "Si no lo has pedido tú, ignora este correo: tu contraseña sigue siendo la misma.",
+  },
+
   profile: {
     title: "Mi perfil",
     description: "Cómo te ven los demás pilotos.",
@@ -641,15 +670,15 @@ export const es = {
   email: {
     /** Profile card */
     title: "Correos",
-    hint: "Opcional. Te escribimos solo sobre lo que marques, y nadie más ve tu dirección.",
+    hint: "Opcional. Sirve para recuperar tu contraseña si la olvidas, y para avisarte de lo que marques. Nadie más ve tu dirección.",
     address: "Tu correo",
-    addressHint: "Déjalo vacío para no recibir ninguno.",
+    addressHint: "Si lo dejas vacío, no recibirás nada ni podrás recuperar la contraseña tú solo.",
     addressPlaceholder: "tu@correo.com",
     invalidAddress: "Escribe un correo válido.",
     whatToReceive: "Quiero recibir",
     saved: "Preferencias guardadas.",
-    savedNoTopics: "Guardado. Marca algún tema para empezar a recibir correos.",
-    removed: "Correo borrado. No te enviaremos nada más.",
+    savedNoTopics: "Guardado. Solo lo usaremos si necesitas recuperar la contraseña.",
+    removed: "Correo borrado. No te enviaremos nada más, y para recuperar la contraseña tendrás que pedírselo al organizador.",
     topics: {
       races: "Nuevas carreras, cuando se abren las inscripciones",
       results: "Resultados de cada carrera",
@@ -685,12 +714,12 @@ export const es = {
     unsubscribeDescription: (address: string) => `Dejaremos de enviar correos a ${address}.`,
     unsubscribeConfirm: "Sí, darme de baja",
     unsubscribedTitle: "Te has dado de baja",
-    unsubscribedDescription: "No te enviaremos más correos. Puedes volver a apuntarte desde tu perfil.",
+    unsubscribedDescription: "No te enviaremos más avisos. Guardamos tu dirección solo por si necesitas recuperar la contraseña; puedes borrarla o volver a apuntarte desde tu perfil.",
     badLinkTitle: "Enlace caducado",
     badLinkDescription: "Este enlace ya no sirve. Puedes cambiar tus correos desde tu perfil.",
     /** One-time banner for drivers without an address */
-    promptTitle: "¿Te avisamos por correo?",
-    promptBody: "Si quieres, añade tu correo para enterarte de nuevas carreras, resultados y noticias. Es opcional y lo puedes cambiar cuando quieras.",
+    promptTitle: "Que no se te olvide la contraseña",
+    promptBody: "Añade tu correo y, si algún día la olvidas, podrás elegir una nueva tú solo. Tú decides si además quieres avisos de carreras y resultados.",
     promptAdd: "Añadir mi correo",
     promptDismiss: "Ahora no",
   },

@@ -44,8 +44,8 @@ model User {
   emailTopics     String    @default("")
   /// Secret for the unsubscribe link in every email, so it works without logging in
   emailToken      String?   @unique
-  /// When they answered the "add your email?" banner (added it or said not now); it isn't shown again
-  emailPromptDismissedAt DateTime?
+  /// When they answered the "add an email to recover your password" banner (added it or said not now); it isn't shown again
+  recoveryPromptDismissedAt DateTime?
 
   sessions      Session[]
   accounts      Account[]

@@ -14,7 +14,7 @@ export async function unsubscribeWithToken(token: string) {
 
 async function dismissPrompt() {
   const user = await requireUser();
-  await db.user.update({ where: { id: user.id }, data: { emailPromptDismissedAt: new Date() } });
+  await db.user.update({ where: { id: user.id }, data: { recoveryPromptDismissedAt: new Date() } });
 }
 
 /** "Add my email" on the banner: never show it again, and open the email settings. */

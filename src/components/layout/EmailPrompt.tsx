@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { dismissEmailPrompt, openEmailSettings } from "@/actions/email";
 import { Alert, Container, SubmitButton } from "@/components/ui";
 import { shouldPromptForEmail } from "@/lib/data/users";
@@ -7,7 +7,8 @@ import { getCurrentUser } from "@/lib/session";
 import { t } from "@/i18n";
 
 /**
- * Asks logged-in drivers without an address, once, whether they want emails.
+ * Asks logged-in drivers without an address, once, to add one so they can
+ * recover their password (and, if they like, get updates).
  * Gone for good after either button, or once they add an address.
  */
 export async function EmailPrompt() {
@@ -17,7 +18,7 @@ export async function EmailPrompt() {
 
   return (
     <Container className="pt-6">
-      <Alert icon={<Mail />}>
+      <Alert icon={<KeyRound />}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-semibold">{t.email.promptTitle}</p>

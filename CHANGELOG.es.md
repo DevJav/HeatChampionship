@@ -6,6 +6,15 @@ Las versiones son `MAYOR.MENOR.PARCHE`: una versión menor nueva trae funciones 
 
 ## [Sin publicar]
 
+## [1.17.0] - 2026-11-26
+
+### Nuevo
+- ¿Se te ha olvidado la contraseña? Pulsa **¿Has olvidado tu contraseña?** en la página de entrar y te enviamos un enlace al correo de tu perfil para que elijas una nueva tú solo. El enlace funciona durante una hora y una sola vez.
+- Si aún no has añadido tu correo, un aviso te lo recuerda una vez para que no te quedes fuera. Puedes guardarlo solo para recuperar la contraseña: desmarca todos los temas y no te enviaremos nada más.
+
+### Cambios
+- Darte de baja de los correos ya no borra tu dirección: la guardamos para recuperar la contraseña. Para quitarla del todo, bórrala en **Mi perfil**.
+
 ## [1.16.0] - 2026-11-25
 
 ### Nuevo
@@ -234,7 +243,8 @@ La primera versión.
 - Perfiles de piloto con números de carrera deportiva, forma e historial.
 - Estadísticas: récords, cara a cara, victorias por posición de salida, circuitos, colores de coche y cartas de mejora.
 
-[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.16.0...HEAD
+[Sin publicar]: https://github.com/DevJav/HeatChampionship/compare/v1.17.0...HEAD
+[1.17.0]: https://github.com/DevJav/HeatChampionship/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/DevJav/HeatChampionship/compare/v1.15.2...v1.16.0
 [1.15.2]: https://github.com/DevJav/HeatChampionship/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/DevJav/HeatChampionship/compare/v1.15.0...v1.15.1

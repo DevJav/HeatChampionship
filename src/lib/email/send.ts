@@ -128,6 +128,46 @@ export async function sendWelcome(userId: string) {
   }
 }
 
+/**
+ * The "choose a new password" link, to the driver's contact address (their
+ * `email` is only a placeholder). Called by Better Auth's password reset; never throws.
+ */
+export async function sendPasswordReset(userId: string, token: string) {
+  if (!resend) return;
+  try {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { contactEmail: true, username: true, banned: true },
+    });
+    if (!user?.contactEmail || user.banned) return;
+
+    const { html, text } = renderEmail(
+      siteConfig.name,
+      {
+        subject: t.passwordReset.emailSubject,
+        heading: t.passwordReset.emailHeading,
+        paragraphs: [t.passwordReset.emailBody(user.username ?? ""), t.passwordReset.emailExpires],
+        button: {
+          label: t.passwordReset.emailButton,
+          url: absoluteUrl(`/recuperar/nueva?token=${encodeURIComponent(token)}`),
+        },
+      },
+      { reason: t.passwordReset.emailFooter, links: [] },
+    );
+    const { error } = await resend.emails.send({
+      from: FROM,
+      replyTo: REPLY_TO,
+      to: user.contactEmail,
+      subject: t.passwordReset.emailSubject,
+      html,
+      text,
+    });
+    if (error) throw new Error(`${error.name}: ${error.message}`);
+  } catch (error) {
+    console.error("[email] password reset", userId, error);
+  }
+}
+
 /** The address an unsubscribe link belongs to, or null if the link is no good. */
 export async function addressForToken(token: string) {
   if (!token) return null;
@@ -135,12 +175,15 @@ export async function addressForToken(token: string) {
   return user?.contactEmail ?? null;
 }
 
-/** Stop all emails for the driver the link belongs to. Returns false if the link is no good. */
+/**
+ * Stop all emails for the driver the link belongs to. Returns false if the link is no good.
+ * The address stays, for password resets; they can remove it from their profile.
+ */
 export async function unsubscribe(token: string) {
   if (!token) return false;
   const { count } = await db.user.updateMany({
     where: { emailToken: token },
-    data: { contactEmail: null, emailTopics: "" },
+    data: { emailTopics: "" },
   });
   return count > 0;
 }

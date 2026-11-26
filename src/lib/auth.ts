@@ -5,11 +5,12 @@ import { nextCookies } from "better-auth/next-js";
 import { admin, username } from "better-auth/plugins";
 import { db } from "./db";
 import { getSettings } from "./data/settings";
+import { sendPasswordReset } from "./email/send";
 import { logPlayerJoined } from "./log-activity";
 
-import { PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
+import { PASSWORD_MIN, RESET_LINK_HOURS, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
 
-export { PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
+export { PASSWORD_MIN, RESET_LINK_HOURS, USERNAME_MAX, USERNAME_MIN, USERNAME_PATTERN } from "./auth-rules";
 
 /** Players log in by username; Better Auth still needs a unique email. */
 export function placeholderEmail(username: string) {
@@ -21,6 +22,13 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: PASSWORD_MIN,
+    // "Forgot your password?": the link goes to the driver's contact email (see /recuperar)
+    sendResetPassword: async ({ user, token }) => {
+      await sendPasswordReset(user.id, token);
+    },
+    resetPasswordTokenExpiresIn: RESET_LINK_HOURS * 60 * 60,
+    // Whoever had the old password is logged out everywhere
+    revokeSessionsOnPasswordReset: true,
   },
   session: {
     // Friends stay logged in for a month between races
